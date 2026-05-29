@@ -1,32 +1,58 @@
-export function IconScreening({ className = 'w-6 h-6' }) {
+/** Lucide-style icons (ISC) — inlined so no extra package is required */
+
+function LucideIcon({ className = 'w-6 h-6', strokeWidth = 1.75, children }) {
   return (
-    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {children}
     </svg>
   )
 }
 
-export function IconCounseling({ className = 'w-6 h-6' }) {
+export function IconScreening({ className = 'w-6 h-6', strokeWidth = 1.75 }) {
   return (
-    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
-    </svg>
+    <LucideIcon className={className} strokeWidth={strokeWidth}>
+      <rect width="8" height="4" x="8" y="2" rx="1" ry="1" />
+      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+      <path d="m9 14 2 2 4-4" />
+    </LucideIcon>
   )
 }
 
-export function IconAssessment({ className = 'w-6 h-6' }) {
+export function IconCounseling({ className = 'w-6 h-6', strokeWidth = 1.75 }) {
   return (
-    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c1.07 0 2.124.039 3.157.11m-3.157 0a48.454 48.454 0 00-7.844 0M9.75 3.104v.008M9.75 3.104A48.45 48.45 0 0112 3c2.136 0 4.158.327 6 0M9.75 3.104v.008M9.75 3.104c-1.135 0-2.098.845-2.192 1.976a48.424 48.424 0 00-.08 1.123m5.801 0v-.008" />
-    </svg>
+    <LucideIcon className={className} strokeWidth={strokeWidth}>
+      <path d="M19.414 14.414C21 12.828 22 11.5 22 9.5a5.5 5.5 0 0 0-9.591-3.676.6.6 0 0 1-.818.001A5.5 5.5 0 0 0 2 9.5c0 2.3 1.5 4 3 5.5l5.535 5.362a2 2 0 0 0 2.879.052 2.12 2.12 0 0 0-.004-3 2.124 2.124 0 1 0 3-3 2.124 2.124 0 0 0 3.004 0 2 2 0 0 0 0-2.828l-1.881-1.882a2.41 2.41 0 0 0-3.409 0l-1.71 1.71a2 2 0 0 1-2.828 0 2 2 0 0 1 0-2.828l2.823-2.762" />
+    </LucideIcon>
   )
 }
 
-export function IconTreatment({ className = 'w-6 h-6' }) {
+export function IconAssessment({ className = 'w-6 h-6', strokeWidth = 1.75 }) {
   return (
-    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
-    </svg>
+    <LucideIcon className={className} strokeWidth={strokeWidth}>
+      <circle cx="10" cy="8" r="5" />
+      <path d="M2 21a8 8 0 0 1 10.434-7.62" />
+      <circle cx="18" cy="18" r="3" />
+      <path d="m22 22-1.9-1.9" />
+    </LucideIcon>
+  )
+}
+
+export function IconTreatment({ className = 'w-6 h-6', strokeWidth = 1.75 }) {
+  return (
+    <LucideIcon className={className} strokeWidth={strokeWidth}>
+      <path d="M12 19v3" />
+      <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+      <rect x="9" y="2" width="6" height="13" rx="3" />
+    </LucideIcon>
   )
 }
 

@@ -1,78 +1,65 @@
-import { expertisePillars } from '../data/content'
-import { IconGlobe, IconShield, IconScience, IconHeart } from './Icons'
-
-const iconMap = {
-  globe: IconGlobe,
-  shield: IconShield,
-  science: IconScience,
-  heart: IconHeart,
-}
-
-const stats = [
-  { value: '30+', label: 'Years of practice' },
-  { value: 'ASHA', label: 'Fellow 2025' },
-  { value: '100%', label: 'Family-centered' },
-]
+import { images, whyChooseUs } from '../data/content'
 
 export default function Expertise() {
   return (
-    <section id="expertise" className="border-t border-slate-200 bg-surface-alt py-20 lg:py-28">
+    <section id="expertise" className="border-t border-slate-200 bg-surface py-20 lg:py-28">
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
-        <div className="overflow-hidden rounded-sm bg-brand text-white lg:grid lg:grid-cols-[1fr_1.2fr]">
-          <div className="flex flex-col justify-center p-10 lg:p-14">
-            <p className="text-sm font-medium tracking-[0.2em] text-white/70 uppercase">
-              Why Families Choose Dr. Wael
+        <div className="overflow-hidden rounded-sm bg-white shadow-md ring-1 ring-slate-200/80 lg:grid lg:grid-cols-2">
+          {/* Content — left on desktop, below image on mobile */}
+          <div className="order-2 flex flex-col justify-center px-8 py-10 sm:px-10 lg:order-1 lg:px-12 lg:py-14 xl:px-14">
+            <p className="text-xs font-semibold tracking-[0.22em] text-brand uppercase">
+              {whyChooseUs.label}
             </p>
-            <h2 className="mt-4 font-serif text-3xl leading-snug font-medium md:text-4xl">
-              Expertise guided by compassion, not guesswork
+            <h2 className="mt-4 font-serif text-3xl leading-tight text-ink md:text-[2.125rem] lg:text-4xl">
+              {whyChooseUs.title}
             </h2>
-            <p className="mt-6 leading-relaxed text-white/80">
-              Every child is treated as a unique case — with clear answers,
-              measurable progress, and parents as true partners in the journey.
-            </p>
+            <div className="mt-5 h-1 w-14 rounded-full bg-brand" aria-hidden="true" />
 
-            <div className="mt-10 flex gap-8">
-              {stats.map((stat) => (
-                <div key={stat.label}>
-                  <p className="font-serif text-3xl">{stat.value}</p>
-                  <p className="mt-1 text-xs tracking-wide text-white/60 uppercase">
-                    {stat.label}
-                  </p>
-                </div>
+            <div className="mt-8 space-y-5">
+              {whyChooseUs.paragraphs.map((paragraph, index) => (
+                <p
+                  key={index}
+                  className={`text-sm leading-relaxed md:text-base ${
+                    index === 0
+                      ? 'text-ink md:text-[1.05rem] md:leading-relaxed'
+                      : 'text-ink-muted'
+                  }`}
+                >
+                  {paragraph}
+                </p>
               ))}
             </div>
+
+            <a
+              href="#contact"
+              className="mt-10 inline-block w-fit rounded-sm bg-brand px-6 py-2.5 text-sm font-semibold tracking-wide text-white uppercase transition-colors hover:bg-brand-light"
+            >
+              Book a Consultation
+            </a>
           </div>
 
-          <div className="flex items-center border-t border-white/15 bg-white/5 p-10 lg:border-t-0 lg:border-l lg:p-14">
-            <blockquote>
-              <p className="font-serif text-2xl leading-relaxed italic md:text-3xl">
-                &ldquo;Empowering every voice, one word at a time.&rdquo;
-              </p>
-              <footer className="mt-6 text-sm text-white/70">
-                — Dr. Wael A. Al-Dakroury
-              </footer>
-            </blockquote>
+          {/* Family photo — right on desktop, top on mobile */}
+          <div className="relative order-1 min-h-[260px] sm:min-h-[320px] lg:order-2 lg:min-h-[520px]">
+            <img
+              src={images.family}
+              alt="Family receiving speech-language support"
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+            {/* Soft white wash over the full image */}
+            <div
+              className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/0 via-white/10 to-white/10"
+              aria-hidden="true"
+            />
+            {/* Stronger fade from the left into the text panel */}
+            <div
+              className="pointer-events-none absolute inset-0 bg-gradient-to-r from-white/15 via-white/30 to-white/5"
+              aria-hidden="true"
+            />
+            <div
+              className="pointer-events-none absolute inset-y-0 left-0 hidden w-28 bg-gradient-to-r from-white via-white/55 to-transparent lg:block"
+              aria-hidden="true"
+            />
           </div>
-        </div>
-
-        <div className="mt-10 grid gap-5 sm:grid-cols-2">
-          {expertisePillars.map((pillar) => {
-            const Icon = iconMap[pillar.icon]
-            return (
-              <div
-                key={pillar.title}
-                className="group rounded-sm border border-slate-100 bg-white p-8 shadow-sm transition-all hover:-translate-y-0.5 hover:border-brand/25 hover:shadow-md"
-              >
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-muted text-brand transition-colors group-hover:bg-brand group-hover:text-white">
-                  <Icon className="h-6 w-6" />
-                </div>
-                <h3 className="mt-5 font-serif text-xl text-ink">{pillar.title}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-ink-muted">
-                  {pillar.description}
-                </p>
-              </div>
-            )
-          })}
         </div>
       </div>
     </section>

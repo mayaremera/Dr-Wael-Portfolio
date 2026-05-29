@@ -1,37 +1,4 @@
-const roles = [
-  {
-    year: '2025',
-    title: 'ASHA Fellow',
-    org: 'American Speech-Language-Hearing Association',
-    note: 'Highest honor — significant international impact',
-  },
-  {
-    year: '2026–28',
-    title: 'Chief Editor',
-    org: 'ASHA SIG17 Perspectives',
-    note: 'Editorial leadership in communication sciences',
-  },
-  {
-    year: 'Present',
-    title: 'International Ambassador',
-    org: 'American Speech-Language-Hearing Association',
-    note: 'Global advocacy and professional collaboration',
-  },
-  {
-    year: 'Present',
-    title: 'Associate Professor',
-    org: 'Alfaisal University',
-    note: 'Academic leadership in speech-language pathology',
-  },
-]
-
-const focusAreas = [
-  'Pediatric language disorders',
-  'ADHD & communication',
-  'Autism spectrum & language',
-  'Evidence-based intervention',
-  'Clinical education & mentorship',
-]
+import { leadershipRoles, clinicalSpecializations } from '../data/content'
 
 export default function Leadership() {
   return (
@@ -46,23 +13,28 @@ export default function Leadership() {
               Advancing the field through clinical and academic excellence
             </h2>
             <p className="mt-6 leading-relaxed text-ink-muted">
-              Dr. Wael&apos;s work spans direct patient care, university teaching,
-              and international professional leadership — ensuring families benefit
-              from both cutting-edge research and decades of hands-on clinical wisdom.
+              Dr. Wael&apos;s work spans direct patient care at Psych Care Complex,
+              university teaching at Alfaisal University, and international
+              professional leadership — ensuring families benefit from both
+              cutting-edge research and decades of hands-on clinical wisdom.
             </p>
 
             <div className="mt-10">
               <p className="text-sm font-medium tracking-wide text-brand uppercase">
-                Clinical Focus
+                Clinical Specializations
               </p>
               <ul className="mt-4 space-y-3">
-                {focusAreas.map((area) => (
+                {clinicalSpecializations.map((area) => (
                   <li
-                    key={area}
-                    className="flex items-center gap-3 text-ink-muted"
+                    key={area.id}
+                    className="flex items-start gap-3 text-ink-muted"
                   >
-                    <span className="h-1 w-1 shrink-0 rounded-full bg-brand" />
-                    {area}
+                    <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-brand" />
+                    <span>
+                      <span className="font-medium text-ink">{area.title}</span>
+                      {' — '}
+                      {area.description}
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -70,9 +42,9 @@ export default function Leadership() {
           </div>
 
           <div className="space-y-6">
-            {roles.map((role) => (
+            {leadershipRoles.map((role) => (
               <div
-                key={role.title}
+                key={`${role.title}-${role.year}`}
                 className="border-l border-brand/30 bg-white py-6 pl-8"
               >
                 <p className="text-xs font-medium tracking-widest text-brand uppercase">

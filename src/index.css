@@ -2,10 +2,13 @@
 
 @theme {
   --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-logo: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
   --font-sans: 'Source Sans 3', system-ui, sans-serif;
   --color-brand: #1a4d5c;
   --color-brand-light: #2d6a7a;
   --color-brand-muted: #e8f1f3;
+  --color-accent: #f08a5d;
+  --color-accent-hover: #e07a4d;
   --color-ink: #1c2833;
   --color-ink-muted: #5c6b73;
   /* Section backgrounds — clear contrast between bands */

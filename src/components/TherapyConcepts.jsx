@@ -18,90 +18,48 @@ export default function TherapyConcepts() {
     <section id="approach" className="border-t border-slate-200 bg-surface py-20 lg:py-28">
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
         <div className="text-center">
-          <p className="text-sm font-medium tracking-[0.2em] text-brand uppercase">
-            Your Child&apos;s Journey
+          <p className="text-md font-medium tracking-[0.2em] text-brand uppercase">
+          Speech Language Pathologist Service You Can Choose
           </p>
-          <h2 className="mt-4 font-serif text-3xl font-medium text-ink md:text-4xl">
-            How speech-language therapy works
-          </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-ink-muted">
-            A clear path from your first question to meaningful progress — four
-            connected steps designed around your family.
-          </p>
+
+
         </div>
 
-        {/* Journey timeline — desktop */}
-        <div className="relative mt-16 hidden lg:block">
-          <div className="absolute top-[52px] right-[12%] left-[12%] h-px bg-gradient-to-r from-brand/20 via-brand to-brand/20" />
-          <div className="grid grid-cols-4 gap-6">
-            {therapyConcepts.map((concept, index) => {
-              const Icon = iconMap[concept.icon]
-              return (
-                <div key={concept.id} className="relative flex flex-col items-center text-center">
-                  <div className="relative z-10 flex h-[104px] w-[104px] flex-col items-center justify-center rounded-full border-2 border-brand bg-white shadow-md shadow-brand/10">
-                    <Icon className="h-7 w-7 text-brand" />
-                    <span className="mt-1 font-serif text-sm text-brand">
-                      {concept.step}
-                    </span>
-                  </div>
-                  {index < therapyConcepts.length - 1 && (
-                    <div className="absolute top-[52px] -right-3 z-0 text-brand/40">
-                      →
-                    </div>
-                  )}
-                  <h3 className="mt-6 font-serif text-xl text-ink">{concept.title}</h3>
-                  <p className="mt-1 text-xs font-medium tracking-wide text-brand uppercase">
-                    {concept.subtitle}
-                  </p>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* Detail cards */}
-        <div className="mt-12 grid gap-6 md:grid-cols-2 lg:mt-20">
+        <div className="mt-12 grid items-stretch gap-6 md:grid-cols-2">
           {therapyConcepts.map((concept) => {
             const Icon = iconMap[concept.icon]
+
             return (
               <article
                 key={concept.id}
-                className="group relative overflow-hidden rounded-sm border border-slate-100 bg-white p-8 shadow-sm transition-all hover:border-brand/30 hover:shadow-md"
+                className="group flex h-full gap-5 rounded-sm border border-slate-100 bg-white p-6 shadow-sm transition-all hover:border-brand/25 hover:shadow-md lg:p-8"
               >
-                <div className="absolute top-0 left-0 h-1 w-full origin-left scale-x-0 bg-brand transition-transform duration-300 group-hover:scale-x-100" />
-
-                <div className="flex items-start gap-5">
-                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-brand-muted text-brand">
-                    <Icon className="h-7 w-7" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-baseline gap-3">
-                      <span className="font-serif text-lg text-brand/60">
-                        {concept.step}
-                      </span>
-                      <h3 className="font-serif text-2xl text-ink">{concept.title}</h3>
-                    </div>
-                    <p className="mt-1 text-sm font-medium text-brand">
-                      {concept.subtitle}
-                    </p>
-                  </div>
+                <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-brand-muted transition-colors duration-300 group-hover:bg-brand lg:h-[5.5rem] lg:w-[5.5rem]">
+                  <Icon
+                    className="h-10 w-10 text-brand transition-colors duration-300 group-hover:text-white lg:h-12 lg:w-12"
+                    strokeWidth={1.75}
+                    aria-hidden
+                  />
                 </div>
 
-                <p className="mt-5 leading-relaxed text-ink">{concept.summary}</p>
+                <div className="flex min-w-0 flex-1 flex-col">
+                  <div className="min-h-[3.5rem]">
+                    <h3 className="font-sans text-xl font-bold leading-snug tracking-tight text-brand md:text-2xl">
+                      {concept.title} — {concept.subtitle}
+                    </h3>
+                  </div>
 
-                <ul className="mt-5 space-y-2.5">
-                  {concept.points.map((point) => (
-                    <li
-                      key={point}
-                      className="flex items-start gap-3 rounded-sm border border-slate-200/80 bg-surface-alt px-3 py-2.5 text-sm text-ink-muted"
-                    >
-                      <span className="mt-1.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-brand text-[10px] font-bold text-white">
-                        ✓
-                      </span>
-                      {point}
-                    </li>
-                  ))}
-                </ul>
+                  <p className="mt-3 flex-1 text-sm leading-relaxed text-ink-muted md:text-base">
+                    {concept.summary}
+                  </p>
+
+                  <a
+                    href="#contact"
+                    className="mt-6 inline-block w-fit rounded-sm bg-brand px-5 py-2.5 text-xs font-semibold tracking-[0.12em] text-white uppercase transition-colors hover:bg-brand-light"
+                  >
+                    More Details
+                  </a>
+                </div>
               </article>
             )
           })}
