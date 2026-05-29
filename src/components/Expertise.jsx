@@ -34,7 +34,7 @@ export default function Expertise() {
               href="#contact"
               className="mt-10 inline-block w-fit rounded-sm bg-brand px-6 py-2.5 text-sm font-semibold tracking-wide text-white uppercase transition-colors hover:bg-brand-light"
             >
-              Book a Consultation
+              Make Appointment
             </a>
           </div>
 
