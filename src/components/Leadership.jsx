@@ -13,7 +13,7 @@ export default function Leadership() {
               Advancing the field through clinical and academic excellence
             </h2>
             <p className="mt-6 leading-relaxed text-ink-muted">
-              Dr. Wael&apos;s work spans direct patient care at Psych Care Complex,
+              Dr. Wael's work spans direct patient care at Psych Care Complex,
               university teaching at Alfaisal University, and international
               professional leadership — ensuring families benefit from both
               cutting-edge research and decades of hands-on clinical wisdom.

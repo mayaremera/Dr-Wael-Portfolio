@@ -1,68 +1,59 @@
 import { therapyConcepts } from '../data/content'
-import {
-  IconScreening,
-  IconCounseling,
-  IconAssessment,
-  IconTreatment,
-} from './Icons'
 
-const iconMap = {
-  screening: IconScreening,
-  counseling: IconCounseling,
-  assessment: IconAssessment,
-  treatment: IconTreatment,
+const linkClassName =
+  'relative mt-4 inline-block w-fit pb-1 text-xs font-semibold tracking-[0.12em] text-brand uppercase transition-colors after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-brand after:transition-transform after:duration-300 after:ease-out hover:text-brand-light hover:after:scale-x-100'
+
+function ServiceCardImage({ src, alt }) {
+  return (
+    <div className="relative h-36 w-full shrink-0 sm:h-auto sm:min-h-full sm:w-[34%] sm:max-w-[150px] sm:self-stretch lg:max-w-[165px]">
+      <img src={src} alt={alt} className="absolute inset-0 h-full w-full object-cover" />
+      <div
+        className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-white"
+        aria-hidden="true"
+      />
+    </div>
+  )
 }
 
 export default function TherapyConcepts() {
   return (
-    <section id="approach" className="border-t border-slate-200 bg-surface py-20 lg:py-28">
+    <section id="approach" className="border-t border-slate-200 bg-surface py-16 lg:py-24">
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
         <div className="text-center">
-          <p className="text-md font-medium tracking-[0.2em] text-brand uppercase">
-          Speech Language Pathologist Service You Can Choose
-          </p>
-
-
+          <p className="text-sm font-medium tracking-[0.1em] text-brand uppercase">Services</p>
+          <h2 className="mt-3 font-serif text-2xl text-ink md:text-3xl">
+            Speech-Language Pathology Services You Can Choose
+          </h2>
         </div>
 
-        <div className="mt-12 grid items-stretch gap-6 md:grid-cols-2">
-          {therapyConcepts.map((concept) => {
-            const Icon = iconMap[concept.icon]
+        <div className="mt-10 grid items-stretch gap-4 md:grid-cols-2">
+          {therapyConcepts.map((concept) => (
+            <article
+              key={concept.id}
+              className="group flex h-full flex-col overflow-hidden rounded-sm border border-slate-100 bg-white shadow-sm transition-all hover:border-brand/25 hover:shadow-md sm:flex-row"
+            >
+              <ServiceCardImage
+                src={concept.image}
+                alt={`${concept.title} — ${concept.subtitle}`}
+              />
 
-            return (
-              <article
-                key={concept.id}
-                className="group flex h-full gap-5 rounded-sm border border-slate-100 bg-white p-6 shadow-sm transition-all hover:border-brand/25 hover:shadow-md lg:p-8"
-              >
-                <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-brand-muted transition-colors duration-300 group-hover:bg-brand lg:h-[5.5rem] lg:w-[5.5rem]">
-                  <Icon
-                    className="h-10 w-10 text-brand transition-colors duration-300 group-hover:text-white lg:h-12 lg:w-12"
-                    strokeWidth={1.75}
-                    aria-hidden
-                  />
-                </div>
+              <div className="flex min-w-0 flex-1 flex-col justify-center p-4 sm:p-5">
+                <h3 className="font-sans text-lg font-bold leading-snug tracking-tight text-brand">
+                  {concept.title}
+                  <span className="font-normal text-ink-muted"> — </span>
+                  <span className="font-semibold text-brand/90">{concept.subtitle}</span>
+                </h3>
 
-                <div className="flex min-w-0 flex-1 flex-col">
-                  <div className="min-h-[3.5rem]">
-                    <h3 className="font-sans text-xl font-bold leading-snug tracking-tight text-brand md:text-2xl">
-                      {concept.title} — {concept.subtitle}
-                    </h3>
-                  </div>
+                <p className="mt-2 flex-1 text-sm leading-relaxed text-ink-muted">
+                  {concept.summary}
+                </p>
 
-                  <p className="mt-3 flex-1 text-sm leading-relaxed text-ink-muted md:text-base">
-                    {concept.summary}
-                  </p>
-
-                  <a
-                    href="#contact"
-                    className="mt-6 inline-block w-fit rounded-sm bg-brand px-5 py-2.5 text-xs font-semibold tracking-[0.12em] text-white uppercase transition-colors hover:bg-brand-light"
-                  >
-                    More Details
-                  </a>
-                </div>
-              </article>
-            )
-          })}
+                <a href="#contact" className={linkClassName}>
+                  More Details
+                </a>
+              </div>
+            </article>
+          ))}
         </div>
       </div>
     </section>

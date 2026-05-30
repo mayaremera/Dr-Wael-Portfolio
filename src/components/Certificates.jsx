@@ -17,10 +17,6 @@ export default function Certificates() {
               Global credentials that speak for themselves
             </h2>
           </div>
-          <p className="max-w-md text-sm text-ink-muted md:text-right">
-            International recognition earned over decades of clinical excellence,
-            research, and leadership.
-          </p>
         </div>
 
         {/* Featured honor — medallion style */}

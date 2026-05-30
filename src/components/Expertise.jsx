@@ -45,18 +45,13 @@ export default function Expertise() {
               alt="Family receiving speech-language support"
               className="absolute inset-0 h-full w-full object-cover"
             />
-            {/* Soft white wash over the full image */}
+            {/* White fade on the left into the text panel; right edge stays clear */}
             <div
-              className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/0 via-white/10 to-white/10"
-              aria-hidden="true"
-            />
-            {/* Stronger fade from the left into the text panel */}
-            <div
-              className="pointer-events-none absolute inset-0 bg-gradient-to-r from-white/15 via-white/30 to-white/5"
+              className="pointer-events-none absolute inset-0 bg-gradient-to-r from-white/85 via-white/25 to-transparent"
               aria-hidden="true"
             />
             <div
-              className="pointer-events-none absolute inset-y-0 left-0 hidden w-28 bg-gradient-to-r from-white via-white/55 to-transparent lg:block"
+              className="pointer-events-none absolute inset-y-0 left-0 hidden w-24 bg-gradient-to-r from-white via-white/40 to-transparent lg:block"
               aria-hidden="true"
             />
           </div>

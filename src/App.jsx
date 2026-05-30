@@ -1,11 +1,12 @@
 import Header from './components/Header'
 import HeroBanner from './components/HeroBanner'
 import Profile from './components/Profile'
+import PromoVideoSection from './components/PromoVideoSection'
+import Leadership from './components/Leadership'
+import Certificates from './components/Certificates'
 import TherapyConcepts from './components/TherapyConcepts'
 import Expertise from './components/Expertise'
 import ClinicalSpecializations from './components/ClinicalSpecializations'
-import Certificates from './components/Certificates'
-import Leadership from './components/Leadership'
 import Testimonials from './components/Testimonials'
 import VideoSection from './components/VideoSection'
 import Contact from './components/Contact'
@@ -18,13 +19,14 @@ function App() {
       <main>
         <HeroBanner />
         <Profile />
+        <PromoVideoSection />
+        {/* <Leadership /> */}
+        {/* <Certificates /> */}
         <TherapyConcepts />
-        <Expertise />
         <ClinicalSpecializations />
-        <Certificates />
-        <Leadership />
+        <Expertise />
         <Testimonials />
-        <VideoSection />
+        {/* <VideoSection /> */}
         <Contact />
       </main>
       <Footer />

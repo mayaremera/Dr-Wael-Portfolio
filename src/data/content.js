@@ -21,6 +21,10 @@ export const images = {
   drWael: '/images/dr-wael.jpeg',
   heroBanner: '/images/hero1.jpeg',
   family: '/images/family.jpg',
+  screening: '/images/screening.jpg',
+  familyCounseling: '/images/familycoun.jpeg',
+  assessment: '/images/assesment.jpeg',
+  treatment: '/images/treatment.jpeg',
   // swap to hero2.jpeg if you prefer that image:
   // heroBanner: '/images/hero2.jpeg',
 }
@@ -37,9 +41,22 @@ export const whyChooseUs = {
 export const video = {
   youtubeId: 'EyIvs6DKl-Y',
   youtubeUrl: 'https://youtu.be/EyIvs6DKl-Y',
-  title: 'See Our Success Story',
+  poster: '/images/video1.jpeg',
+  title: 'Center for Autism Research — Award Ceremony',
+  paragraphs: [
+    'This video captures Dr. Wael Al-Dakroury at the Center for Autism Research award ceremony — recognition of his dedication to children with autism, their families, and the field of communication sciences.',
+  ],
+}
+
+export const promoVideo = {
+  src: '/videos/vidsection.mp4',
+  label: 'Transform Communication',
+  titleLine1: 'Every child deserves',
+  titleHighlight: 'a voice.',
   description:
-    'Families share their journeys — real progress in communication, confidence, and connection.',
+    '30+ years of expert speech-language care — bilingual, family-centered, and built on real progress for children across autism, ADHD, language, and speech.',
+  cta: { label: 'Book a Consultation', href: '#contact' },
+  secondary: { label: 'Explore Services', href: '#approach' },
 }
 
 export const profileDetails = {
@@ -75,7 +92,7 @@ export const profileDetails = {
 export const therapyConcepts = [
   {
     id: 'screening',
-    icon: 'screening',
+    image: images.screening,
     title: 'Screening',
     subtitle: 'A Simple First Step',
     summary:
@@ -83,7 +100,7 @@ export const therapyConcepts = [
   },
   {
     id: 'counseling',
-    icon: 'counseling',
+    image: images.familyCounseling,
     title: 'Family Counseling',
     subtitle: 'Support Every Step of the Way',
     summary:
@@ -91,7 +108,7 @@ export const therapyConcepts = [
   },
   {
     id: 'assessment',
-    icon: 'assessment',
+    image: images.assessment,
     title: 'Assessment',
     subtitle: 'Understanding Your Child\'s Unique Profile',
     summary:
@@ -99,7 +116,7 @@ export const therapyConcepts = [
   },
   {
     id: 'treatment',
-    icon: 'treatment',
+    image: images.treatment,
     title: 'Treatment',
     subtitle: 'Helping Children Find Their Voice',
     summary:
@@ -173,6 +190,7 @@ export const clinicalSpecializations = [
     id: 'autism',
     category: 'Autism',
     title: 'Autism Spectrum Disorder',
+    image: '/images/treatment.jpeg',
     description:
       'Support for verbal and non-verbal children, including PECS and PODD augmentative communication systems.',
   },
@@ -180,6 +198,7 @@ export const clinicalSpecializations = [
     id: 'adhd',
     category: 'ADHD',
     title: 'ADHD',
+    image: '/images/screening.jpg',
     description:
       'Addressing multi-step direction difficulties and the links between attention, executive function, and language.',
   },
@@ -187,6 +206,7 @@ export const clinicalSpecializations = [
     id: 'language',
     category: 'Language',
     title: 'Developmental Language Disorder',
+    image: '/images/assesment.jpeg',
     description:
       'Bilingual expertise in English and Arabic, with accurate DLD diagnosis and individualized intervention.',
   },
@@ -194,6 +214,7 @@ export const clinicalSpecializations = [
     id: 'speech',
     category: 'Speech',
     title: 'Speech Sound Disorder',
+    image: '/images/family.jpg',
     description:
       'Improving intelligibility, confidence, and academic readiness through targeted speech intervention.',
   },
@@ -201,6 +222,7 @@ export const clinicalSpecializations = [
     id: 'apraxia',
     category: 'Apraxia',
     title: 'Childhood Apraxia of Speech (CAS)',
+    image: '/images/familycoun.jpeg',
     description:
       'A specialized approach for a frequently misdiagnosed condition — motor planning and speech production.',
   },
@@ -208,6 +230,7 @@ export const clinicalSpecializations = [
     id: 'fluency',
     category: 'Fluency',
     title: 'Fluency Disorders & Stuttering',
+    image: '/images/treatment.jpeg',
     description:
       'Integrative, person-centered treatment that respects each child\'s experience and communication goals.',
   },
@@ -215,6 +238,7 @@ export const clinicalSpecializations = [
     id: 'bilingual',
     category: 'Language',
     title: 'Language Support',
+    image: '/images/family.jpg',
     description:
       'Bilingual services in English and Arabic — supporting communication development across both languages.',
   },
@@ -224,23 +248,42 @@ export const testimonials = [
   {
     id: 'shackleton',
     name: 'Paul Shackleton',
-    location: 'UK / Australia',
+    location: '',
+    image: '/images/paul.jpeg',
     quote:
-      'Dr. Wael worked with our profoundly autistic non-verbal son with patience, expertise, and genuine care. His approach gave us hope and a clear path forward.',
+      'Dr Wael worked with my profoundly autistic non-verbal son between 2013-15. Since leaving Saudi Arabia we have employed a number of other speech language pathologists in the UK and Australia, but we have been unable to find any who have matched Dr Wael\'s dedication, commitment, and professional skills. Other therapists have struggled to hold his attention and deal with his considerable challenging behaviors and aggression. What impressed me most about Dr Wael was his ability to engage my child in meaningful learning. Before Dr Wael worked with my son, he would never maintain eye contact with other people. Without Dr Wael\'s interventions, I doubt that my son would have been able to develop the ability to communicate his needs effectively using the PECS and PODD systems. I\'m sure that Dr Wael\'s therapy has made a lasting and significant improvement to my son\'s quality of life.',
   },
   {
-    id: 'alotaibi',
-    name: 'Dr. Shaima AlOtaibi',
-    location: '',
+    id: 'alolabi',
+    name: 'Dr. Shaima AlOlabi',
+    location: "Faris's Mom",
+    image: '/images/drshayma.jpeg',
     quote:
-      'Through our autism journey, Dr. Wael helped us understand functional communication and how to support our child at every stage — with compassion and evidence-based guidance.',
+      'Throughout my journey with autism, I have met many professionals in all different kinds of fields and specialities, visiting many centres and clinics to look for the best services and care for my precious son. It has been, and remains, a struggle to find a dedicated professional to rely on. As my son struggles with communication, speech therapy is crucial for him to improve his functional communication, reduce frustration, and enhance social interaction. I was referred to Dr. AlDakroury a couple of years ago, and I\'m confident to say that it was one of the best referrals I\'ve ever had for my son. His expertise, knowledge, care, attention, and dedication are all really what I needed for my son. He isn\'t only working with him on speech and communication; he\'s also provided our family with the gift of better understanding and connection. Thank you, Dr. AlDakroury, for your tireless dedication and for believing in him.',
   },
   {
     id: 'yahia',
     name: "Yahia's Family",
     location: '',
+    image: '/images/yehias.jpeg',
     quote:
-      'We saw meaningful progress in cognitive, social, and speech development. Dr. Wael treated our child as an individual, not a diagnosis.',
+      'Working with Dr. Wael has been a very positive and professional experience for our family. Throughout our journey, we have seen remarkable progress in our son\'s development. His cognitive abilities have improved noticeably, his social skills have improved significantly, and his speech has developed significantly over time. Dr. Wael\'s guidance, support, and professional approach gave us confidence and reassurance during every step of the process. We are truly grateful for the care and dedication provided, and we highly recommend his services to families seeking support and meaningful progress for their children.',
+  },
+  {
+    id: 'alruwais',
+    name: 'Mrs. Mary Alruwais',
+    location: 'Director of My School, Riyadh',
+    image: '/images/mrsmary.jpeg',
+    quote:
+      'Working with Dr. Wael Al-Dakroury has been an outstanding experience for our school community. His professionalism, expertise, and dedication to supporting students\' communication and language development have had a positive impact on both students and staff alike. Dr. Wael consistently demonstrates excellent collaboration with educational teams, providing thoughtful guidance, practical strategies, and individualized support that contribute meaningfully to student success and wellbeing. His ability to work effectively with teachers, families, and multidisciplinary teams reflects a high level of professionalism and genuine care for children\'s development. We greatly value his contributions to our schools and highly recommend his services to educational institutions and families seeking high-quality speech and language support.',
+  },
+  {
+    id: 'abo-yousif',
+    name: 'Abo Yousif',
+    location: '',
+    image: '/images/aboyousif.jpeg',
+    quote:
+      'When our son was 3, we began noticing that he had limited eye contact, communication-related difficulties, and was only using a few words. Like any parents, we felt worried, confused, and unsure of what to do next. Meeting Dr. Wael during that time gave us a real sense of relief. He listened patiently, understood our concerns, and explained everything in a calm, clear, and reassuring way. What truly stood out was not only his assessment but also the way he worked with our son in each session. His sessions were thoughtful, engaging, and tailored to our son\'s specific needs. He knew how to make him feel comfortable and safe, which helped him respond better and open up little by little. Every session felt purposeful, with clear progress, practical strategies, and guidance that we could continue at home. Over time, we saw real changes. Our son became more confident, improved in communication, and started connecting better with others. We are deeply grateful for the care, patience, and consistency throughout the journey. For any parent feeling worried about communication or developmental concerns, I can honestly say that finding the right support early can make all the difference.',
   },
 ]
 
