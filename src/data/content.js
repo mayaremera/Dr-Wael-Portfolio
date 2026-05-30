@@ -25,8 +25,28 @@ export const images = {
   familyCounseling: '/images/familycoun.jpeg',
   assessment: '/images/assesment.jpeg',
   treatment: '/images/treatment.jpeg',
-  // swap to hero2.jpeg if you prefer that image:
-  // heroBanner: '/images/hero2.jpeg',
+}
+
+export const hopeGallery = {
+  label: 'Our Impact',
+  title: 'Expert Care in Every Session',
+  images: [
+    {
+      src: '/images/gallery/hope-therapy.png',
+      alt: 'Speech-language pathologist guiding a child through a one-on-one oral motor exercise during therapy',
+      eyebrow: 'Personalized therapy',
+    },
+    {
+      src: '/images/gallery/hope-2.png',
+      alt: 'Child engaged in a speech therapy session with picture cards',
+      eyebrow: 'Every Session counts',
+    },
+    {
+      src: '/images/familycoun.jpeg',
+      alt: 'Speech-language pathologist meeting with parents and their child to explain progress and discuss the care plan',
+      eyebrow: 'Guidance for parents',
+    },
+  ],
 }
 
 export const whyChooseUs = {
@@ -50,6 +70,8 @@ export const video = {
 
 export const promoVideo = {
   src: '/videos/vidsection.mp4',
+  sectionLabel: 'Transform Communication',
+  sectionTitle: 'Every Child Deserves a Voice',
   label: 'Transform Communication',
   titleLine1: 'Every child deserves',
   titleHighlight: 'a voice.',

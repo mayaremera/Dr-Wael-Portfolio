@@ -5,7 +5,6 @@ export default function Expertise() {
     <section id="expertise" className="border-t border-slate-200 bg-surface py-20 lg:py-28">
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
         <div className="overflow-hidden rounded-sm bg-white shadow-md ring-1 ring-slate-200/80 lg:grid lg:grid-cols-2">
-          {/* Content — left on desktop, below image on mobile */}
           <div className="order-2 flex flex-col justify-center px-8 py-10 sm:px-10 lg:order-1 lg:px-12 lg:py-14 xl:px-14">
             <p className="text-xs font-semibold tracking-[0.22em] text-brand uppercase">
               {whyChooseUs.label}
@@ -38,14 +37,12 @@ export default function Expertise() {
             </a>
           </div>
 
-          {/* Family photo — right on desktop, top on mobile */}
           <div className="relative order-1 min-h-[260px] sm:min-h-[320px] lg:order-2 lg:min-h-[520px]">
             <img
               src={images.family}
               alt="Family receiving speech-language support"
               className="absolute inset-0 h-full w-full object-cover"
             />
-            {/* White fade on the left into the text panel; right edge stays clear */}
             <div
               className="pointer-events-none absolute inset-0 bg-gradient-to-r from-white/85 via-white/25 to-transparent"
               aria-hidden="true"

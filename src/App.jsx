@@ -1,5 +1,6 @@
 import Header from './components/Header'
 import HeroBanner from './components/HeroBanner'
+import HopeGallery from './components/HopeGallery'
 import Profile from './components/Profile'
 import PromoVideoSection from './components/PromoVideoSection'
 import Leadership from './components/Leadership'
@@ -19,13 +20,14 @@ function App() {
       <main>
         <HeroBanner />
         <Profile />
+        <HopeGallery />
         <PromoVideoSection />
-        {/* <Leadership /> */}
-        {/* <Certificates /> */}
         <TherapyConcepts />
         <ClinicalSpecializations />
         <Expertise />
         <Testimonials />
+        {/* <Leadership /> */}
+        {/* <Certificates /> */}
         {/* <VideoSection /> */}
         <Contact />
       </main>
