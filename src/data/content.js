@@ -27,6 +27,83 @@ export const images = {
   treatment: '/images/treatment.jpeg',
 }
 
+export const drWaelActivity = {
+  label: 'In the Field',
+  title: 'Dr. Wael\'s Month & Year',
+  description:
+    'Conferences, lectures, meetings, and professional engagements — a snapshot of where Dr. Wael is contributing now and the highlights from recent months.',
+  upcoming: [
+    {
+      id: 'alfaisal-lecture',
+      period: 'May 2026',
+      date: '15 May',
+      type: 'Guest Lecture',
+      title: 'Developmental Language Disorder in Bilingual Children',
+      location: 'Alfaisal University, Riyadh',
+      image: images.assessment,
+      imageAlt: 'Clinical assessment session with a child and speech-language pathologist',
+      note: 'Clinical lecture for faculty and graduate students on DLD assessment and intervention across Arabic and English.',
+    },
+    {
+      id: 'asha-panel',
+      period: 'June 2026',
+      date: '8–10 Jun',
+      type: 'Conference',
+      title: 'ASHA Connect — Panel on Culturally Responsive Assessment',
+      location: 'Virtual / International',
+      image: images.drWael,
+      imageAlt: 'Dr. Wael Al-Dakroury presenting at a professional conference',
+      note: 'Discussant on fair assessment practices when standardized tools are not culturally appropriate.',
+    },
+  ],
+  recent: [
+    {
+      id: 'autism-award',
+      period: 'April 2026',
+      date: '22 Apr',
+      type: 'Recognition',
+      title: 'Center for Autism Research — Award Ceremony',
+      location: 'Riyadh',
+      video: '/videos/event1.mp4',
+      imageAlt: 'Center for Autism Research award ceremony honoring Dr. Wael Al-Dakroury',
+      note: 'Honored for outstanding contributions to children with autism and the field of communication sciences.',
+    },
+    {
+      id: 'psych-care-meeting',
+      period: 'March 2026',
+      date: '12 Mar',
+      type: 'Leadership Meeting',
+      title: 'Communication Disorders Department — Clinical Review',
+      location: 'Psych Care Complex, Riyadh',
+      image: images.familyCounseling,
+      imageAlt: 'Multidisciplinary team meeting at Psych Care Complex',
+      note: 'Led multidisciplinary review of caseload progress, therapy protocols, and family engagement strategies.',
+    },
+    {
+      id: 'school-outreach',
+      period: 'February 2026',
+      date: '3 Feb',
+      type: 'School Visit',
+      title: 'Collaborative SLP Workshop for Educators',
+      location: 'My School, Riyadh',
+      image: images.screening,
+      imageAlt: 'Speech-language pathologist leading a workshop with educators',
+      note: 'Training session with teachers on supporting students with speech and language needs in the classroom.',
+    },
+    {
+      id: 'cas-seminar',
+      period: 'January 2026',
+      date: '18 Jan',
+      type: 'Professional Seminar',
+      title: 'Childhood Apraxia of Speech — Misdiagnosis & Motor Planning',
+      location: 'Riyadh',
+      image: images.family,
+      imageAlt: 'Professional seminar on childhood apraxia of speech',
+      note: 'Presented on accurate CAS identification and evidence-based intervention approaches.',
+    },
+  ],
+}
+
 export const hopeGallery = {
   label: 'Our Impact',
   title: 'Expert Care in Every Session',
@@ -49,6 +126,18 @@ export const hopeGallery = {
   ],
 }
 
+export const promoVideo = {
+  src: '/videos/vidsection.mp4',
+  sectionLabel: 'Featured Presentation',
+  sectionTitle: 'When Language Doesn\'t Develop as Expected',
+  label: 'Understanding DLD',
+  titleHighlight: 'Understanding DLD in Children',
+  description:
+    'Explore how DLD affects language development, why assessment fails without culturally appropriate tools, and why reading comprehension depends on background knowledge—not decoding alone.',
+  cta: { label: 'Book a Consultation', href: '#contact' },
+  secondary: { label: 'Explore Services', href: '#approach' },
+}
+
 export const whyChooseUs = {
   label: 'Why Choose Dr. Wael',
   title: 'Why Families Choose Dr. Wael Al-Dakroury',
@@ -66,19 +155,6 @@ export const video = {
   paragraphs: [
     'This video captures Dr. Wael Al-Dakroury at the Center for Autism Research award ceremony — recognition of his dedication to children with autism, their families, and the field of communication sciences.',
   ],
-}
-
-export const promoVideo = {
-  src: '/videos/vidsection.mp4',
-  sectionLabel: 'Transform Communication',
-  sectionTitle: 'Every Child Deserves a Voice',
-  label: 'Transform Communication',
-  titleLine1: 'Every child deserves',
-  titleHighlight: 'a voice.',
-  description:
-    '30+ years of expert speech-language care — bilingual, family-centered, and built on real progress for children across autism, ADHD, language, and speech.',
-  cta: { label: 'Book a Consultation', href: '#contact' },
-  secondary: { label: 'Explore Services', href: '#approach' },
 }
 
 export const profileDetails = {

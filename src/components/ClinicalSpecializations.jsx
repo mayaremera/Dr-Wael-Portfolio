@@ -2,153 +2,329 @@ import { useState } from 'react'
 import { clinicalSpecializations } from '../data/content'
 
 const filters = ['All', 'Autism', 'ADHD', 'Language', 'Speech', 'Apraxia', 'Fluency']
+const NAV_PAGE_SIZE = 4
 
-const cardTheme = {
-  stripe: 'bg-brand',
-  badge: 'bg-white/20 text-white ring-white/30',
-  iconWrap: 'bg-accent text-white ring-accent/40',
-  body: 'border-brand/20 bg-gradient-to-br from-brand-muted/50 to-white',
-  category: 'text-brand',
-}
+const sectionLinkClassName =
+  'relative inline-block w-fit pb-1 text-xs font-semibold tracking-[0.12em] text-white uppercase transition-colors after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-accent after:transition-transform after:duration-300 after:ease-out hover:text-accent hover:after:scale-x-100'
 
-function CaseIcon({ id, className = 'h-6 w-6' }) {
-  const props = { className, fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor', strokeWidth: 1.5 }
+function CaseNavItem({ item, index, isActive, onSelect }) {
+  const number = String(index + 1).padStart(2, '0')
 
-  switch (id) {
-    case 'autism':
-      return (
-        <svg {...props}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
-        </svg>
-      )
-    case 'adhd':
-      return (
-        <svg {...props}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
-        </svg>
-      )
-    case 'speech':
-      return (
-        <svg {...props}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
-        </svg>
-      )
-    case 'apraxia':
-      return (
-        <svg {...props}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
-        </svg>
-      )
-    case 'fluency':
-      return (
-        <svg {...props}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9a2.25 2.25 0 012.25 2.25v4.5A2.25 2.25 0 0116.5 17.25H14l-2.25 2.25V17.25H7.5a2.25 2.25 0 01-2.25-2.25v-4.5A2.25 2.25 0 017.5 8.25z" />
-        </svg>
-      )
-    case 'bilingual':
-      return (
-        <svg {...props}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.902m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
-        </svg>
-      )
-    default:
-      return (
-        <svg {...props}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9a2.25 2.25 0 012.25 2.25v4.5A2.25 2.25 0 0116.5 17.25H14l-2.25 2.25V17.25H7.5a2.25 2.25 0 01-2.25-2.25v-4.5A2.25 2.25 0 017.5 8.25z" />
-        </svg>
-      )
-  }
-}
-
-function CaseCard({ item }) {
   return (
-    <article
-      className={`group flex h-full flex-col overflow-hidden rounded-sm border shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${cardTheme.body}`}
+    <button
+      type="button"
+      onClick={() => onSelect(index)}
+      aria-current={isActive ? 'true' : undefined}
+      className={`group relative flex w-full items-start gap-3 border-l-2 py-2.5 pl-4 text-left transition-all duration-300 sm:pl-5 ${
+        isActive
+          ? 'border-accent bg-white/10'
+          : 'border-white/15 hover:border-white/40 hover:bg-white/5'
+      }`}
     >
-      <div className="relative h-36 shrink-0 overflow-hidden sm:h-40">
+      <span
+        className={`mt-0.5 shrink-0 font-serif text-base tabular-nums transition-colors sm:text-lg ${
+          isActive ? 'text-accent' : 'text-white/35 group-hover:text-white/55'
+        }`}
+      >
+        {number}
+      </span>
+
+      <span className="min-w-0 flex-1">
+        <span
+          className={`block text-sm font-semibold leading-snug transition-colors ${
+            isActive ? 'text-white' : 'text-white/70 group-hover:text-white/90'
+          }`}
+        >
+          {item.title}
+        </span>
+        <span
+          className={`mt-1 inline-block rounded-full px-2 py-0.5 text-[0.6rem] font-semibold tracking-wide uppercase transition-colors ${
+            isActive ? 'bg-accent/25 text-accent' : 'bg-white/10 text-white/50 group-hover:text-white/65'
+          }`}
+        >
+          {item.category}
+        </span>
+      </span>
+    </button>
+  )
+}
+
+function NavPagination({ page, pageCount, onPageChange }) {
+  if (pageCount <= 1) return null
+
+  return (
+    <div className="mt-4 flex items-center justify-between border-t border-white/15 pt-4">
+      <button
+        type="button"
+        onClick={() => onPageChange(page - 1)}
+        disabled={page === 0}
+        aria-label="Previous cases"
+        className="inline-flex items-center gap-1.5 rounded-sm px-2 py-1.5 text-xs font-semibold tracking-wide text-white/70 uppercase transition-colors hover:text-white disabled:pointer-events-none disabled:opacity-30"
+      >
+        <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+        </svg>
+        Prev
+      </button>
+
+      <span className="text-xs tabular-nums text-white/50">
+        {page + 1}
+        <span className="text-white/30"> / </span>
+        {pageCount}
+      </span>
+
+      <button
+        type="button"
+        onClick={() => onPageChange(page + 1)}
+        disabled={page >= pageCount - 1}
+        aria-label="Next cases"
+        className="inline-flex items-center gap-1.5 rounded-sm px-2 py-1.5 text-xs font-semibold tracking-wide text-white/70 uppercase transition-colors hover:text-white disabled:pointer-events-none disabled:opacity-30"
+      >
+        Next
+        <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+        </svg>
+      </button>
+    </div>
+  )
+}
+
+function CaseSpotlight({ item }) {
+  return (
+    <article className="animate-fade-up flex h-full min-h-[380px] flex-col overflow-hidden rounded-sm bg-white shadow-xl shadow-brand/20 lg:min-h-0 lg:flex-row">
+      <div className="relative min-h-[220px] flex-1 sm:min-h-[260px] lg:min-h-full lg:max-w-[52%]">
         <img
           src={item.image}
           alt=""
-          className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className="absolute inset-0 h-full w-full object-cover"
         />
-        <div className="absolute inset-0 bg-brand/70" aria-hidden="true" />
+        <div
+          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-brand/80 via-brand/20 to-transparent lg:bg-gradient-to-r lg:from-transparent lg:via-brand/10 lg:to-brand/40"
+          aria-hidden="true"
+        />
 
-        <div className={`absolute inset-x-0 top-0 h-1 ${cardTheme.stripe}`} aria-hidden="true" />
-
-        <div className="absolute inset-0 flex items-end justify-between p-4">
-          <span
-            className={`rounded-full px-3 py-1 text-[0.65rem] font-semibold tracking-wide uppercase ring-1 backdrop-blur-sm ${cardTheme.badge}`}
-          >
+        <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6 lg:hidden">
+          <span className="inline-block rounded-full bg-accent px-3 py-1 text-[0.65rem] font-semibold tracking-wide text-white uppercase">
             {item.category}
           </span>
-          <div
-            className={`flex h-11 w-11 items-center justify-center rounded-full shadow-lg ring-2 transition-transform duration-300 group-hover:scale-110 ${cardTheme.iconWrap}`}
-          >
-            <CaseIcon id={item.id} />
-          </div>
+          <h3 className="mt-3 font-serif text-2xl leading-tight text-white">{item.title}</h3>
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col p-5">
-        <h3 className="font-serif text-xl leading-snug text-ink">{item.title}</h3>
-        <p className="mt-3 flex-1 text-sm leading-relaxed text-ink-muted">{item.description}</p>
-        <p className={`mt-4 text-xs font-semibold tracking-wide uppercase ${cardTheme.category}`}>
-          Specialized care
+      <div className="relative flex flex-1 flex-col justify-center px-6 py-8 sm:px-8 sm:py-10 lg:px-10 lg:py-10">
+        <div className="hidden lg:block">
+          <span className="inline-flex items-center gap-2 rounded-full bg-brand-muted px-3 py-1 text-[0.65rem] font-semibold tracking-wide text-brand uppercase">
+            <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden="true" />
+            {item.category}
+          </span>
+          <h3 className="mt-4 font-serif text-3xl leading-tight text-ink xl:text-4xl">{item.title}</h3>
+        </div>
+
+        <p className="mt-4 text-base leading-relaxed text-ink-muted lg:mt-6 lg:text-[1.05rem] lg:leading-relaxed">
+          {item.description}
         </p>
+
+        <div className="mt-auto flex flex-wrap items-center gap-4 border-t border-slate-100 pt-6 lg:mt-8">
+          <div>
+            <p className="text-xs font-semibold tracking-wide text-brand uppercase">Focus area</p>
+            <p className="text-sm font-medium text-ink">{item.category}</p>
+          </div>
+
+          <a
+            href="#contact"
+            className="ml-auto inline-flex items-center gap-2 rounded-sm bg-accent px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase transition-colors hover:bg-accent-hover"
+          >
+            Consult
+            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+            </svg>
+          </a>
+        </div>
       </div>
     </article>
   )
 }
 
+function CompactCaseTile({ item, isActive, onSelect }) {
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      aria-current={isActive ? 'true' : undefined}
+      className={`group relative overflow-hidden rounded-sm border text-left transition-all duration-300 ${
+        isActive
+          ? 'border-accent bg-white shadow-md ring-2 ring-accent/20'
+          : 'border-white/20 bg-white/5 hover:border-white/35 hover:bg-white/10'
+      }`}
+    >
+      <div className="flex items-stretch">
+        <div className="relative w-16 shrink-0 overflow-hidden sm:w-20">
+          <img src={item.image} alt="" className="absolute inset-0 h-full w-full object-cover" />
+          <div
+            className={`absolute inset-0 transition-colors ${isActive ? 'bg-accent/30' : 'bg-brand/50'}`}
+            aria-hidden="true"
+          />
+        </div>
+
+        <div className="flex min-w-0 flex-1 flex-col justify-center px-3 py-3 sm:px-4">
+          <span className={`truncate text-xs font-semibold sm:text-sm ${isActive ? 'text-brand' : 'text-white/75'}`}>
+            {item.title}
+          </span>
+          <span className={`mt-0.5 text-[0.6rem] font-semibold tracking-wide uppercase ${isActive ? 'text-accent' : 'text-white/45'}`}>
+            {item.category}
+          </span>
+        </div>
+      </div>
+    </button>
+  )
+}
+
 export default function ClinicalSpecializations() {
   const [activeFilter, setActiveFilter] = useState('All')
+  const [activeIndex, setActiveIndex] = useState(0)
+  const [navPage, setNavPage] = useState(0)
 
   const filtered =
     activeFilter === 'All'
       ? clinicalSpecializations
       : clinicalSpecializations.filter((item) => item.category === activeFilter)
 
+  const safeIndex = Math.min(activeIndex, Math.max(filtered.length - 1, 0))
+  const activeCase = filtered[safeIndex]
+
+  const navPageCount = Math.max(1, Math.ceil(filtered.length / NAV_PAGE_SIZE))
+  const safeNavPage = Math.min(navPage, navPageCount - 1)
+  const navPageStart = safeNavPage * NAV_PAGE_SIZE
+  const navPageItems = filtered.slice(navPageStart, navPageStart + NAV_PAGE_SIZE)
+
+  const handleFilterChange = (filter) => {
+    setActiveFilter(filter)
+    setActiveIndex(0)
+    setNavPage(0)
+  }
+
+  const handleSelectCase = (globalIndex) => {
+    setActiveIndex(globalIndex)
+    setNavPage(Math.floor(globalIndex / NAV_PAGE_SIZE))
+  }
+
+  const handleNavPageChange = (nextPage) => {
+    const clamped = Math.max(0, Math.min(nextPage, navPageCount - 1))
+    setNavPage(clamped)
+
+    const pageStart = clamped * NAV_PAGE_SIZE
+    if (safeIndex < pageStart || safeIndex >= pageStart + NAV_PAGE_SIZE) {
+      setActiveIndex(pageStart)
+    }
+  }
+
   return (
-    <section id="cases" className="relative overflow-hidden border-t border-slate-200 bg-surface-alt py-20 lg:py-28">
-      <div
-        className="pointer-events-none absolute -left-20 top-16 h-64 w-64 rounded-full bg-brand/10 blur-3xl"
-        aria-hidden="true"
-      />
-      <div
-        className="pointer-events-none absolute -right-16 bottom-20 h-56 w-56 rounded-full bg-accent/15 blur-3xl"
-        aria-hidden="true"
-      />
+    <section id="cases" className="relative overflow-hidden border-t border-brand/20">
+      <div className="bg-gradient-to-br from-brand via-brand to-brand-light">
+        <div
+          className="pointer-events-none absolute -left-24 top-0 h-96 w-96 rounded-full bg-accent/10 blur-3xl"
+          aria-hidden="true"
+        />
+        <div
+          className="pointer-events-none absolute -right-20 bottom-0 h-80 w-80 rounded-full bg-white/5 blur-3xl"
+          aria-hidden="true"
+        />
 
-      <div className="relative mx-auto max-w-6xl px-6 lg:px-8">
-        <div className="text-center">
-          <p className="text-xs font-semibold tracking-[0.22em] text-brand uppercase">Clinical Cases</p>
-          <h2 className="mt-3 font-serif text-3xl leading-tight text-ink md:text-4xl">
-            Clinical specializations
-          </h2>
-          <div className="mx-auto mt-5 h-1 w-14 rounded-full bg-gradient-to-r from-brand via-brand-light to-accent" />
-        </div>
+        <div className="relative mx-auto max-w-6xl px-6 py-16 lg:px-8 lg:py-24">
+          <header className="mx-auto max-w-2xl text-center">
+            <p className="text-xs font-semibold tracking-[0.22em] text-accent uppercase">Clinical Cases</p>
+            <h2 className="mt-3 font-serif text-3xl leading-tight text-white md:text-4xl">
+              Conditions we specialize in
+            </h2>
+            <p className="mt-4 text-base leading-relaxed text-white/70 md:text-lg">
+              Evidence-based intervention across a wide range of speech, language, and communication disorders.
+            </p>
+            <div className="mx-auto mt-5 h-1 w-14 rounded-full bg-accent" aria-hidden="true" />
+          </header>
 
-        <div className="mt-10 flex flex-wrap justify-center gap-2">
-          {filters.map((filter) => (
-            <button
-              key={filter}
-              type="button"
-              onClick={() => setActiveFilter(filter)}
-              className={`rounded-full px-4 py-2 text-xs font-semibold tracking-wide uppercase transition-all ${
-                activeFilter === filter
-                  ? 'bg-gradient-to-r from-brand to-brand-light text-white shadow-md shadow-brand/25'
-                  : 'border border-brand/15 bg-white text-ink-muted hover:border-accent hover:text-accent'
-              }`}
-            >
-              {filter}
-            </button>
-          ))}
-        </div>
+          <div className="mt-10 flex flex-wrap justify-center gap-2">
+            {filters.map((filter) => (
+              <button
+                key={filter}
+                type="button"
+                onClick={() => handleFilterChange(filter)}
+                className={`rounded-full px-4 py-2 text-xs font-semibold tracking-wide uppercase transition-all ${
+                  activeFilter === filter
+                    ? 'bg-accent text-white shadow-md shadow-accent/30'
+                    : 'border border-white/25 bg-white/10 text-white/80 hover:border-white/40 hover:bg-white/15 hover:text-white'
+                }`}
+              >
+                {filter}
+              </button>
+            ))}
+          </div>
 
-        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((item) => (
-            <CaseCard key={item.id} item={item} />
-          ))}
+          {filtered.length > 0 && activeCase ? (
+            <div className="mt-12 lg:mt-16 lg:grid lg:grid-cols-[minmax(0,320px)_1fr] lg:items-stretch lg:gap-8 xl:gap-10">
+              <aside className="hidden lg:flex lg:flex-col">
+                <p className="mb-3 text-xs font-semibold tracking-[0.18em] text-white/50 uppercase">
+                  Browse cases
+                </p>
+                <nav className="flex flex-1 flex-col space-y-0.5" aria-label="Clinical cases">
+                  {navPageItems.map((item, localIndex) => {
+                    const globalIndex = navPageStart + localIndex
+                    return (
+                      <CaseNavItem
+                        key={item.id}
+                        item={item}
+                        index={globalIndex}
+                        isActive={globalIndex === safeIndex}
+                        onSelect={handleSelectCase}
+                      />
+                    )
+                  })}
+                </nav>
+                <NavPagination
+                  page={safeNavPage}
+                  pageCount={navPageCount}
+                  onPageChange={handleNavPageChange}
+                />
+              </aside>
+
+              <div className="lg:hidden">
+                <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-2">
+                  {navPageItems.map((item, localIndex) => {
+                    const globalIndex = navPageStart + localIndex
+                    return (
+                      <CompactCaseTile
+                        key={item.id}
+                        item={item}
+                        isActive={globalIndex === safeIndex}
+                        onSelect={() => handleSelectCase(globalIndex)}
+                      />
+                    )
+                  })}
+                </div>
+                <NavPagination
+                  page={safeNavPage}
+                  pageCount={navPageCount}
+                  onPageChange={handleNavPageChange}
+                />
+              </div>
+
+              <div className="min-w-0 lg:flex lg:flex-col" key={activeCase.id}>
+                <CaseSpotlight item={activeCase} />
+              </div>
+            </div>
+          ) : (
+            <p className="mt-12 text-center text-white/70">No cases match this filter.</p>
+          )}
+
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-6 border-t border-white/15 pt-8 sm:justify-between lg:mt-14">
+            <p className="text-sm text-white/60">
+              <span className="font-semibold text-accent">{filtered.length}</span>
+              {' '}
+              specialization{filtered.length !== 1 ? 's' : ''} shown
+            </p>
+            <a href="#contact" className={sectionLinkClassName}>
+              Discuss your case
+            </a>
+          </div>
         </div>
       </div>
     </section>

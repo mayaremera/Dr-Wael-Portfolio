@@ -114,3 +114,20 @@ body {
   animation: promo-fade-up 1s ease-out forwards;
   opacity: 0;
 }
+
+@keyframes event-sound-wave {
+  0%,
+  100% {
+    transform: scaleY(0.35);
+    opacity: 0.25;
+  }
+  50% {
+    transform: scaleY(1);
+    opacity: 0.5;
+  }
+}
+
+.animate-event-sound-wave {
+  animation: event-sound-wave 1.15s ease-in-out infinite;
+  transform-origin: bottom center;
+}

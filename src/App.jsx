@@ -1,6 +1,7 @@
 import Header from './components/Header'
 import HeroBanner from './components/HeroBanner'
 import HopeGallery from './components/HopeGallery'
+import DrWaelActivity from './components/DrWaelActivity'
 import Profile from './components/Profile'
 import PromoVideoSection from './components/PromoVideoSection'
 import Leadership from './components/Leadership'
@@ -21,6 +22,7 @@ function App() {
         <HeroBanner />
         <Profile />
         <HopeGallery />
+        <DrWaelActivity />
         <PromoVideoSection />
         <TherapyConcepts />
         <ClinicalSpecializations />

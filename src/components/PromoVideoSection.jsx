@@ -9,7 +9,6 @@ export default function PromoVideoSection() {
     sectionLabel,
     sectionTitle,
     label,
-    titleLine1,
     titleHighlight,
     description,
     cta,
@@ -103,13 +102,9 @@ export default function PromoVideoSection() {
 
               <h2
                 id="promo-heading"
-                className="animate-promo-fade-up animation-delay-100 mt-6 font-serif text-3xl leading-[1.1] text-white sm:text-4xl md:text-5xl lg:text-6xl"
+                className="animate-promo-fade-up animation-delay-100 mt-6 font-serif text-2xl leading-[1.15] text-white sm:text-3xl md:text-4xl lg:text-[4rem] lg:leading-[1.12]"
               >
-                {titleLine1}
-                <br />
-                <span className="bg-gradient-to-r from-white via-accent to-accent-hover bg-clip-text text-transparent">
-                  {titleHighlight}
-                </span>
+                {titleHighlight}
               </h2>
 
               <div

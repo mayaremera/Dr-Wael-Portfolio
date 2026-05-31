@@ -1,7 +1,10 @@
 import { therapyConcepts } from '../data/content'
 
-const linkClassName =
+const cardLinkClassName =
   'relative mt-4 inline-block w-fit pb-1 text-xs font-semibold tracking-[0.12em] text-brand uppercase transition-colors after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-brand after:transition-transform after:duration-300 after:ease-out hover:text-brand-light hover:after:scale-x-100'
+
+const sectionLinkClassName =
+  'relative inline-block w-fit pb-1 text-xs font-semibold tracking-[0.12em] text-brand uppercase transition-colors after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-brand after:transition-transform after:duration-300 after:ease-out hover:text-brand-light hover:after:scale-x-100'
 
 function ServiceCardImage({ src, alt }) {
   return (
@@ -20,13 +23,24 @@ export default function TherapyConcepts() {
     <section id="approach" className="border-t border-slate-200 bg-surface py-16 lg:py-24">
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
         <div className="text-center">
-          <p className="text-sm font-medium tracking-[0.1em] text-brand uppercase">Services</p>
-          <h2 className="mt-3 font-serif text-2xl text-ink md:text-3xl">
-            Speech-Language Pathology Services You Can Choose
+          <p className="text-xs font-semibold tracking-[0.22em] text-brand uppercase">Services</p>
+          <h2 className="mt-3 font-serif text-3xl leading-tight text-ink md:text-4xl">
+            Speech-Language Pathology Services
           </h2>
+          <div
+            className="mx-auto mt-5 h-1 w-14 rounded-full bg-gradient-to-r from-brand via-brand-light to-accent"
+            aria-hidden="true"
+          />
         </div>
 
-        <div className="mt-10 grid items-stretch gap-4 md:grid-cols-2">
+        <div className="mt-10">
+          <div className="mb-4 flex justify-end">
+            <a href="#contact" className={sectionLinkClassName}>
+              View all services
+            </a>
+          </div>
+
+          <div className="grid items-stretch gap-4 md:grid-cols-2">
           {therapyConcepts.map((concept) => (
             <article
               key={concept.id}
@@ -48,12 +62,13 @@ export default function TherapyConcepts() {
                   {concept.summary}
                 </p>
 
-                <a href="#contact" className={linkClassName}>
+                <a href="#contact" className={cardLinkClassName}>
                   More Details
                 </a>
               </div>
             </article>
           ))}
+          </div>
         </div>
       </div>
     </section>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { site } from '../data/content'
+import Logo from './Logo'
 
 const navLinks = [
   { href: '#profile', label: 'About' },
@@ -21,28 +22,6 @@ function SocialIcon({ href, label, children }) {
     >
       {children}
     </a>
-  )
-}
-
-function Logo({ scrolled }) {
-  return (
-    <div className="leading-none">
-      <p
-        className={`font-logo text-xl font-medium tracking-[0.04em] lg:text-[1.65rem] ${
-          scrolled ? 'text-brand' : 'text-white'
-        }`}
-      >
-        Dr. Wael{' '}
-        <span className="font-normal italic opacity-90">A.</span>
-      </p>
-      <p
-        className={`mt-1.5 font-logo text-[0.7rem] font-normal tracking-[0.4em] uppercase lg:text-xs ${
-          scrolled ? 'text-brand/80' : 'text-white/75'
-        }`}
-      >
-        Al-Dakroury
-      </p>
-    </div>
   )
 }
 
@@ -155,8 +134,12 @@ export default function Header() {
             : 'bg-transparent py-4 lg:py-5'
         }`}
       >
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 lg:px-8">
-          <a href="#" className="transition-opacity hover:opacity-90">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 lg:px-15">
+          <a
+            href="#"
+            aria-label="Home"
+            className="flex items-center transition-opacity hover:opacity-90"
+          >
             <Logo scrolled={scrolled} />
           </a>
 
