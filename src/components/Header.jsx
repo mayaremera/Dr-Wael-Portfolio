@@ -3,12 +3,13 @@ import { site } from '../data/content'
 import Logo from './Logo'
 
 const navLinks = [
-  { href: '#profile', label: 'About' },
-  { href: '#approach', label: 'Services' },
-  { href: '#cases', label: 'Cases' },
-  { href: '#certificates', label: 'Credentials' },
-  { href: '#video', label: 'Video' },
-  { href: '#contact', label: 'Contact' },
+  { href: '/about-me', label: 'About Me' },
+  { href: '/services', label: 'Services' },
+  { href: '/cases', label: 'Cases' },
+  { href: '/video-gallery', label: 'Video / Gallery' },
+  { href: '/in-the-field', label: 'In the Field' },
+  { href: '/testimonials', label: 'Testimonials' },
+  { href: '/contact', label: 'Contact' },
 ]
 
 function SocialIcon({ href, label, children }) {
@@ -136,7 +137,7 @@ export default function Header() {
       >
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 lg:px-15">
           <a
-            href="#"
+            href="/"
             aria-label="Home"
             className="flex items-center transition-opacity hover:opacity-90"
           >
@@ -155,7 +156,7 @@ export default function Header() {
           </nav>
 
           <a
-            href="#contact"
+            href="/contact"
             className={`hidden rounded-sm px-5 py-2.5 text-sm font-medium tracking-wide transition-colors lg:inline-block ${
               scrolled
                 ? 'bg-brand text-white hover:bg-brand-light'
@@ -199,7 +200,7 @@ export default function Header() {
               ))}
               <li>
                 <a
-                  href="#contact"
+                  href="/contact"
                   className="inline-block rounded-sm bg-brand px-5 py-2.5 text-sm font-medium text-white"
                   onClick={() => setOpen(false)}
                 >

@@ -1,4 +1,64 @@
-import { images, profileDetails } from '../data/content'
+import { images, profileDetails, certificates } from '../data/content'
+import { IconAward } from './Icons'
+
+function AshaFellowCard() {
+  const award = certificates.find((c) => c.featured)
+  if (!award) return null
+
+  return (
+    <div className="mt-14 overflow-hidden rounded-sm shadow-lg ring-1 ring-brand/15">
+      <div className="grid lg:grid-cols-[minmax(260px,320px)_1fr]">
+        <div className="relative flex flex-col items-center justify-center bg-gradient-to-br from-brand via-brand to-brand-light px-8 py-10 lg:py-12">
+          <div
+            className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-accent/20 blur-2xl"
+            aria-hidden="true"
+          />
+          <div
+            className="pointer-events-none absolute -bottom-6 -left-6 h-24 w-24 rounded-full bg-white/10 blur-xl"
+            aria-hidden="true"
+          />
+
+          <div className="relative mb-6 h-28 w-28 overflow-hidden rounded-full ring-4 ring-white/25 ring-offset-2 ring-offset-brand">
+            <img
+              src={images.drWael}
+              alt="Dr. Wael A. Al-Dakroury"
+              className="h-full w-full object-cover object-top"
+            />
+          </div>
+
+          <div className="relative flex h-24 w-24 items-center justify-center">
+            <div className="absolute inset-0 rounded-full border-2 border-accent/40" />
+            <div className="absolute inset-2 rounded-full border border-dashed border-white/30" />
+            <div className="flex h-16 w-16 flex-col items-center justify-center rounded-full bg-accent text-white shadow-lg shadow-accent/30">
+              <IconAward className="h-7 w-7" />
+            </div>
+          </div>
+
+          <p className="relative mt-5 text-center text-[0.65rem] font-bold tracking-[0.22em] text-accent uppercase">
+            Highest Honor · {award.year}
+          </p>
+        </div>
+
+        <div className="flex flex-col justify-center bg-white px-6 py-8 sm:px-8 lg:px-10 lg:py-10">
+          <span className="inline-flex w-fit rounded-full bg-brand-muted px-3 py-1 text-[0.65rem] font-semibold tracking-wide text-brand uppercase">
+            Distinguished Recognition
+          </span>
+          <h3 className="mt-4 font-serif text-2xl leading-tight text-ink md:text-3xl lg:text-4xl">
+            {award.title}
+          </h3>
+          <p className="mt-2 text-base font-medium text-brand">{award.issuer}</p>
+          <p className="mt-5 max-w-2xl text-sm leading-relaxed text-ink-muted md:text-base">
+            {award.description}
+          </p>
+          <p className="mt-4 text-sm leading-relaxed text-ink-muted">
+            Awarded to a select group of members worldwide who have advanced the field through
+            outstanding contributions to communication sciences and disorders.
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default function Profile() {
   const { name, title, credentials, tagline, bio } = profileDetails
@@ -66,6 +126,8 @@ export default function Profile() {
             </div>
           </div>
         </div>
+
+        <AshaFellowCard />
       </div>
     </section>
   )

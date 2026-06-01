@@ -10,10 +10,13 @@ export const site = {
   hours: 'Sunday – Thursday',
   languages: ['English', 'Arabic'],
   tagline: 'Every child has something to say — we help them find the words.',
+  footerTagline: 'Helping children communicate, connect, and thrive.',
   social: {
-    twitter: 'https://twitter.com/',
+    facebook: 'https://facebook.com/',
     instagram: 'https://instagram.com/',
+    youtube: 'https://youtube.com/',
     linkedin: 'https://linkedin.com/',
+    twitter: 'https://twitter.com/',
   },
 }
 
@@ -386,8 +389,17 @@ export const testimonials = [
 ]
 
 export const footerServices = [
-  'Screening',
   'Assessment',
-  'Family Counseling',
   'Therapy',
+  'Parent Coaching',
+  'School Collaboration',
+]
+
+export const footerQuickLinks = [
+  { label: 'About', href: '/about-me' },
+  { label: 'Services', href: '/services' },
+  { label: 'Cases', href: '/cases' },
+  { label: 'Video / Gallery', href: '/video-gallery' },
+  { label: 'In the Field', href: '/in-the-field' },
+  { label: 'Contact', href: '/contact' },
 ]
