@@ -47,10 +47,6 @@ export default function PromoVideoSection() {
           >
             {sectionTitle}
           </h2>
-          <div
-            className="mx-auto mt-5 h-1 w-14 rounded-full bg-gradient-to-r from-brand via-brand-light to-accent"
-            aria-hidden="true"
-          />
         </header>
 
         <div className="relative min-h-[min(72vh,640px)] overflow-hidden rounded-sm shadow-xl shadow-brand/15">

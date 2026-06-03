@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import Header from './components/Header'
 import HeroBanner from './components/HeroBanner'
 import HopeGallery from './components/HopeGallery'
@@ -8,12 +9,11 @@ import Leadership from './components/Leadership'
 import CertificationGallery from './components/CertificationGallery'
 import TherapyConcepts from './components/TherapyConcepts'
 import Expertise from './components/Expertise'
-import ClinicalSpecializations from './components/ClinicalSpecializations'
 import Testimonials from './components/Testimonials'
 import VideoSection from './components/VideoSection'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
-import { images } from './data/content'
+import { images, pediatricServices } from './data/content'
 
 const HOME_PATH = '/'
 
@@ -49,12 +49,10 @@ function HomePage() {
       <HeroBanner />
       <Profile />
       <Expertise />
-      <TherapyConcepts />
+      <TherapyConcepts showCasesPreview />
       <PromoVideoSection />
-      <ClinicalSpecializations />
-      <HopeGallery />
       <DrWaelActivity />
-      <Testimonials />
+      <Testimonials variant="showcase" />
       <Contact />
     </>
   )
@@ -117,7 +115,14 @@ function VibeBand({
 }
 
 function App() {
-  const pathname = window.location.pathname.replace(/\/+$/, '') || HOME_PATH
+  const rawPath = window.location.pathname.replace(/\/+$/, '') || HOME_PATH
+  const pathname = rawPath === '/cases' ? '/services' : rawPath
+
+  useEffect(() => {
+    if (rawPath === '/cases') {
+      window.history.replaceState(null, '', '/services#cases')
+    }
+  }, [rawPath])
 
   const pages = {
     [HOME_PATH]: <HomePage />,
@@ -149,48 +154,22 @@ function App() {
       <PageLayout
         hero={{
           eyebrow: 'Services',
-          title: 'Speech-Language Services',
-          description:
-            'Comprehensive, evidence-based support from screening and assessment to therapy and family guidance.',
+          title: pediatricServices.title,
+          description: pediatricServices.intro,
           image: images.familyCounseling,
         }}
       >
         <Expertise />
-        <TherapyConcepts />
+        <TherapyConcepts fullDetail />
         <VibeBand
           label="Integrated Care Pathway"
           title="From First Screening to Long-Term Progress"
           description="Every service is connected in one clear journey: early identification, thorough assessment, personalized therapy, and practical family coaching."
           primaryHref="/contact"
           primaryLabel="Start with Screening"
-          secondaryHref="/cases"
+          secondaryHref="#cases"
           secondaryLabel="See Clinical Cases"
         />
-        <ClinicalSpecializations />
-        <Testimonials />
-      </PageLayout>
-    ),
-    '/cases': (
-      <PageLayout
-        hero={{
-          eyebrow: 'Clinical Cases',
-          title: 'Conditions We Specialize In',
-          description:
-            'Explore key clinical areas where Dr. Wael provides focused, personalized intervention.',
-          image: images.assessment,
-        }}
-      >
-        <ClinicalSpecializations />
-        <VibeBand
-          label="Case-Based Excellence"
-          title="Specialized Care for Complex Communication Needs"
-          description="Each case is managed with evidence-based strategy, bilingual precision, and close collaboration with families and educational teams."
-          primaryHref="/contact"
-          primaryLabel="Discuss Your Case"
-          secondaryHref="/services"
-          secondaryLabel="Review Services"
-        />
-        <TherapyConcepts />
         <Testimonials />
       </PageLayout>
     ),
@@ -251,7 +230,7 @@ function App() {
           image: images.family,
         }}
       >
-        <Testimonials />
+        <Testimonials variant="gallery" />
         <VibeBand
           label="Families First"
           title="Stories of Progress, Trust, and Lasting Results"
@@ -281,7 +260,7 @@ function App() {
           description="Share your concerns, ask questions, and receive clear guidance on what support your child may need next."
           primaryHref="/services"
           primaryLabel="View Services"
-          secondaryHref="/cases"
+          secondaryHref="/services#cases"
           secondaryLabel="See Specializations"
         />
         <TherapyConcepts />

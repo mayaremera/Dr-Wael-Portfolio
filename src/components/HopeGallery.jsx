@@ -41,10 +41,6 @@ export default function HopeGallery() {
           <h2 className="mt-3 font-serif text-3xl leading-tight text-ink md:text-4xl">
             {hopeGallery.title}
           </h2>
-          <div
-            className="mx-auto mt-5 h-1 w-14 rounded-full bg-gradient-to-r from-brand via-brand-light to-accent"
-            aria-hidden="true"
-          />
         </header>
 
         <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-12 lg:grid-rows-2 lg:gap-4">

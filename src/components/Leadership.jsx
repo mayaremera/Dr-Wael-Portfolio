@@ -33,7 +33,7 @@ export default function Leadership() {
                     <span>
                       <span className="font-medium text-ink">{area.title}</span>
                       {' — '}
-                      {area.description}
+                      {area.excerpt}
                     </span>
                   </li>
                 ))}

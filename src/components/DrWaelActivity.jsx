@@ -109,7 +109,7 @@ function ActivityCard({ item, isUpcoming = false }) {
       <ActivityCardMedia item={item} />
 
       <div className="px-4 py-4 sm:px-5 sm:py-5">
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex min-h-7 flex-wrap items-start gap-2">
           <span className="rounded-full bg-brand-muted px-2.5 py-0.5 text-[0.65rem] font-semibold tracking-wide text-brand uppercase">
             {item.type}
           </span>
@@ -125,10 +125,12 @@ function ActivityCard({ item, isUpcoming = false }) {
           <p className="text-xs font-medium tracking-wide text-ink-muted uppercase">{item.period}</p>
         </div>
 
-        <h3 className="mt-2 font-serif text-base leading-snug text-ink sm:mt-3 sm:text-lg">{item.title}</h3>
+        <h3 className="mt-2 line-clamp-2 min-h-[2.75rem] font-serif text-base leading-snug text-ink sm:mt-3 sm:min-h-[3.25rem] sm:text-lg">
+          {item.title}
+        </h3>
         <p className="mt-1 text-sm font-medium text-brand">{item.location}</p>
 
-        <div className="grid grid-rows-[0fr] transition-[grid-template-rows] duration-500 ease-out group-hover/card:grid-rows-[1fr] group-focus-within/card:grid-rows-[1fr]">
+        <div className="mt-3 grid grid-rows-[0fr] transition-[grid-template-rows] duration-500 ease-out group-hover/card:grid-rows-[1fr] group-focus-within/card:grid-rows-[1fr]">
           <div className="overflow-hidden">
             <p className="border-t border-slate-200/80 pt-3 text-sm leading-relaxed text-ink-muted opacity-0 transition-opacity duration-500 delay-75 group-hover/card:opacity-100 group-focus-within/card:opacity-100 sm:pt-4">
               {item.note}
@@ -169,10 +171,6 @@ export default function DrWaelActivity() {
           <h2 id="activity-heading" className="mt-3 font-serif text-3xl leading-tight text-ink md:text-4xl">
             {title}
           </h2>
-          <div
-            className="mx-auto mt-5 h-1 w-14 rounded-full bg-gradient-to-r from-brand via-brand-light to-accent"
-            aria-hidden="true"
-          />
           <p className="mt-6 text-base leading-relaxed text-ink-muted md:text-lg">{description}</p>
         </header>
 

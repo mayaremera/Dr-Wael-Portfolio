@@ -15,6 +15,7 @@
   --color-surface: #ffffff;
   --color-surface-alt: #f0f4f6;
   --color-surface-tint: #e2eaee;
+  --max-width-6xl: 80rem;
 }
 
 html {
@@ -130,4 +131,19 @@ body {
 .animate-event-sound-wave {
   animation: event-sound-wave 1.15s ease-in-out infinite;
   transform-origin: bottom center;
+}
+
+@keyframes testimonial-spotlight-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-testimonial-spotlight {
+  animation: testimonial-spotlight-in 0.55s ease-out forwards;
 }

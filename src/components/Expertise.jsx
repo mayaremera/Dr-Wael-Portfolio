@@ -12,8 +12,6 @@ export default function Expertise() {
             <h2 className="mt-4 font-serif text-3xl leading-tight text-ink md:text-[2.125rem] lg:text-4xl">
               {whyChooseUs.title}
             </h2>
-            <div className="mt-5 h-1 w-14 rounded-full bg-brand" aria-hidden="true" />
-
             <div className="mt-8 space-y-5">
               {whyChooseUs.paragraphs.map((paragraph, index) => (
                 <p

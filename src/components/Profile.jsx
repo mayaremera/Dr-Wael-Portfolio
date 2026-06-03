@@ -1,59 +1,133 @@
-import { images, profileDetails, certificates } from '../data/content'
-import { IconAward } from './Icons'
+import { useState } from 'react'
+import { images, profileDetails, trustedCompanies } from '../data/content'
 
-function AshaFellowCard() {
-  const award = certificates.find((c) => c.featured)
-  if (!award) return null
+const sectionLinkClassName =
+  'relative inline-block w-fit pb-1 text-xs font-semibold tracking-[0.12em] text-brand uppercase transition-colors after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-brand after:transition-transform after:duration-300 after:ease-out hover:text-brand-light hover:after:scale-x-100'
+
+function AffiliationHoverOverlay({ company }) {
+  return (
+    <>
+      <div
+        className="absolute inset-0 z-[2] translate-y-full bg-brand transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0 group-focus-within:translate-y-0"
+        aria-hidden="true"
+      />
+
+      <div className="pointer-events-none absolute inset-0 z-[3] flex translate-y-3 flex-col justify-end p-3.5 opacity-0 transition-all duration-500 delay-75 ease-out group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100 sm:p-4">
+        <span className="mb-2 inline-block h-0.5 w-0 origin-left bg-accent transition-all duration-500 delay-150 group-hover:w-8 group-focus-within:w-8" />
+        <p className="text-[0.58rem] font-bold tracking-[0.16em] text-accent uppercase">{company.shortName}</p>
+        <p className="mt-1 font-serif text-xs leading-snug text-white sm:text-[0.8125rem]">{company.name}</p>
+        <p className="mt-1.5 text-[0.6875rem] leading-snug text-white/75 sm:text-xs">{company.role}</p>
+      </div>
+    </>
+  )
+}
+
+function AffiliationTile({ company }) {
+  const [logoFailed, setLogoFailed] = useState(false)
 
   return (
-    <div className="mt-14 overflow-hidden rounded-sm shadow-lg ring-1 ring-brand/15">
-      <div className="grid lg:grid-cols-[minmax(260px,320px)_1fr]">
-        <div className="relative flex flex-col items-center justify-center bg-gradient-to-br from-brand via-brand to-brand-light px-8 py-10 lg:py-12">
-          <div
-            className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-accent/20 blur-2xl"
-            aria-hidden="true"
-          />
-          <div
-            className="pointer-events-none absolute -bottom-6 -left-6 h-24 w-24 rounded-full bg-white/10 blur-xl"
-            aria-hidden="true"
-          />
-
-          <div className="relative mb-6 h-28 w-28 overflow-hidden rounded-full ring-4 ring-white/25 ring-offset-2 ring-offset-brand">
+    <article
+      className="group relative h-32 overflow-hidden rounded-sm border border-slate-200/80 bg-white shadow-sm transition-[box-shadow,background-color,border-color] duration-300 hover:border-brand hover:bg-brand hover:shadow-xl hover:shadow-brand/20 focus-within:border-brand focus-within:bg-brand focus-within:shadow-xl focus-within:shadow-brand/20 sm:h-36"
+      tabIndex={0}
+    >
+      <div className="relative h-full w-full overflow-hidden">
+        {!logoFailed ? (
+          <div className="flex h-full w-full items-center justify-center">
             <img
-              src={images.drWael}
-              alt="Dr. Wael A. Al-Dakroury"
-              className="h-full w-full object-cover object-top"
+              src={company.logo}
+              alt={company.name}
+              onError={() => setLogoFailed(true)}
+              className="max-h-[82%] w-auto max-w-[88%] object-contain transition-all duration-300 ease-out group-hover:scale-95 group-hover:opacity-0 group-focus-within:scale-95 group-focus-within:opacity-0"
             />
           </div>
+        ) : (
+          <div className="flex h-full w-full items-center justify-center">
+            <div className="flex h-20 w-20 items-center justify-center rounded-full border border-brand/15 bg-brand-muted/50 transition-opacity duration-300 group-hover:opacity-0 group-focus-within:opacity-0">
+              <span className="font-serif text-xl font-semibold text-brand">{company.shortName.slice(0, 3)}</span>
+            </div>
+          </div>
+        )}
 
-          <div className="relative flex h-24 w-24 items-center justify-center">
-            <div className="absolute inset-0 rounded-full border-2 border-accent/40" />
-            <div className="absolute inset-2 rounded-full border border-dashed border-white/30" />
-            <div className="flex h-16 w-16 flex-col items-center justify-center rounded-full bg-accent text-white shadow-lg shadow-accent/30">
-              <IconAward className="h-7 w-7" />
+        <AffiliationHoverOverlay company={company} />
+      </div>
+    </article>
+  )
+}
+
+function RecognitionTile({ company }) {
+  return (
+    <article className="relative h-32 overflow-hidden rounded-sm border border-brand/30 bg-gradient-to-br from-brand via-brand to-brand-light shadow-sm sm:h-36">
+      <div className="relative h-full w-full overflow-hidden">
+        <div className="pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full bg-white/10 blur-2xl" aria-hidden="true" />
+        <div className="pointer-events-none absolute -bottom-6 -left-6 h-20 w-20 rounded-full bg-accent/25 blur-xl" aria-hidden="true" />
+
+        <div className="relative flex h-full flex-col justify-between p-3.5 sm:p-4">
+          <div className="flex items-start gap-2.5">
+            <span className="mt-0.5 h-9 w-0.5 shrink-0 bg-accent sm:h-10" aria-hidden="true" />
+            <div className="min-w-0">
+              <p className="text-[0.55rem] font-bold tracking-[0.18em] text-accent uppercase sm:text-[0.58rem]">
+                {company.shortName}
+              </p>
+              <p className="mt-1 font-serif text-xs leading-snug text-white sm:text-[0.8125rem]">{company.name}</p>
             </div>
           </div>
 
-          <p className="relative mt-5 text-center text-[0.65rem] font-bold tracking-[0.22em] text-accent uppercase">
-            Highest Honor · {award.year}
+          <p className="line-clamp-2 pl-3 text-[0.625rem] leading-snug text-white/70 sm:text-[0.6875rem]">
+            {company.role}
           </p>
         </div>
+      </div>
+    </article>
+  )
+}
 
-        <div className="flex flex-col justify-center bg-white px-6 py-8 sm:px-8 lg:px-10 lg:py-10">
-          <span className="inline-flex w-fit rounded-full bg-brand-muted px-3 py-1 text-[0.65rem] font-semibold tracking-wide text-brand uppercase">
-            Distinguished Recognition
-          </span>
-          <h3 className="mt-4 font-serif text-2xl leading-tight text-ink md:text-3xl lg:text-4xl">
-            {award.title}
-          </h3>
-          <p className="mt-2 text-base font-medium text-brand">{award.issuer}</p>
-          <p className="mt-5 max-w-2xl text-sm leading-relaxed text-ink-muted md:text-base">
-            {award.description}
-          </p>
-          <p className="mt-4 text-sm leading-relaxed text-ink-muted">
-            Awarded to a select group of members worldwide who have advanced the field through
-            outstanding contributions to communication sciences and disorders.
-          </p>
+function AffiliationGrid({ companies }) {
+  const featured = companies.find((company) => company.featured)
+  const standard = companies.filter((company) => !company.featured)
+  const rowOne = standard.slice(0, 4)
+  const rowTwo = standard.slice(4, 6)
+
+  return (
+    <div className="space-y-3 sm:space-y-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+        {rowOne.map((company) => (
+          <AffiliationTile key={company.id} company={company} />
+        ))}
+      </div>
+
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
+        {rowTwo.map((company) => (
+          <AffiliationTile key={company.id} company={company} />
+        ))}
+        {featured ? (
+          <div className="col-span-2 sm:col-span-1">
+            <RecognitionTile company={featured} />
+          </div>
+        ) : null}
+      </div>
+    </div>
+  )
+}
+
+function TrustedCompanies() {
+  const { title, subtitle, viewAllLabel, viewAllHref, companies } = trustedCompanies
+
+  return (
+    <div className="mt-12 border-t border-slate-200/80 pt-10 lg:mt-14 lg:pt-12">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-8">
+        <div className="max-w-2xl">
+          <p className="text-sm font-medium tracking-[0.1em] text-brand uppercase">Global collaboration</p>
+          <h3 className="mt-2 font-serif text-2xl leading-tight text-ink md:text-3xl">{title}</h3>
+          <p className="mt-3 text-sm leading-relaxed text-ink-muted md:text-base">{subtitle}</p>
+        </div>
+        <a href={viewAllHref} className={`${sectionLinkClassName} shrink-0 self-start sm:mt-2`}>
+          {viewAllLabel}
+        </a>
+      </div>
+
+      <div className="mt-8 rounded-sm bg-gradient-to-br from-brand/8 via-brand-muted/40 to-accent/10 p-[1px] sm:mt-10">
+        <div className="rounded-[calc(0.125rem-1px)] bg-white/90 p-3 backdrop-blur-sm sm:p-4 lg:p-5">
+          <AffiliationGrid companies={companies} />
         </div>
       </div>
     </div>
@@ -96,12 +170,12 @@ export default function Profile() {
               ))}
             </div>
 
-            <blockquote className="mt-5 border-l-4 border-brand pl-4">
+            <blockquote className="mt-5">
               <p className="font-serif text-lg leading-relaxed text-ink italic md:text-xl">
                 &ldquo;{tagline}&rdquo;
               </p>
               <footer className="mt-2 text-sm font-medium text-brand">
-                — {name}
+                {name}
               </footer>
             </blockquote>
 
@@ -127,7 +201,7 @@ export default function Profile() {
           </div>
         </div>
 
-        <AshaFellowCard />
+        <TrustedCompanies />
       </div>
     </section>
   )

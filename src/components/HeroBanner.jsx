@@ -5,7 +5,7 @@ export default function HeroBanner() {
     <section className="relative min-h-[80vh] overflow-hidden lg:min-h-[95vh]">
       <img
         src={images.heroBanner}
-        alt="Dr. Wael A. Al-Dakroury — pediatric speech and language pathology"
+        alt="Dr. Wael A. Al-Dakroury, pediatric speech and language pathology"
         className="absolute inset-0 h-full w-full object-cover"
       />
       <div className="absolute inset-0 bg-gradient-to-r from-ink/85 via-ink/60 to-ink/30" />
@@ -18,7 +18,7 @@ export default function HeroBanner() {
           {profileDetails.name}
         </h1>
         <p className="mt-6 max-w-xl text-lg leading-relaxed text-white drop-shadow-md">
-          Over 30 years of clinical excellence — ASHA Fellow 2025. Helping
+          Over 30 years of clinical excellence, ASHA Fellow. Helping
           children with autism, ADHD, and language disorders find their voice
           through compassionate, evidence-based care in English and Arabic.
         </p>

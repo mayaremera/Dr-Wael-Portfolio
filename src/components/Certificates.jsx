@@ -34,7 +34,7 @@ export default function Certificates() {
                 </div>
               </div>
               <p className="mt-6 text-center text-xs font-bold tracking-[0.2em] text-brand uppercase">
-                Highest Honor · {featured.year}
+                Highest Honor
               </p>
             </div>
 

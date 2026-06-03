@@ -24,7 +24,7 @@ export default function Contact() {
             <p className="mt-6 leading-relaxed text-ink-muted">
               Whether you are a parent seeking guidance for your child, a
               colleague interested in collaboration, or an institution looking for
-              expert consultation — reach out to begin the conversation.
+              expert consultation. Reach out to begin the conversation.
             </p>
 
             <div className="mt-10 space-y-4">
