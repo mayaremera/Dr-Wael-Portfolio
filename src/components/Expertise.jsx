@@ -2,7 +2,7 @@ import { images, whyChooseUs } from '../data/content'
 
 export default function Expertise() {
   return (
-    <section id="expertise" className="border-t border-slate-200 bg-surface py-20 lg:py-28">
+    <section id="expertise" className="border-t border-slate-200 bg-surface-alt py-20 lg:py-28">
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
         <div className="overflow-hidden rounded-sm bg-white shadow-md ring-1 ring-slate-200/80 lg:grid lg:grid-cols-2">
           <div className="order-2 flex flex-col justify-center px-8 py-10 sm:px-10 lg:order-1 lg:px-12 lg:py-14 xl:px-14">
@@ -42,11 +42,11 @@ export default function Expertise() {
               className="absolute inset-0 h-full w-full object-cover"
             />
             <div
-              className="pointer-events-none absolute inset-0 bg-gradient-to-r from-white/85 via-white/25 to-transparent"
+              className="pointer-events-none absolute inset-0 bg-gradient-to-r from-surface-alt/85 via-surface-alt/25 to-transparent"
               aria-hidden="true"
             />
             <div
-              className="pointer-events-none absolute inset-y-0 left-0 hidden w-24 bg-gradient-to-r from-white via-white/40 to-transparent lg:block"
+              className="pointer-events-none absolute inset-y-0 left-0 hidden w-24 bg-gradient-to-r from-surface-alt via-surface-alt/40 to-transparent lg:block"
               aria-hidden="true"
             />
           </div>

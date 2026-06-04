@@ -4,16 +4,7 @@ import { promoVideo } from '../data/content'
 const PROMO_PLAYBACK_RATE = 0.65
 
 export default function PromoVideoSection() {
-  const {
-    src,
-    sectionLabel,
-    sectionTitle,
-    label,
-    titleHighlight,
-    description,
-    cta,
-    secondary,
-  } = promoVideo
+  const { src, label, titleHighlight, description, cta, secondary } = promoVideo
   const videoRef = useRef(null)
 
   useEffect(() => {
@@ -34,21 +25,9 @@ export default function PromoVideoSection() {
     <section
       id="promo"
       className="border-t border-slate-200 bg-surface-alt py-16 lg:py-20"
-      aria-labelledby="promo-section-heading"
+      aria-labelledby="promo-heading"
     >
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
-        <header className="mb-10 text-center lg:mb-12">
-          <p className="text-xs font-semibold tracking-[0.22em] text-brand uppercase">
-            {sectionLabel}
-          </p>
-          <h2
-            id="promo-section-heading"
-            className="mt-3 font-serif text-3xl leading-tight text-ink md:text-4xl"
-          >
-            {sectionTitle}
-          </h2>
-        </header>
-
         <div className="relative min-h-[min(72vh,640px)] overflow-hidden rounded-sm shadow-xl shadow-brand/15">
           <video
             ref={videoRef}

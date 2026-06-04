@@ -3,12 +3,12 @@ import { site } from '../data/content'
 import Logo from './Logo'
 
 const navLinks = [
+  { href: '/', label: 'Home' },
   { href: '/about-me', label: 'About Me' },
   { href: '/services', label: 'Services' },
   { href: '/video-gallery', label: 'Video / Gallery' },
   { href: '/in-the-field', label: 'In the Field' },
   { href: '/testimonials', label: 'Testimonials' },
-  { href: '/contact', label: 'Contact' },
 ]
 
 function SocialIcon({ href, label, children }) {
@@ -56,6 +56,11 @@ export default function Header() {
       <div className="border-b border-slate-100 bg-white/95 backdrop-blur-sm">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-2 lg:px-8 lg:py-2.5">
           <div className="flex shrink-0 items-center gap-2">
+            <SocialIcon href={site.social.facebook} label="Facebook">
+              <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 fill-current" aria-hidden="true">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+              </svg>
+            </SocialIcon>
             <SocialIcon href={site.social.twitter} label="X / Twitter">
               <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 fill-current">
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
@@ -134,16 +139,16 @@ export default function Header() {
             : 'bg-transparent py-4 lg:py-5'
         }`}
       >
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 lg:px-15">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 lg:gap-6 lg:px-8">
           <a
             href="/"
             aria-label="Home"
-            className="flex items-center transition-opacity hover:opacity-90"
+            className="flex shrink-0 items-center transition-opacity hover:opacity-90"
           >
             <Logo scrolled={scrolled} />
           </a>
 
-          <nav className="hidden items-center gap-8 lg:flex">
+          <nav className="hidden items-center gap-6 xl:gap-8 lg:flex">
             {navLinks.map((link) => (
               <NavLink
                 key={link.href}

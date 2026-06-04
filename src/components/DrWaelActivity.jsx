@@ -68,7 +68,7 @@ function ActivityCardMedia({ item }) {
             aria-hidden="true"
           />
 
-          <span className="pointer-events-none absolute left-3 top-3 rounded-full bg-black/40 px-2.5 py-1 text-[0.65rem] font-semibold tracking-wide text-white/100 uppercase backdrop-">
+          <span className="pointer-events-none absolute left-3 top-3 rounded-full bg-black/40 px-2.5 py-1 text-[0.65rem] font-semibold tracking-wide text-white uppercase backdrop-">
             Event clip
           </span>
 
@@ -171,21 +171,19 @@ export default function DrWaelActivity() {
           <h2 id="activity-heading" className="mt-3 font-serif text-3xl leading-tight text-ink md:text-4xl">
             {title}
           </h2>
-          <p className="mt-6 text-base leading-relaxed text-ink-muted md:text-lg">{description}</p>
+          <p className="mt-4 text-base leading-relaxed text-ink-muted md:text-lg">{description}</p>
         </header>
 
-        <div className="mt-14">
-          <div className="mb-4 flex justify-end">
-            <a href="#contact" className={sectionLinkClassName}>
-              View all events
-            </a>
-          </div>
+        <div className="mt-10 mb-4 flex justify-end">
+          <a href="/in-the-field" className={sectionLinkClassName}>
+            View all events
+          </a>
+        </div>
 
-          <div className="grid items-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {featuredEvents.map((item) => (
-              <ActivityCard key={item.id} item={item} isUpcoming={item.isUpcoming} />
-            ))}
-          </div>
+        <div className="grid items-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {featuredEvents.map((item) => (
+            <ActivityCard key={item.id} item={item} isUpcoming={item.isUpcoming} />
+          ))}
         </div>
       </div>
     </section>

@@ -5,7 +5,7 @@ export default function Logo({ scrolled = false, className = '' }) {
     <img
       src={logo}
       alt=""
-      className={`h-12 w-auto shrink-0 transition-[filter] duration-300 lg:h-12 ${
+      className={`h-[3.3rem] w-auto shrink-0 transition-[filter] duration-300 lg:h-[3.3rem] ${
         scrolled ? '' : 'brightness-0 invert'
       } ${className}`}
     />

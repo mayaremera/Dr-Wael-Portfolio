@@ -1,6 +1,12 @@
 import { useState } from 'react'
 import { testimonials, testimonialsSection } from '../data/content'
 
+const sectionLinkClassName =
+  'relative inline-block w-fit pb-1 text-xs font-semibold tracking-[0.12em] text-brand uppercase transition-colors after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-brand after:transition-transform after:duration-300 after:ease-out hover:text-brand-light hover:after:scale-x-100'
+
+const showcaseLinkClassName =
+  'relative inline-block w-fit pb-1 text-xs font-semibold tracking-[0.12em] text-accent uppercase transition-colors after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-accent after:transition-transform after:duration-300 after:ease-out hover:text-white hover:after:scale-x-100'
+
 function excerpt(quote, max = 88) {
   if (quote.length <= max) return quote
   const slice = quote.slice(0, max)
@@ -178,7 +184,7 @@ function TestimonialsShowcase() {
         </p>
 
         <div className="relative mx-auto max-w-6xl px-6 py-12 lg:px-8 lg:py-14">
-          <header className="max-w-2xl">
+          <header className="mx-auto max-w-2xl text-center">
             <p className="text-xs font-semibold tracking-[0.22em] text-accent uppercase">
               {testimonialsSection.eyebrow}
             </p>
@@ -190,7 +196,13 @@ function TestimonialsShowcase() {
             </p>
           </header>
 
-          <div className="mt-8 lg:mt-10 lg:grid lg:grid-cols-[minmax(0,280px)_1fr] lg:items-stretch lg:gap-8 xl:grid-cols-[minmax(0,300px)_1fr] xl:gap-10">
+          <div className="mt-8 mb-4 flex justify-end">
+            <a href="/testimonials" className={showcaseLinkClassName}>
+              Read all family stories
+            </a>
+          </div>
+
+          <div className="lg:grid lg:grid-cols-[minmax(0,280px)_1fr] lg:items-stretch lg:gap-8 xl:grid-cols-[minmax(0,300px)_1fr] xl:gap-10">
             <div className="grid min-w-0 grid-cols-1">
               <div
                 className="pointer-events-none invisible col-start-1 row-start-1 hidden min-w-0 lg:block"
@@ -256,16 +268,10 @@ function TestimonialsShowcase() {
                 />
 
                 <div className="flex min-h-0 flex-1 flex-col p-5 sm:p-6">
-                  <div className="flex shrink-0 items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                  <div className="flex shrink-0 items-center border-b border-slate-100 pb-3">
                     <p className="text-[0.65rem] font-semibold tracking-[0.16em] text-brand uppercase">
                       {String(activeIndex + 1).padStart(2, '0')} / {String(testimonials.length).padStart(2, '0')}
                     </p>
-                    <a
-                      href="/testimonials"
-                      className="relative shrink-0 pb-0.5 text-right text-[0.65rem] font-semibold tracking-[0.12em] text-brand uppercase transition-colors after:absolute after:bottom-0 after:right-0 after:left-0 after:h-0.5 after:origin-right after:scale-x-0 after:bg-brand after:transition-transform after:duration-300 hover:text-brand-light hover:after:scale-x-100"
-                    >
-                      Read all family stories
-                    </a>
                   </div>
 
                   <div className="mt-3 flex shrink-0 flex-wrap items-start justify-between gap-3">
@@ -351,7 +357,7 @@ function TestimonialsGallery() {
   return (
     <section id="testimonials" className="border-t border-slate-200 bg-surface-alt py-16 lg:py-24">
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
-        <header className="max-w-2xl">
+        <header className="mx-auto max-w-2xl text-center">
           <p className="text-xs font-semibold tracking-[0.22em] text-brand uppercase">
             {testimonialsSection.eyebrow}
           </p>

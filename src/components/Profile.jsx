@@ -8,15 +8,15 @@ function AffiliationHoverOverlay({ company }) {
   return (
     <>
       <div
-        className="absolute inset-0 z-[2] translate-y-full bg-brand transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0 group-focus-within:translate-y-0"
+        className="absolute inset-0 z-[2] translate-y-full bg-brand-muted transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0 group-focus-within:translate-y-0"
         aria-hidden="true"
       />
 
       <div className="pointer-events-none absolute inset-0 z-[3] flex translate-y-3 flex-col justify-end p-3.5 opacity-0 transition-all duration-500 delay-75 ease-out group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100 sm:p-4">
-        <span className="mb-2 inline-block h-0.5 w-0 origin-left bg-accent transition-all duration-500 delay-150 group-hover:w-8 group-focus-within:w-8" />
-        <p className="text-[0.58rem] font-bold tracking-[0.16em] text-accent uppercase">{company.shortName}</p>
-        <p className="mt-1 font-serif text-xs leading-snug text-white sm:text-[0.8125rem]">{company.name}</p>
-        <p className="mt-1.5 text-[0.6875rem] leading-snug text-white/75 sm:text-xs">{company.role}</p>
+        <span className="mb-2 inline-block h-0.5 w-0 origin-left bg-brand/40 transition-all duration-500 delay-150 group-hover:w-8 group-focus-within:w-8" />
+        <p className="text-[0.58rem] font-bold tracking-[0.16em] text-brand uppercase">{company.shortName}</p>
+        <p className="mt-1 font-serif text-xs leading-snug text-ink sm:text-[0.8125rem]">{company.name}</p>
+        <p className="mt-1.5 text-[0.6875rem] leading-snug text-ink-muted sm:text-xs">{company.role}</p>
       </div>
     </>
   )
@@ -27,7 +27,7 @@ function AffiliationTile({ company }) {
 
   return (
     <article
-      className="group relative h-32 overflow-hidden rounded-sm border border-slate-200/80 bg-white shadow-sm transition-[box-shadow,background-color,border-color] duration-300 hover:border-brand hover:bg-brand hover:shadow-xl hover:shadow-brand/20 focus-within:border-brand focus-within:bg-brand focus-within:shadow-xl focus-within:shadow-brand/20 sm:h-36"
+      className="group relative h-32 overflow-hidden rounded-sm border border-slate-200/80 bg-white shadow-sm transition-[box-shadow,border-color,transform] duration-300 hover:-translate-y-0.5 hover:border-brand/20 hover:shadow-md hover:shadow-brand/10 focus-within:-translate-y-0.5 focus-within:border-brand/20 focus-within:shadow-md focus-within:shadow-brand/10 sm:h-36"
       tabIndex={0}
     >
       <div className="relative h-full w-full overflow-hidden">
@@ -37,12 +37,12 @@ function AffiliationTile({ company }) {
               src={company.logo}
               alt={company.name}
               onError={() => setLogoFailed(true)}
-              className="max-h-[82%] w-auto max-w-[88%] object-contain transition-all duration-300 ease-out group-hover:scale-95 group-hover:opacity-0 group-focus-within:scale-95 group-focus-within:opacity-0"
+              className="max-h-[82%] w-auto max-w-[88%] object-contain transition-all duration-500 ease-out group-hover:scale-[0.88] group-hover:opacity-25 group-focus-within:scale-[0.88] group-focus-within:opacity-25"
             />
           </div>
         ) : (
           <div className="flex h-full w-full items-center justify-center">
-            <div className="flex h-20 w-20 items-center justify-center rounded-full border border-brand/15 bg-brand-muted/50 transition-opacity duration-300 group-hover:opacity-0 group-focus-within:opacity-0">
+            <div className="flex h-20 w-20 items-center justify-center rounded-full border border-brand/15 bg-brand-muted/50 transition-opacity duration-500 group-hover:opacity-25 group-focus-within:opacity-25">
               <span className="font-serif text-xl font-semibold text-brand">{company.shortName.slice(0, 3)}</span>
             </div>
           </div>
@@ -56,26 +56,21 @@ function AffiliationTile({ company }) {
 
 function RecognitionTile({ company }) {
   return (
-    <article className="relative h-32 overflow-hidden rounded-sm border border-brand/30 bg-gradient-to-br from-brand via-brand to-brand-light shadow-sm sm:h-36">
-      <div className="relative h-full w-full overflow-hidden">
-        <div className="pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full bg-white/10 blur-2xl" aria-hidden="true" />
-        <div className="pointer-events-none absolute -bottom-6 -left-6 h-20 w-20 rounded-full bg-accent/25 blur-xl" aria-hidden="true" />
-
-        <div className="relative flex h-full flex-col justify-between p-3.5 sm:p-4">
-          <div className="flex items-start gap-2.5">
-            <span className="mt-0.5 h-9 w-0.5 shrink-0 bg-accent sm:h-10" aria-hidden="true" />
-            <div className="min-w-0">
-              <p className="text-[0.55rem] font-bold tracking-[0.18em] text-accent uppercase sm:text-[0.58rem]">
-                {company.shortName}
-              </p>
-              <p className="mt-1 font-serif text-xs leading-snug text-white sm:text-[0.8125rem]">{company.name}</p>
-            </div>
+    <article className="relative h-32 overflow-hidden rounded-sm border border-brand/20 bg-brand-muted shadow-sm sm:h-36">
+      <div className="relative flex h-full flex-col justify-between p-3.5 sm:p-4">
+        <div className="flex items-start gap-2.5">
+          <span className="mt-0.5 h-9 w-0.5 shrink-0 bg-brand/40 sm:h-10" aria-hidden="true" />
+          <div className="min-w-0">
+            <p className="text-[0.55rem] font-bold tracking-[0.18em] text-brand uppercase sm:text-[0.58rem]">
+              {company.shortName}
+            </p>
+            <p className="mt-1 font-serif text-xs leading-snug text-ink sm:text-[0.8125rem]">{company.name}</p>
           </div>
-
-          <p className="line-clamp-2 pl-3 text-[0.625rem] leading-snug text-white/70 sm:text-[0.6875rem]">
-            {company.role}
-          </p>
         </div>
+
+        <p className="line-clamp-2 pl-3 text-[0.625rem] leading-snug text-ink-muted sm:text-[0.6875rem]">
+          {company.role}
+        </p>
       </div>
     </article>
   )
@@ -114,22 +109,19 @@ function TrustedCompanies() {
 
   return (
     <div className="mt-12 border-t border-slate-200/80 pt-10 lg:mt-14 lg:pt-12">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-8">
-        <div className="max-w-2xl">
-          <p className="text-sm font-medium tracking-[0.1em] text-brand uppercase">Global collaboration</p>
-          <h3 className="mt-2 font-serif text-2xl leading-tight text-ink md:text-3xl">{title}</h3>
-          <p className="mt-3 text-sm leading-relaxed text-ink-muted md:text-base">{subtitle}</p>
-        </div>
-        <a href={viewAllHref} className={`${sectionLinkClassName} shrink-0 self-start sm:mt-2`}>
+      <header className="mx-auto max-w-2xl text-center">
+        <p className="text-sm font-medium tracking-[0.1em] text-brand uppercase">Global collaboration</p>
+        <h3 className="mt-2 font-serif text-2xl leading-tight text-ink md:text-3xl">{title}</h3>
+        <p className="mt-3 text-sm leading-relaxed text-ink-muted md:text-base">{subtitle}</p>
+      </header>
+
+      <div className="mt-8 mb-4 flex justify-end">
+        <a href={viewAllHref} className={sectionLinkClassName}>
           {viewAllLabel}
         </a>
       </div>
 
-      <div className="mt-8 rounded-sm bg-gradient-to-br from-brand/8 via-brand-muted/40 to-accent/10 p-[1px] sm:mt-10">
-        <div className="rounded-[calc(0.125rem-1px)] bg-white/90 p-3 backdrop-blur-sm sm:p-4 lg:p-5">
-          <AffiliationGrid companies={companies} />
-        </div>
-      </div>
+      <AffiliationGrid companies={companies} />
     </div>
   )
 }
@@ -140,7 +132,7 @@ export default function Profile() {
   return (
     <section
       id="profile"
-      className="border-t border-slate-200 bg-surface-alt py-16 lg:py-20"
+      className="border-t border-slate-200 bg-surface py-16 lg:py-20"
     >
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
         <div className="grid gap-8 lg:grid-cols-[minmax(280px,380px)_1fr] lg:items-stretch lg:gap-12">

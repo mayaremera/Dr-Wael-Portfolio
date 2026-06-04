@@ -96,7 +96,7 @@ export default function TherapyConcepts({ showCasesPreview = false, fullDetail =
     <>
     <section id="approach" className="border-t border-slate-200 bg-surface py-16 lg:py-24">
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
-        <div className="text-center">
+        <header className="mx-auto max-w-3xl text-center">
           <p className="text-xs font-semibold tracking-[0.22em] text-brand uppercase">Services</p>
           <h2 className="mt-3 font-serif text-3xl leading-tight text-ink md:text-4xl">
             {fullDetail ? pediatricServices.title : 'Speech-Language Pathology Services'}
@@ -109,7 +109,7 @@ export default function TherapyConcepts({ showCasesPreview = false, fullDetail =
               </p>
             </>
           ) : null}
-        </div>
+        </header>
 
         {fullDetail ? (
           <ul className="mx-auto mt-8 flex max-w-xl flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-ink-muted">
@@ -191,23 +191,21 @@ export default function TherapyConcepts({ showCasesPreview = false, fullDetail =
 
           {showCasesPreview ? (
             <div className="mt-12 border-t border-slate-100 pt-10">
-              <div className="mx-auto max-w-3xl text-center">
+              <header className="mx-auto max-w-3xl text-center">
                 <p className="text-xs font-semibold tracking-[0.22em] text-brand uppercase">Clinical cases</p>
                 <h3 className="mt-3 font-serif text-2xl leading-tight text-ink md:text-3xl">
                   {casesWeServe.title}
                 </h3>
                 <p className="mt-3 text-sm leading-relaxed text-ink-muted">{casesWeServe.intro}</p>
-              </div>
+              </header>
 
-              <div className="mt-8 flex justify-end">
+              <div className="mt-8 mb-4 flex justify-end">
                 <a href="/services#cases" className={sectionLinkClassName}>
                   View all cases
                 </a>
               </div>
 
-              <div className="mt-4">
-                <CasesPreviewRail cases={clinicalSpecializations.slice(0, 3)} />
-              </div>
+              <CasesPreviewRail cases={clinicalSpecializations.slice(0, 3)} />
             </div>
           ) : null}
         </div>
