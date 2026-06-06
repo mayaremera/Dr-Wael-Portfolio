@@ -25,37 +25,14 @@ function AffiliationHoverOverlay({ company }) {
 function AffiliationBadge({ logo, label }) {
   return (
     <div
-      className="pointer-events-none absolute right-1.5 bottom-2 z-4 sm:right-2 sm:bottom-2.5"
+      className="pointer-events-none absolute right-1.5 bottom-1.5 z-[4] opacity-100 transition-opacity duration-300 group-hover:opacity-0 group-focus-within:opacity-0 sm:right-2 sm:bottom-2"
       title={label}
     >
-      <div className="relative transition-transform duration-500 ease-out group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-focus-within:-translate-y-0.5 group-focus-within:translate-x-0.5">
-        <svg
-          className="absolute -left-[1.15rem] top-1/2 h-5 w-5 -translate-y-[85%] text-accent"
-          viewBox="0 0 20 20"
-          fill="none"
-          aria-hidden="true"
-        >
-          <path
-            d="M18 14 C12 16, 6 12, 3 4"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-        </svg>
-
-        <div className="flex items-center gap-1 rounded-full border border-white/90 bg-brand/95 py-0.5 pr-2 pl-0.5 shadow-[0_4px_14px_rgba(0,0,0,0.5)] backdrop-blur-sm sm:gap-1.5 sm:pr-2.5">
-          <div className="relative h-7 w-7 shrink-0 overflow-hidden rounded-full sm:h-8 sm:w-8">
-            <img src={logo} alt={label || ''} className="h-full w-full object-cover" />
-            <div
-              className="pointer-events-none absolute inset-0 rounded-full ring-2 ring-inset ring-white/25"
-              aria-hidden="true"
-            />
-          </div>
-          <span className="text-[0.5rem] font-bold tracking-[0.22em] text-white uppercase sm:text-[0.5625rem]">
-            ARC
-          </span>
-        </div>
-      </div>
+      <img
+        src={logo}
+        alt=""
+        className="h-5 w-5 rounded-full object-cover shadow-sm ring-1 ring-white sm:h-6 sm:w-6"
+      />
     </div>
   )
 }
