@@ -7,24 +7,32 @@ import Profile from './components/Profile'
 import PromoVideoSection from './components/PromoVideoSection'
 import Leadership from './components/Leadership'
 import CertificationGallery from './components/CertificationGallery'
+import CareerTimeline from './components/CareerTimeline'
 import TherapyConcepts from './components/TherapyConcepts'
 import Expertise from './components/Expertise'
 import Testimonials from './components/Testimonials'
 import VideoSection from './components/VideoSection'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
-import { images, pediatricServices } from './data/content'
+import { images, speechLanguageServices } from './data/content'
 
 const HOME_PATH = '/'
 
-function PageHeading({ eyebrow, title, description, backgroundImage }) {
+function PageHeading({ eyebrow, title, backgroundImage, imagePosition = 'center' }) {
+  const positionClass =
+    imagePosition === 'top'
+      ? 'object-cover object-top'
+      : imagePosition === 'contain'
+        ? 'object-contain object-center'
+        : 'object-cover object-center'
+
   return (
     <section className="relative overflow-hidden">
       <div className="relative min-h-[300px] pt-36 sm:min-h-[340px] sm:pt-40">
         <img
           src={backgroundImage}
           alt=""
-          className="absolute inset-0 h-full w-full object-cover"
+          className={`absolute inset-0 h-full w-full ${positionClass}`}
         />
         <div className="absolute inset-0 bg-gradient-to-r from-ink/85 via-ink/65 to-ink/40" />
         <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-ink/35 to-transparent" />
@@ -34,9 +42,32 @@ function PageHeading({ eyebrow, title, description, backgroundImage }) {
           <h1 className="mt-3 max-w-3xl font-serif text-4xl leading-tight text-white md:text-5xl">
             {title}
           </h1>
-          <p className="mt-4 max-w-2xl text-base leading-relaxed text-white/85 md:text-lg">
-            {description}
-          </p>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function ServicesPageHeading({ eyebrow, title, backgroundImage }) {
+  return (
+    <section className="relative overflow-hidden">
+      <div className="relative min-h-[320px] pt-36 sm:min-h-[380px] sm:pt-40 lg:min-h-[400px]">
+        <img
+          src={backgroundImage}
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover"
+          style={{ objectPosition: '72% 28%' }}
+        />
+
+        <div className="absolute inset-0 bg-linear-to-r from-ink/95 via-ink/75 to-ink/20" />
+        <div className="absolute inset-0 bg-linear-to-t from-ink/80 via-ink/25 to-transparent" />
+        <div className="absolute inset-y-0 left-0 w-full max-w-xl bg-linear-to-r from-ink/55 to-transparent sm:max-w-2xl" />
+
+        <div className="relative mx-auto flex min-h-[320px] max-w-6xl flex-col justify-end px-6 pb-10 sm:min-h-[380px] sm:pb-12 lg:min-h-[400px] lg:px-8">
+          <p className="text-xs font-semibold tracking-[0.24em] text-accent uppercase">{eyebrow}</p>
+          <h1 className="mt-3 font-serif text-xl leading-tight whitespace-nowrap text-white sm:text-2xl md:text-3xl lg:text-5xl">
+            {title}
+          </h1>
         </div>
       </div>
     </section>
@@ -59,13 +90,15 @@ function HomePage() {
 }
 
 function PageLayout({ hero, children }) {
+  const Heading = hero.variant === 'services' ? ServicesPageHeading : PageHeading
+
   return (
     <>
-      <PageHeading
+      <Heading
         eyebrow={hero.eyebrow}
         title={hero.title}
-        description={hero.description}
         backgroundImage={hero.image}
+        imagePosition={hero.imagePosition}
       />
       {children}
     </>
@@ -133,44 +166,37 @@ function App() {
           title: 'Dr. Wael A. Al-Dakroury',
           description:
             'Learn more about Dr. Wael’s clinical journey, global leadership, and the ASHA Fellow distinction.',
-          image: images.drWael,
+          image: images.aboutHero,
+          imagePosition: 'center',
         }}
       >
-        <Profile />
+        <Profile variant="page" />
         <CertificationGallery />
+        <CareerTimeline />
+        <Leadership />
         <VibeBand
           label="Professional Leadership"
           title="Global Recognition with Real-World Impact"
           description="Beyond clinical care, Dr. Wael contributes to international organizations and research initiatives that shape modern speech-language practice."
           primaryHref="/contact"
-          primaryLabel="Work with Dr. Wael"
+          primaryLabel="Contact Dr. Wael"
           secondaryHref="/in-the-field"
           secondaryLabel="View Field Activity"
         />
-        <Leadership />
       </PageLayout>
     ),
     '/services': (
       <PageLayout
         hero={{
           eyebrow: 'Services',
-          title: pediatricServices.title,
-          description: pediatricServices.intro,
-          image: images.familyCounseling,
+          title: speechLanguageServices.title,
+          description: speechLanguageServices.intro,
+          image: images.servicesHero,
+          variant: 'services',
         }}
       >
-        <Expertise />
         <TherapyConcepts fullDetail />
-        <VibeBand
-          label="Integrated Care Pathway"
-          title="From First Screening to Long-Term Progress"
-          description="Every service is connected in one clear journey: early identification, thorough assessment, personalized therapy, and practical family coaching."
-          primaryHref="/contact"
-          primaryLabel="Start with Screening"
-          secondaryHref="#cases"
-          secondaryLabel="See Clinical Cases"
-        />
-        <Testimonials />
+        <Testimonials variant="light" />
       </PageLayout>
     ),
     '/video-gallery': (
@@ -214,33 +240,10 @@ function App() {
           description="Regular participation in lectures, leadership forums, and international committees keeps care aligned with the latest advances in the field."
           primaryHref="/contact"
           primaryLabel="Connect with Dr. Wael"
-          secondaryHref="/testimonials"
-          secondaryLabel="Read Testimonials"
+          secondaryHref="/services"
+          secondaryLabel="Explore Services"
         />
         <Leadership />
-      </PageLayout>
-    ),
-    '/testimonials': (
-      <PageLayout
-        hero={{
-          eyebrow: 'Testimonials',
-          title: 'Voices of Trust from Families',
-          description:
-            'Read the experiences of families and institutions who have seen real communication progress.',
-          image: images.family,
-        }}
-      >
-        <Testimonials variant="gallery" />
-        <VibeBand
-          label="Families First"
-          title="Stories of Progress, Trust, and Lasting Results"
-          description="From first words to stronger confidence, these voices reflect the power of individualized care and consistent family support."
-          primaryHref="/contact"
-          primaryLabel="Start Your Journey"
-          secondaryHref="/services"
-          secondaryLabel="Explore Care Options"
-        />
-        <HopeGallery />
       </PageLayout>
     ),
     '/contact': (

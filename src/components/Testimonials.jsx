@@ -1,12 +1,6 @@
 import { useState } from 'react'
 import { testimonials, testimonialsSection } from '../data/content'
 
-const sectionLinkClassName =
-  'relative inline-block w-fit pb-1 text-xs font-semibold tracking-[0.12em] text-brand uppercase transition-colors after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-brand after:transition-transform after:duration-300 after:ease-out hover:text-brand-light hover:after:scale-x-100'
-
-const showcaseLinkClassName =
-  'relative inline-block w-fit pb-1 text-xs font-semibold tracking-[0.12em] text-accent uppercase transition-colors after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-accent after:transition-transform after:duration-300 after:ease-out hover:text-white hover:after:scale-x-100'
-
 function excerpt(quote, max = 88) {
   if (quote.length <= max) return quote
   const slice = quote.slice(0, max)
@@ -16,26 +10,33 @@ function excerpt(quote, max = 88) {
 
 const VOICES_PAGE_SIZE = 3
 
-function VoiceSliderNav({ page, pageCount, onPageChange }) {
+function VoiceSliderNav({ page, pageCount, onPageChange, light = false }) {
   if (pageCount <= 1) return null
 
+  const borderClass = light ? 'border-slate-200' : 'border-white/15'
+  const textClass = light
+    ? 'text-ink-muted hover:text-brand'
+    : 'text-white/70 hover:text-white'
+  const mutedClass = light ? 'text-ink-muted/60' : 'text-white/50'
+  const dividerClass = light ? 'text-ink-muted/30' : 'text-white/30'
+
   return (
-    <div className="mt-3 flex items-center justify-between border-t border-white/15 pt-3">
+    <div className={`mt-3 flex items-center justify-between border-t pt-3 ${borderClass}`}>
       <button
         type="button"
         onClick={() => onPageChange(page - 1)}
         disabled={page === 0}
         aria-label="Previous voices"
-        className="inline-flex items-center gap-1 rounded-sm px-2 py-1 text-xs font-semibold tracking-wide text-white/70 uppercase transition-colors hover:text-white disabled:pointer-events-none disabled:opacity-30"
+        className={`inline-flex items-center gap-1 rounded-sm px-2 py-1 text-xs font-semibold tracking-wide uppercase transition-colors disabled:pointer-events-none disabled:opacity-30 ${textClass}`}
       >
         <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
         </svg>
         Prev
       </button>
-      <span className="text-xs tabular-nums text-white/50">
+      <span className={`text-xs tabular-nums ${mutedClass}`}>
         {page + 1}
-        <span className="text-white/30"> / </span>
+        <span className={dividerClass}> / </span>
         {pageCount}
       </span>
       <button
@@ -43,7 +44,7 @@ function VoiceSliderNav({ page, pageCount, onPageChange }) {
         onClick={() => onPageChange(page + 1)}
         disabled={page >= pageCount - 1}
         aria-label="Next voices"
-        className="inline-flex items-center gap-1 rounded-sm px-2 py-1 text-xs font-semibold tracking-wide text-white/70 uppercase transition-colors hover:text-white disabled:pointer-events-none disabled:opacity-30"
+        className={`inline-flex items-center gap-1 rounded-sm px-2 py-1 text-xs font-semibold tracking-wide uppercase transition-colors disabled:pointer-events-none disabled:opacity-30 ${textClass}`}
       >
         Next
         <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -54,7 +55,7 @@ function VoiceSliderNav({ page, pageCount, onPageChange }) {
   )
 }
 
-function VoiceSelector({ item, index, isActive, onSelect, inert = false }) {
+function VoiceSelector({ item, index, isActive, onSelect, inert = false, light = false }) {
   return (
     <button
       type="button"
@@ -63,21 +64,31 @@ function VoiceSelector({ item, index, isActive, onSelect, inert = false }) {
       aria-hidden={inert ? true : undefined}
       aria-current={isActive ? 'true' : undefined}
       className={`group relative flex w-full items-center gap-3 rounded-sm border px-3 py-3 text-left transition-all duration-300 sm:gap-4 sm:px-4 sm:py-3.5 ${
-        isActive
-          ? 'border-accent/50 bg-white/12 shadow-lg shadow-black/10'
-          : 'border-transparent bg-white/5 hover:border-white/20 hover:bg-white/8'
+        light
+          ? isActive
+            ? 'border-brand/25 bg-brand-muted/60 shadow-md shadow-brand/10'
+            : 'border-slate-200/80 bg-surface-alt hover:border-brand/20 hover:bg-brand-muted/40'
+          : isActive
+            ? 'border-accent/50 bg-white/12 shadow-lg shadow-black/10'
+            : 'border-transparent bg-white/5 hover:border-white/20 hover:bg-white/8'
       }`}
     >
       <span
-        className={`absolute top-1/2 -left-px h-8 w-0.5 -translate-y-1/2 rounded-full bg-accent transition-opacity ${
-          isActive ? 'opacity-100' : 'opacity-0'
-        }`}
+        className={`absolute top-1/2 -left-px h-8 w-0.5 -translate-y-1/2 rounded-full transition-opacity ${
+          light ? 'bg-brand' : 'bg-accent'
+        } ${isActive ? 'opacity-100' : 'opacity-0'}`}
         aria-hidden="true"
       />
 
       <div
         className={`relative h-11 w-11 shrink-0 overflow-hidden rounded-full ring-2 transition-all duration-300 sm:h-12 sm:w-12 ${
-          isActive ? 'ring-accent scale-105' : 'ring-white/25 group-hover:ring-white/40'
+          light
+            ? isActive
+              ? 'ring-brand scale-105'
+              : 'ring-slate-200 group-hover:ring-brand/30'
+            : isActive
+              ? 'ring-accent scale-105'
+              : 'ring-white/25 group-hover:ring-white/40'
         }`}
       >
         <img src={item.image} alt="" className="h-full w-full object-cover object-top" />
@@ -86,35 +97,40 @@ function VoiceSelector({ item, index, isActive, onSelect, inert = false }) {
       <span className="min-w-0 flex-1">
         <span
           className={`block truncate text-sm font-semibold transition-colors ${
-            isActive ? 'text-white' : 'text-white/80 group-hover:text-white'
+            light
+              ? isActive
+                ? 'text-brand'
+                : 'text-ink group-hover:text-brand'
+              : isActive
+                ? 'text-white'
+                : 'text-white/80 group-hover:text-white'
           }`}
         >
           {item.name}
         </span>
         {item.location ? (
-          <span className="mt-0.5 block truncate text-xs text-white/50">{item.location}</span>
+          <span className={`mt-0.5 block truncate text-xs ${light ? 'text-ink-muted' : 'text-white/50'}`}>
+            {item.location}
+          </span>
         ) : (
-          <span className="mt-0.5 block truncate text-xs text-white/40">{excerpt(item.quote, 42)}</span>
+          <span className={`mt-0.5 block truncate text-xs ${light ? 'text-ink-muted/80' : 'text-white/40'}`}>
+            {excerpt(item.quote, 42)}
+          </span>
         )}
-      </span>
-
-      <span
-        className={`shrink-0 font-serif text-lg tabular-nums transition-colors ${
-          isActive ? 'text-accent' : 'text-white/25'
-        }`}
-      >
-        {String(index + 1).padStart(2, '0')}
       </span>
     </button>
   )
 }
 
-function VoicesNavSizer() {
+function VoicesNavSizer({ light = false }) {
   const sizerItems = testimonials.slice(0, VOICES_PAGE_SIZE)
+  const labelClass = light
+    ? 'text-xs font-semibold tracking-wide text-ink-muted uppercase'
+    : 'text-xs font-semibold tracking-wide text-white/45 uppercase'
 
   return (
     <>
-      <p className="mb-3 text-xs font-semibold tracking-wide text-white/45 uppercase">Choose a voice</p>
+      <p className={`mb-3 ${labelClass}`}>Choose a voice</p>
       <div className="flex flex-col gap-2">
         {sizerItems.map((item, index) => (
           <VoiceSelector
@@ -139,7 +155,7 @@ function VoicesNavSizer() {
   )
 }
 
-function TestimonialsShowcase() {
+function TestimonialsShowcase({ light = false }) {
   const [activeIndex, setActiveIndex] = useState(0)
   const [voicesPage, setVoicesPage] = useState(0)
   const active = testimonials[activeIndex]
@@ -166,18 +182,29 @@ function TestimonialsShowcase() {
   }
 
   return (
-    <section id="testimonials" className="relative overflow-hidden border-t border-brand/15">
-      <div className="bg-gradient-to-br from-brand via-[#1e5566] to-brand-light">
+    <section
+      id="testimonials"
+      className={`relative overflow-hidden border-t ${
+        light ? 'border-slate-200 bg-white' : 'border-brand/15'
+      }`}
+    >
+      <div className={light ? 'bg-white' : 'bg-gradient-to-br from-brand via-[#1e5566] to-brand-light'}>
         <div
-          className="pointer-events-none absolute -left-20 top-1/4 h-56 w-56 rounded-full bg-accent/15 blur-3xl"
+          className={`pointer-events-none absolute -left-20 top-1/4 h-56 w-56 rounded-full blur-3xl ${
+            light ? 'bg-brand/8' : 'bg-accent/15'
+          }`}
           aria-hidden="true"
         />
         <div
-          className="pointer-events-none absolute -right-16 bottom-0 h-48 w-48 rounded-full bg-white/8 blur-3xl"
+          className={`pointer-events-none absolute -right-16 bottom-0 h-48 w-48 rounded-full blur-3xl ${
+            light ? 'bg-accent/10' : 'bg-white/8'
+          }`}
           aria-hidden="true"
         />
         <p
-          className="pointer-events-none absolute top-6 right-6 font-serif text-[5rem] leading-none text-white/[0.04] select-none sm:text-[6rem] lg:right-10"
+          className={`pointer-events-none absolute top-6 right-6 font-serif text-[5rem] leading-none select-none sm:text-[6rem] lg:right-10 ${
+            light ? 'text-brand/[0.05]' : 'text-white/[0.04]'
+          }`}
           aria-hidden="true"
         >
           &ldquo;
@@ -185,37 +212,51 @@ function TestimonialsShowcase() {
 
         <div className="relative mx-auto max-w-6xl px-6 py-12 lg:px-8 lg:py-14">
           <header className="mx-auto max-w-2xl text-center">
-            <p className="text-xs font-semibold tracking-[0.22em] text-accent uppercase">
+            <p
+              className={`text-xs font-semibold tracking-[0.22em] uppercase ${
+                light ? 'text-brand' : 'text-accent'
+              }`}
+            >
               {testimonialsSection.eyebrow}
             </p>
-            <h2 className="mt-2 font-serif text-2xl leading-tight text-white md:text-3xl">
+            <h2
+              className={`mt-2 font-serif text-2xl leading-tight md:text-3xl ${
+                light ? 'text-ink' : 'text-white'
+              }`}
+            >
               {testimonialsSection.title}
             </h2>
-            <p className="mt-2 text-sm leading-relaxed text-white/70 line-clamp-2 md:line-clamp-none">
+            <p
+              className={`mt-2 text-sm leading-relaxed line-clamp-2 md:line-clamp-none ${
+                light ? 'text-ink-muted' : 'text-white/70'
+              }`}
+            >
               {testimonialsSection.description}
             </p>
           </header>
 
-          <div className="mt-8 mb-4 flex justify-end">
-            <a href="/testimonials" className={showcaseLinkClassName}>
-              Read all family stories
-            </a>
-          </div>
-
-          <div className="lg:grid lg:grid-cols-[minmax(0,280px)_1fr] lg:items-stretch lg:gap-8 xl:grid-cols-[minmax(0,300px)_1fr] xl:gap-10">
+          <div className="mt-8 lg:grid lg:grid-cols-[minmax(0,280px)_1fr] lg:items-stretch lg:gap-8 xl:grid-cols-[minmax(0,300px)_1fr] xl:gap-10">
             <div className="grid min-w-0 grid-cols-1">
               <div
                 className="pointer-events-none invisible col-start-1 row-start-1 hidden min-w-0 lg:block"
                 aria-hidden="true"
               >
-                <VoicesNavSizer />
+                <VoicesNavSizer light={light} />
               </div>
 
               <div className="col-start-1 row-start-1 min-w-0 lg:col-start-1 lg:row-start-1">
-                <p className="text-xs font-semibold tracking-wide text-white/45 uppercase lg:hidden">
+                <p
+                  className={`text-xs font-semibold tracking-wide uppercase lg:hidden ${
+                    light ? 'text-ink-muted' : 'text-white/45'
+                  }`}
+                >
                   Choose a voice
                 </p>
-                <p className="mb-3 hidden text-xs font-semibold tracking-wide text-white/45 uppercase lg:block">
+                <p
+                  className={`mb-3 hidden text-xs font-semibold tracking-wide uppercase lg:block ${
+                    light ? 'text-ink-muted' : 'text-white/45'
+                  }`}
+                >
                   Choose a voice
                 </p>
 
@@ -229,6 +270,7 @@ function TestimonialsShowcase() {
                         index={globalIndex}
                         isActive={globalIndex === activeIndex}
                         onSelect={handleSelectVoice}
+                        light={light}
                       />
                     )
                   })}
@@ -244,6 +286,7 @@ function TestimonialsShowcase() {
                         isActive={false}
                         onSelect={() => {}}
                         inert
+                        light={light}
                       />
                     </div>
                   ))}
@@ -253,6 +296,7 @@ function TestimonialsShowcase() {
                   page={safeVoicesPage}
                   pageCount={voicesPageCount}
                   onPageChange={handleVoicesPageChange}
+                  light={light}
                 />
               </div>
             </div>
@@ -260,7 +304,11 @@ function TestimonialsShowcase() {
             <div className="mt-8 flex min-h-0 min-w-0 flex-col lg:mt-0">
               <article
                 key={active.id}
-                className="animate-testimonial-spotlight relative flex h-full min-h-0 flex-col overflow-hidden rounded-sm bg-white shadow-xl shadow-black/20"
+                className={`animate-testimonial-spotlight relative flex h-full min-h-0 flex-col overflow-hidden rounded-sm bg-white ${
+                  light
+                    ? 'border border-slate-200/80 shadow-lg shadow-brand/10'
+                    : 'shadow-xl shadow-black/20'
+                }`}
               >
                 <div
                   className="absolute top-0 right-0 h-24 w-24 bg-gradient-to-bl from-accent/15 to-transparent"
@@ -384,5 +432,5 @@ export default function Testimonials({ variant = 'showcase' }) {
     return <TestimonialsGallery />
   }
 
-  return <TestimonialsShowcase />
+  return <TestimonialsShowcase light={variant === 'light'} />
 }

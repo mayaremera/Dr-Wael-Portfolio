@@ -151,8 +151,9 @@ function TrustedCompanies() {
   )
 }
 
-export default function Profile() {
+export default function Profile({ variant = 'home' }) {
   const { name, title, credentials, tagline, bio } = profileDetails
+  const isPage = variant === 'page'
 
   return (
     <section
@@ -207,18 +208,20 @@ export default function Profile() {
               ))}
             </div>
 
-            <div className="mt-8">
-              <a
-                href="#promo"
-                className="inline-block rounded-sm bg-brand px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-light"
-              >
-                More About Me
-              </a>
-            </div>
+            {!isPage ? (
+              <div className="mt-8">
+                <a
+                  href="/about-me"
+                  className="inline-block rounded-sm bg-brand px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-light"
+                >
+                  More About Me
+                </a>
+              </div>
+            ) : null}
           </div>
         </div>
 
-        <TrustedCompanies />
+        {!isPage ? <TrustedCompanies /> : null}
       </div>
     </section>
   )

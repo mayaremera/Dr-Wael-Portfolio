@@ -5,7 +5,7 @@ export default function HeroBanner() {
     <section className="relative min-h-[80vh] overflow-hidden lg:min-h-[95vh]">
       <img
         src={images.heroBanner}
-        alt="Dr. Wael A. Al-Dakroury, pediatric speech and language pathology"
+        alt="Dr. Wael A. Al-Dakroury, speech and language pathology"
         className="absolute inset-0 h-full w-full object-cover"
       />
       <div className="absolute inset-0 bg-gradient-to-r from-ink/85 via-ink/60 to-ink/30" />

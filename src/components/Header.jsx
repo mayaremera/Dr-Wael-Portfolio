@@ -8,8 +8,17 @@ const navLinks = [
   { href: '/services', label: 'Services' },
   { href: '/video-gallery', label: 'Video / Gallery' },
   { href: '/in-the-field', label: 'In the Field' },
-  { href: '/testimonials', label: 'Testimonials' },
 ]
+
+function getCurrentPath() {
+  const rawPath = window.location.pathname.replace(/\/+$/, '') || '/'
+  return rawPath === '/cases' ? '/services' : rawPath
+}
+
+function isLinkActive(href, currentPath) {
+  if (href === '/') return currentPath === '/'
+  return currentPath === href
+}
 
 function SocialIcon({ href, label, children }) {
   return (
@@ -25,15 +34,22 @@ function SocialIcon({ href, label, children }) {
   )
 }
 
-function NavLink({ href, label, scrolled, onClick }) {
+function NavLink({ href, label, scrolled, active, onClick }) {
   return (
     <a
       href={href}
       onClick={onClick}
-      className={`relative pb-1 text-sm tracking-wide uppercase transition-colors after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:transition-transform after:duration-300 after:ease-out hover:after:scale-x-100 ${
+      aria-current={active ? 'page' : undefined}
+      className={`relative pb-1 text-sm tracking-wide uppercase transition-colors after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:origin-left after:transition-transform after:duration-300 after:ease-out ${
+        active ? 'after:scale-x-100 font-semibold' : 'after:scale-x-0 hover:after:scale-x-100'
+      } ${
         scrolled
-          ? 'text-ink-muted after:bg-brand hover:text-brand'
-          : 'text-white/85 after:bg-white hover:text-white'
+          ? active
+            ? 'text-brand after:bg-brand'
+            : 'text-ink-muted after:bg-brand hover:text-brand'
+          : active
+            ? 'text-white after:bg-white'
+            : 'text-white/85 after:bg-white hover:text-white'
       }`}
     >
       {label}
@@ -44,6 +60,8 @@ function NavLink({ href, label, scrolled, onClick }) {
 export default function Header() {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const currentPath = getCurrentPath()
+  const isContactActive = currentPath === '/contact'
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40)
@@ -155,16 +173,22 @@ export default function Header() {
                 href={link.href}
                 label={link.label}
                 scrolled={scrolled}
+                active={isLinkActive(link.href, currentPath)}
               />
             ))}
           </nav>
 
           <a
             href="/contact"
+            aria-current={isContactActive ? 'page' : undefined}
             className={`hidden rounded-sm px-5 py-2.5 text-sm font-medium tracking-wide transition-colors lg:inline-block ${
-              scrolled
-                ? 'bg-brand text-white hover:bg-brand-light'
-                : 'bg-white text-brand hover:bg-brand-muted'
+              isContactActive
+                ? scrolled
+                  ? 'bg-brand-light text-white ring-2 ring-brand/30'
+                  : 'bg-brand text-white ring-2 ring-white/40'
+                : scrolled
+                  ? 'bg-brand text-white hover:bg-brand-light'
+                  : 'bg-white text-brand hover:bg-brand-muted'
             }`}
           >
             Contact Us Now
@@ -198,6 +222,7 @@ export default function Header() {
                     href={link.href}
                     label={link.label}
                     scrolled
+                    active={isLinkActive(link.href, currentPath)}
                     onClick={() => setOpen(false)}
                   />
                 </li>
@@ -205,7 +230,10 @@ export default function Header() {
               <li>
                 <a
                   href="/contact"
-                  className="inline-block rounded-sm bg-brand px-5 py-2.5 text-sm font-medium text-white"
+                  aria-current={isContactActive ? 'page' : undefined}
+                  className={`inline-block rounded-sm px-5 py-2.5 text-sm font-medium text-white ${
+                    isContactActive ? 'bg-brand-light ring-2 ring-brand/30' : 'bg-brand'
+                  }`}
                   onClick={() => setOpen(false)}
                 >
                   Contact Us Now

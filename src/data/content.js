@@ -23,6 +23,8 @@ export const site = {
 
 export const images = {
   drWael: '/images/dr-wael.jpeg',
+  aboutHero: '/images/aboutmesection.jpeg',
+  servicesHero: '/images/servicesection.png',
   heroBanner: '/images/hero1.jpeg',
   family: '/images/family.jpg',
   screening: '/images/screening.jpg',
@@ -191,6 +193,84 @@ export const profileDetails = {
   ],
 }
 
+export const careerTimeline = [
+  {
+    id: 'phd',
+    year: 'Doctorate',
+    title: 'PhD in Speech-Language Pathology',
+    org: 'Queen Margaret University, Edinburgh',
+    type: 'education',
+  },
+  {
+    id: 'ma',
+    year: 'Graduate',
+    title: 'MA in Speech-Language Pathology',
+    org: 'San Jose State University, California',
+    type: 'education',
+  },
+  {
+    id: 'director',
+    year: 'Present',
+    title: 'Director, Communication Disorders Department',
+    org: 'Psych Care Complex, Riyadh',
+    type: 'clinical',
+  },
+  {
+    id: 'professor',
+    year: 'Present',
+    title: 'Associate Professor, Faculty of Medicine',
+    org: 'Alfaisal University, Riyadh',
+    type: 'academic',
+  },
+  {
+    id: 'asha-ambassador',
+    year: '2024–2026',
+    title: 'ASHA International SLP Ambassador',
+    org: 'American Speech-Language-Hearing Association',
+    type: 'leadership',
+  },
+  {
+    id: 'asha-fellow',
+    year: '2025',
+    title: 'ASHA Fellow',
+    org: 'American Speech-Language-Hearing Association',
+    type: 'honor',
+  },
+  {
+    id: 'sig17-editor',
+    year: '2026–2028',
+    title: 'Chief Editor, SIG17 Perspectives',
+    org: 'American Speech-Language-Hearing Association',
+    type: 'leadership',
+  },
+  {
+    id: 'ialp',
+    year: '2025–2031',
+    title: 'Member, Child Language Committee',
+    org: 'International Association of Communication Sciences and Disorders',
+    type: 'leadership',
+  },
+  {
+    id: 'eacsl',
+    year: 'Present',
+    title: 'Honorary President',
+    org: 'Egyptian Association for Communication Sciences',
+    type: 'leadership',
+  },
+  {
+    id: 'jslhr',
+    year: '2023–2025',
+    title: 'Editorial Board Member, Language Section',
+    org: 'Journal of Speech, Language, and Hearing Research',
+    type: 'research',
+  },
+]
+
+export const certificatePlaceholders = [
+  '/images/certificates/certificate-1.png',
+  '/images/certificates/certificate-2.png',
+]
+
 export const trustedCompanies = {
   title: 'Affiliations & recognized training',
   subtitle:
@@ -223,7 +303,7 @@ export const trustedCompanies = {
       id: 'lsvt',
       name: 'LSVT Global',
       shortName: 'LSVT LOUD',
-      role: 'LSVT LOUD for Parkinson\'s, pediatrics, and other populations.',
+      role: 'LSVT LOUD for Parkinson\'s, children, and other populations.',
       logo: '/images/trusted5.png',
     },
     {
@@ -253,13 +333,13 @@ export const trustedCompanies = {
   ],
 }
 
-export const pediatricServices = {
-  title: 'Pediatric Speech & Language Services',
+export const speechLanguageServices = {
+  title: 'Speech & Language Services',
   tagline: 'Every child deserves to be understood.',
   intro:
-    'Our pediatric speech-language services are here to help your child express themselves clearly and confidently—at home, in school, and in everyday life.',
+    'Our speech-language services are here to help your child express themselves clearly and confidently—at home, in school, and in everyday life.',
   familyBenefits: [
-    'Certified, experienced pediatric speech-language pathologists',
+    'Certified, experienced speech-language pathologists',
     'Friendly, supportive atmosphere for kids and families',
     'Personalized, evidence-based therapy plans',
     'Practical tips for home and school success',
@@ -278,7 +358,7 @@ export const therapyConcepts = [
       'In just a few minutes, we gently observe how your child communicates—no stress, no pressure.',
       'If we notice anything that could use extra attention, we\'ll suggest a full evaluation to understand your child\'s needs in more detail.',
     ],
-    ctaLabel: 'Book a Screening',
+    ctaLabel: 'Book a Session',
   },
   {
     id: 'counseling',
@@ -309,7 +389,7 @@ export const therapyConcepts = [
       'Oral-motor and articulation checks',
       'Age-appropriate standardized testing',
     ],
-    ctaLabel: 'Schedule an Evaluation',
+    ctaLabel: 'Book a Session',
   },
   {
     id: 'treatment',
@@ -327,7 +407,7 @@ export const therapyConcepts = [
       'Simple home practice strategies for parents',
       'Fun exercises to enjoy outside the clinic',
     ],
-    ctaLabel: 'Start Therapy',
+    ctaLabel: 'Book a Session',
   },
 ]
 
@@ -516,7 +596,7 @@ export const clinicalSpecializations = [
       'Prosody: stress, rhythm, and intonation in connected speech',
       'Functional vocabulary and high-frequency targets first',
       'Augmentative and Alternative Communication (AAC) as a bridge, not a last resort',
-      'Parent coaching for practice intensity between sessions',
+      'Family counseling for practice intensity between sessions',
     ],
     bilingualNote: 'Bilingual CAS assessment and treatment available in English and Arabic',
   },
@@ -601,7 +681,7 @@ export const testimonials = [
 export const footerServices = [
   'Assessment',
   'Therapy',
-  'Parent Coaching',
+  'Family Counseling',
   'School Collaboration',
 ]
 
