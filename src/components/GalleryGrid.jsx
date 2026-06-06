@@ -122,9 +122,6 @@ function GalleryTile({ item, aspectClass, onImageClick }) {
           <source src={encodeURI(item.src)} type="video/mp4" />
         </video>
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
-        <span className="pointer-events-none absolute left-2.5 top-2.5 z-10 rounded-full bg-black/45 px-2 py-0.5 text-[0.58rem] font-semibold tracking-wide text-white uppercase backdrop-blur-sm">
-          Event clip
-        </span>
         <VideoSoundWaves />
       </figure>
     )
@@ -184,18 +181,6 @@ export default function GalleryGrid() {
               </div>
             )
           })}
-        </div>
-
-        <div className="mt-8 flex items-center justify-center gap-5 text-[0.65rem] font-semibold tracking-[0.14em] text-ink-muted uppercase">
-          <span className="flex items-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-brand" />
-            Photos
-          </span>
-          <span className="h-3 w-px bg-slate-200" />
-          <span className="flex items-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-            Event clips
-          </span>
         </div>
       </div>
 

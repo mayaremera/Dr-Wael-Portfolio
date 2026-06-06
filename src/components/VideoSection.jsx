@@ -1,23 +1,30 @@
 import { useState } from 'react'
 import { video } from '../data/content'
 
-export default function VideoSection() {
+export default function VideoSection({ variant = 'default' }) {
   const [playing, setPlaying] = useState(false)
   const embedUrl = `https://www.youtube.com/embed/${video.youtubeId}?rel=0&autoplay=1`
+  const isLight = variant === 'light'
 
   return (
     <section
       id="video"
-      className="relative overflow-hidden border-t border-slate-200 bg-surface-alt py-20 lg:py-28"
+      className={`relative overflow-hidden py-20 lg:py-28 ${
+        isLight ? 'border-b border-slate-200 bg-white' : 'border-t border-slate-200 bg-surface-alt'
+      }`}
     >
-      <div
-        className="pointer-events-none absolute -left-24 top-16 h-72 w-72 rounded-full bg-brand/10 blur-3xl"
-        aria-hidden="true"
-      />
-      <div
-        className="pointer-events-none absolute -right-20 bottom-8 h-56 w-56 rounded-full bg-accent/15 blur-3xl"
-        aria-hidden="true"
-      />
+      {!isLight ? (
+        <>
+          <div
+            className="pointer-events-none absolute -left-24 top-16 h-72 w-72 rounded-full bg-brand/10 blur-3xl"
+            aria-hidden="true"
+          />
+          <div
+            className="pointer-events-none absolute -right-20 bottom-8 h-56 w-56 rounded-full bg-accent/15 blur-3xl"
+            aria-hidden="true"
+          />
+        </>
+      ) : null}
 
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
         <div className="grid items-stretch gap-10 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:gap-12 xl:gap-14">

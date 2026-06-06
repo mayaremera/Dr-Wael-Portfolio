@@ -30,6 +30,13 @@ export const images = {
   familyCounseling: '/images/familycoun.jpeg',
   assessment: '/images/assesment.jpeg',
   treatment: '/images/treatment.jpeg',
+  inTheFieldHero: '/images/inthefieldsection.jpeg',
+  galleryHeading: [
+    '/images/gallery-heading-1.png',
+    '/images/gallery-heading-2.png',
+    '/images/gallery-heading-3.png',
+    '/images/gallery-heading-4.png',
+  ],
 }
 
 export const drWaelActivity = {

@@ -12,6 +12,7 @@ import TherapyConcepts from './components/TherapyConcepts'
 import Expertise from './components/Expertise'
 import Testimonials from './components/Testimonials'
 import VideoSection from './components/VideoSection'
+import GalleryPageHeading from './components/GalleryPageHeading'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
 import ContactButton from './components/ContactButton'
@@ -52,7 +53,7 @@ function PageHeading({ eyebrow, title, backgroundImage, imagePosition = 'center'
 function ServicesPageHeading({ eyebrow, title, backgroundImage }) {
   return (
     <section className="relative overflow-hidden">
-      <div className="relative min-h-[320px] pt-36 sm:min-h-[380px] sm:pt-40 lg:min-h-[400px]">
+      <div className="relative min-h-[300px] pt-36 sm:min-h-[340px] sm:pt-40">
         <img
           src={backgroundImage}
           alt=""
@@ -64,7 +65,7 @@ function ServicesPageHeading({ eyebrow, title, backgroundImage }) {
         <div className="absolute inset-0 bg-linear-to-t from-ink/80 via-ink/25 to-transparent" />
         <div className="absolute inset-y-0 left-0 w-full max-w-xl bg-linear-to-r from-ink/55 to-transparent sm:max-w-2xl" />
 
-        <div className="relative mx-auto flex min-h-[320px] max-w-6xl flex-col justify-end px-6 pb-10 sm:min-h-[380px] sm:pb-12 lg:min-h-[400px] lg:px-8">
+        <div className="relative mx-auto flex min-h-[300px] max-w-6xl flex-col justify-end px-6 pb-10 sm:min-h-[340px] sm:pb-12 lg:px-8">
           <p className="text-xs font-semibold tracking-[0.24em] text-accent uppercase">{eyebrow}</p>
           <h1 className="mt-3 font-serif text-xl leading-tight whitespace-nowrap text-white sm:text-2xl md:text-3xl lg:text-5xl">
             {title}
@@ -91,16 +92,28 @@ function HomePage() {
 }
 
 function PageLayout({ hero, children }) {
-  const Heading = hero.variant === 'services' ? ServicesPageHeading : PageHeading
-
   return (
     <>
-      <Heading
-        eyebrow={hero.eyebrow}
-        title={hero.title}
-        backgroundImage={hero.image}
-        imagePosition={hero.imagePosition}
-      />
+      {hero.variant === 'gallery' ? (
+        <GalleryPageHeading
+          eyebrow={hero.eyebrow}
+          title={hero.title}
+          galleryImages={hero.galleryImages}
+        />
+      ) : hero.variant === 'services' ? (
+        <ServicesPageHeading
+          eyebrow={hero.eyebrow}
+          title={hero.title}
+          backgroundImage={hero.image}
+        />
+      ) : (
+        <PageHeading
+          eyebrow={hero.eyebrow}
+          title={hero.title}
+          backgroundImage={hero.image}
+          imagePosition={hero.imagePosition}
+        />
+      )}
       {children}
     </>
   )
@@ -205,23 +218,13 @@ function App() {
         hero={{
           eyebrow: 'Video & Gallery',
           title: 'Insights and Moments from Practice',
-          description:
-            'Watch featured educational videos and view snapshots of meaningful therapy and family sessions.',
-          image: images.heroBanner,
+          variant: 'gallery',
+          galleryImages: images.galleryHeading,
         }}
       >
+        <VideoSection variant="light" />
         <PromoVideoSection />
-        <VideoSection />
         <GalleryGrid />
-        <VibeBand
-          label="Learning Through Media"
-          title="See the Clinical Approach in Action"
-          description="Educational content and gallery highlights offer a closer look at how therapy principles translate into meaningful progress for children and families."
-          primaryHref="/contact"
-          primaryLabel="Book a Consultation"
-          secondaryHref="/about-me"
-          secondaryLabel="Learn More"
-        />
       </PageLayout>
     ),
     '/in-the-field': (
@@ -231,7 +234,7 @@ function App() {
           title: 'Professional Activity & Events',
           description:
             'Follow recent conferences, lectures, and clinical engagements where Dr. Wael contributes his expertise.',
-          image: images.treatment,
+          image: images.inTheFieldHero,
         }}
       >
         <DrWaelActivity />
@@ -263,10 +266,9 @@ function App() {
           description="Share your concerns, ask questions, and receive clear guidance on what support your child may need next."
           primaryHref="/services"
           primaryLabel="View Services"
-          secondaryHref="/services#cases"
-          secondaryLabel="See Specializations"
+          secondaryHref="/about-me"
+          secondaryLabel="About Dr. Wael"
         />
-        <TherapyConcepts />
       </PageLayout>
     ),
   }
