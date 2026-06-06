@@ -16,7 +16,7 @@ export function getHeaderContactButtonClass({ active, scrolled }) {
     return 'bg-brand text-white hover:bg-brand-light'
   }
 
-  return 'border border-white/35 bg-white/10 text-white backdrop-blur-md hover:border-white/55 hover:bg-white/20'
+  return 'bg-white text-brand hover:bg-brand-muted'
 }
 
 export default function ContactButton({
