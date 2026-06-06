@@ -23,14 +23,14 @@ export const site = {
 export const images = {
   drWael: '/images/dr-wael.jpeg',
   aboutHero: '/images/aboutmesection.jpeg',
-  servicesHero: '/images/servicesection.png',
+  servicesHero: '/images/services-hero-v3.png',
   heroBanner: '/images/hero1.jpeg',
   family: '/images/family.jpg',
   screening: '/images/screening.jpg',
   familyCounseling: '/images/familycoun.jpeg',
   assessment: '/images/assesment.jpeg',
   treatment: '/images/treatment.jpeg',
-  inTheFieldHero: '/images/inthefieldsection.jpeg',
+  inTheFieldHero: '/images/inthefield-scholar.png',
   galleryHeading: [
     '/images/gallery-heading-1.png',
     '/images/gallery-heading-2.png',

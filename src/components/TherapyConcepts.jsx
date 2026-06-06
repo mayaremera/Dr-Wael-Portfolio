@@ -52,27 +52,30 @@ function ServiceDetailCard({ concept, index }) {
   const accent = serviceAccents[index % serviceAccents.length]
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-sm border border-slate-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-brand/20 hover:shadow-lg hover:shadow-brand/10">
-      <div className={`h-1 shrink-0 ${accent.bar}`} aria-hidden="true" />
-
-      <div className="relative aspect-[5/2] overflow-hidden sm:aspect-[2/1]">
-        <img
-          src={concept.image}
-          alt={`${concept.title}, ${concept.subtitle}`}
-          className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-        />
-        <div className={`pointer-events-none absolute inset-0 bg-linear-to-t ${accent.overlay}`} />
-        <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
-          <h3 className="font-serif text-2xl leading-tight text-white sm:text-[1.65rem]">{concept.title}</h3>
-          <p className="mt-1 text-sm font-medium text-white/85">{concept.subtitle}</p>
+    <article className="group row-span-5 grid grid-rows-subgrid overflow-hidden rounded-sm border border-slate-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-brand/20 hover:shadow-lg hover:shadow-brand/10">
+      <div className="flex min-h-[180px] flex-col overflow-hidden sm:min-h-[200px]">
+        <div className={`h-1 shrink-0 ${accent.bar}`} aria-hidden="true" />
+        <div className="relative min-h-0 flex-1 overflow-hidden">
+          <img
+            src={concept.image}
+            alt={`${concept.title}, ${concept.subtitle}`}
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+          />
+          <div className={`pointer-events-none absolute inset-0 bg-linear-to-t ${accent.overlay}`} />
+          <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
+            <h3 className="font-serif text-2xl leading-tight text-white sm:text-[1.65rem]">{concept.title}</h3>
+            <p className="mt-1 text-sm font-medium text-white/85">{concept.subtitle}</p>
+          </div>
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col p-5 sm:p-6">
+      <div className="px-5 pt-5 sm:px-6 sm:pt-6">
         <p className="text-sm leading-relaxed text-ink md:text-[0.9375rem]">{concept.summary}</p>
+      </div>
 
+      <div className="px-5 sm:px-6">
         {concept.paragraphs?.length > 0 ? (
-          <div className="mt-4 space-y-3 border-t border-slate-100 pt-4">
+          <div className="space-y-3 border-t border-slate-100 pt-4">
             {concept.paragraphs.map((paragraph) => (
               <p key={paragraph.slice(0, 40)} className="text-sm leading-relaxed text-ink-muted">
                 {paragraph}
@@ -80,7 +83,9 @@ function ServiceDetailCard({ concept, index }) {
             ))}
           </div>
         ) : null}
+      </div>
 
+      <div className="px-5 sm:px-6">
         {concept.bullets?.length > 0 ? (
           <ul className="mt-4 space-y-2 rounded-sm bg-surface-alt px-4 py-3.5">
             {concept.bullets.map((bullet) => (
@@ -91,10 +96,10 @@ function ServiceDetailCard({ concept, index }) {
             ))}
           </ul>
         ) : null}
+      </div>
 
-        <div className="mt-auto pt-5">
-          <ContactButton href="#contact">Contact Us Now</ContactButton>
-        </div>
+      <div className="px-5 pt-5 pb-5 sm:px-6 sm:pb-6">
+        <ContactButton href="#contact">Contact Us Now</ContactButton>
       </div>
     </article>
   )
@@ -196,11 +201,26 @@ export default function TherapyConcepts({ showCasesPreview = false, fullDetail =
             </div>
           )}
 
-          <div className={`grid items-stretch gap-6 ${fullDetail ? 'md:grid-cols-2' : 'gap-4 md:grid-cols-2'}`}>
-            {therapyConcepts.map((concept, index) =>
-              fullDetail ? (
-                <ServiceDetailCard key={concept.id} concept={concept} index={index} />
-              ) : (
+          {fullDetail ? (
+            <div className="flex flex-col gap-6">
+              {[0, 2].map((rowStart) => (
+                <div
+                  key={rowStart}
+                  className="grid gap-6 md:grid-cols-2 md:grid-rows-[repeat(5,auto)]"
+                >
+                  {therapyConcepts.slice(rowStart, rowStart + 2).map((concept, offset) => (
+                    <ServiceDetailCard
+                      key={concept.id}
+                      concept={concept}
+                      index={rowStart + offset}
+                    />
+                  ))}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid items-stretch gap-4 md:grid-cols-2">
+              {therapyConcepts.map((concept) => (
                 <article
                   key={concept.id}
                   className="group flex h-full flex-col overflow-hidden rounded-sm border border-slate-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-brand/20 hover:shadow-md sm:flex-row"
@@ -221,9 +241,9 @@ export default function TherapyConcepts({ showCasesPreview = false, fullDetail =
                     </a>
                   </div>
                 </article>
-              ),
-            )}
-          </div>
+              ))}
+            </div>
+          )}
 
           {showCasesPreview ? (
             <div className="mt-12 border-t border-slate-100 pt-10">

@@ -57,8 +57,7 @@ function ServicesPageHeading({ eyebrow, title, backgroundImage }) {
         <img
           src={backgroundImage}
           alt=""
-          className="absolute inset-0 h-full w-full object-cover"
-          style={{ objectPosition: '72% 28%' }}
+          className="absolute inset-0 h-full w-full object-cover object-top"
         />
 
         <div className="absolute inset-0 bg-linear-to-r from-ink/95 via-ink/75 to-ink/20" />
@@ -235,6 +234,7 @@ function App() {
           description:
             'Follow recent conferences, lectures, and clinical engagements where Dr. Wael contributes his expertise.',
           image: images.inTheFieldHero,
+          imagePosition: 'top',
         }}
       >
         <DrWaelActivity />
