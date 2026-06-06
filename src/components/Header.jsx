@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { site } from '../data/content'
+import ContactButton from './ContactButton'
 import Logo from './Logo'
 
 const navLinks = [
@@ -178,21 +179,14 @@ export default function Header() {
             ))}
           </nav>
 
-          <a
+          <ContactButton
             href="/contact"
             aria-current={isContactActive ? 'page' : undefined}
-            className={`hidden rounded-sm px-5 py-2.5 text-sm font-medium tracking-wide transition-colors lg:inline-block ${
-              isContactActive
-                ? scrolled
-                  ? 'bg-brand-light text-white ring-2 ring-brand/30'
-                  : 'bg-brand text-white ring-2 ring-white/40'
-                : scrolled
-                  ? 'bg-brand text-white hover:bg-brand-light'
-                  : 'bg-white text-brand hover:bg-brand-muted'
-            }`}
+            className="hidden lg:inline-flex"
+            headerState={{ active: isContactActive, scrolled }}
           >
             Contact Us Now
-          </a>
+          </ContactButton>
 
           <button
             type="button"
@@ -228,16 +222,14 @@ export default function Header() {
                 </li>
               ))}
               <li>
-                <a
+                <ContactButton
                   href="/contact"
                   aria-current={isContactActive ? 'page' : undefined}
-                  className={`inline-block rounded-sm px-5 py-2.5 text-sm font-medium text-white ${
-                    isContactActive ? 'bg-brand-light ring-2 ring-brand/30' : 'bg-brand'
-                  }`}
+                  headerState={{ active: isContactActive, scrolled: true }}
                   onClick={() => setOpen(false)}
                 >
                   Contact Us Now
-                </a>
+                </ContactButton>
               </li>
             </ul>
           </nav>

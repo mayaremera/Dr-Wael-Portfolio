@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import Header from './components/Header'
 import HeroBanner from './components/HeroBanner'
-import HopeGallery from './components/HopeGallery'
+import GalleryGrid from './components/GalleryGrid'
 import DrWaelActivity from './components/DrWaelActivity'
 import Profile from './components/Profile'
 import PromoVideoSection from './components/PromoVideoSection'
@@ -14,6 +14,7 @@ import Testimonials from './components/Testimonials'
 import VideoSection from './components/VideoSection'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
+import ContactButton from './components/ContactButton'
 import { images, speechLanguageServices } from './data/content'
 
 const HOME_PATH = '/'
@@ -211,7 +212,7 @@ function App() {
       >
         <PromoVideoSection />
         <VideoSection />
-        <HopeGallery />
+        <GalleryGrid />
         <VibeBand
           label="Learning Through Media"
           title="See the Clinical Approach in Action"
@@ -243,7 +244,6 @@ function App() {
           secondaryHref="/services"
           secondaryLabel="Explore Services"
         />
-        <Leadership />
       </PageLayout>
     ),
     '/contact': (
@@ -282,12 +282,9 @@ function App() {
           <section className="mx-auto max-w-3xl px-6 py-24 text-center">
             <p className="text-xs font-semibold tracking-[0.22em] text-brand uppercase">Page not found</p>
             <h1 className="mt-4 font-serif text-4xl text-ink">This page does not exist.</h1>
-            <a
-              href="/"
-              className="mt-8 inline-block rounded-sm bg-brand px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-light"
-            >
+            <ContactButton href="/" className="mt-8">
               Back to Home
-            </a>
+            </ContactButton>
           </section>
         )}
       </main>

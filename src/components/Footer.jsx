@@ -1,4 +1,4 @@
-import { site, footerServices, footerQuickLinks } from '../data/content'
+import { site, footerQuickLinks } from '../data/content'
 
 function FooterSocialIcon({ href, label, children }) {
   return (
@@ -33,7 +33,7 @@ export default function Footer() {
   return (
     <footer className="bg-brand">
       <div className="mx-auto max-w-6xl px-6 py-14 lg:px-8 lg:py-16">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
           <div className="sm:col-span-2 lg:col-span-1">
             <p className="font-serif text-xl leading-snug text-white md:text-2xl">{site.name}</p>
             <p className="mt-2 text-sm text-white/65">{site.title}</p>
@@ -59,21 +59,6 @@ export default function Footer() {
                 </ul>
               ))}
             </div>
-          </FooterLinkColumn>
-
-          <FooterLinkColumn title="Services">
-            <ul className="mt-4 space-y-2.5">
-              {footerServices.map((service) => (
-                <li key={service}>
-                  <a
-                    href="/services"
-                    className="text-sm text-white/60 transition-colors hover:text-white"
-                  >
-                    {service}
-                  </a>
-                </li>
-              ))}
-            </ul>
           </FooterLinkColumn>
 
           <FooterLinkColumn title="Follow Us">

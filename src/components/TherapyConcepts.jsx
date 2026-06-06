@@ -5,6 +5,7 @@ import {
   therapyConcepts,
 } from '../data/content'
 import ClinicalSpecializations from './ClinicalSpecializations'
+import ContactButton from './ContactButton'
 
 const cardLinkClassName =
   'relative mt-4 inline-block w-fit pb-1 text-xs font-semibold tracking-[0.12em] text-brand uppercase transition-colors after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-brand after:transition-transform after:duration-300 after:ease-out hover:text-brand-light hover:after:scale-x-100'
@@ -92,15 +93,7 @@ function ServiceDetailCard({ concept, index }) {
         ) : null}
 
         <div className="mt-auto pt-5">
-          <a
-            href="#contact"
-            className={`inline-flex items-center gap-2 rounded-sm px-5 py-2.5 text-xs font-semibold tracking-[0.1em] text-white uppercase transition-colors ${accent.cta}`}
-          >
-            Book a Session
-            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-            </svg>
-          </a>
+          <ContactButton href="#contact">Contact Us Now</ContactButton>
         </div>
       </div>
     </article>

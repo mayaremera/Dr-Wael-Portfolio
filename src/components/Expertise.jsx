@@ -1,4 +1,5 @@
 import { images, whyChooseUs } from '../data/content'
+import ContactButton from './ContactButton'
 
 export default function Expertise() {
   return (
@@ -27,12 +28,9 @@ export default function Expertise() {
               ))}
             </div>
 
-            <a
-              href="#contact"
-              className="mt-10 inline-block w-fit rounded-sm bg-brand px-6 py-2.5 text-sm font-semibold tracking-wide text-white uppercase transition-colors hover:bg-brand-light"
-            >
-              Make Appointment
-            </a>
+            <ContactButton href="#contact" className="mt-10 w-fit">
+              Contact Us Now
+            </ContactButton>
           </div>
 
           <div className="relative order-1 min-h-[260px] sm:min-h-[320px] lg:order-2 lg:min-h-[520px]">

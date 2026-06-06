@@ -26,7 +26,6 @@ export default function VideoSection() {
             <h2 className="mt-3 font-serif text-3xl leading-tight text-ink md:text-4xl lg:text-[2.75rem] xl:text-[3.1rem]">
               {video.title}
             </h2>
-            <div className="mt-5 h-1 w-14 rounded-full bg-brand" aria-hidden="true" />
 
             <div className="mt-8 space-y-4">
               {video.paragraphs.map((paragraph) => (

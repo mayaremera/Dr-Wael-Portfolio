@@ -1,4 +1,5 @@
 import { images, profileDetails, site } from '../data/content'
+import ContactButton from './ContactButton'
 
 export default function HeroBanner() {
   return (
@@ -23,12 +24,9 @@ export default function HeroBanner() {
           through compassionate, evidence-based care in English and Arabic.
         </p>
         <div className="mt-10 flex flex-wrap gap-4">
-          <a
-            href="#contact"
-            className="rounded-sm bg-white px-7 py-3 text-sm font-semibold tracking-wide text-brand transition-colors hover:bg-brand-muted"
-          >
-            Make Appointment
-          </a>
+          <ContactButton href="#contact" headerState={{ active: false, scrolled: false }}>
+            Contact Us Now
+          </ContactButton>
           <a
             href="#approach"
             className="rounded-sm border border-white/40 bg-black/20 px-7 py-3 text-sm font-medium tracking-wide text-white backdrop-blur-sm transition-colors hover:border-white hover:bg-black/30"

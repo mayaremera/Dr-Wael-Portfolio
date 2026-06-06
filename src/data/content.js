@@ -8,7 +8,6 @@ export const site = {
   domain: 'drwaelslp.com',
   email: 'info@drwaelslp.com',
   phone: '+91 3309 62885',
-  hours: 'Sunday – Thursday',
   languages: ['English', 'Arabic'],
   tagline: 'Every child has something to say. We help them find the words.',
   footerTagline: 'Helping children communicate, connect, and thrive.',
@@ -110,6 +109,48 @@ export const drWaelActivity = {
   ],
 }
 
+const gridMedia = (filename, type) => ({
+  type,
+  src: `/images/grid/${filename}`,
+  alt:
+    type === 'video'
+      ? 'Event clip from a professional engagement'
+      : 'Speech-language pathology practice moment',
+})
+
+export const mediaGallery = {
+  label: 'Gallery',
+  title: 'Snapshots from Sessions & Events',
+  items: [
+    gridMedia('WhatsApp Video 2026-05-27 at 62.49.01 PM.mp4', 'video'),
+    gridMedia('WhatsApp Video 2026-05-27 at 6.49.00 PM.mp4', 'video'),
+    gridMedia('WhatsApp Image 2026-05-27 at 6.238.47 PM.jpeg', 'image'),
+    gridMedia('WhatsApp Image 2026-05-27 at 6.49.015 PM.jpeg', 'image'),
+    gridMedia('WhatsApp Image 2026-05-27 at 62.49.01 PM.jpeg', 'image'),
+    gridMedia('WhatsApp Image 2026-05-27 at 6.49.013 PM.jpeg', 'image'),
+    gridMedia('WhatsApp Image 2026-05-27 at 6.49.041 PM.jpeg', 'image'),
+    gridMedia('WhatsApp Image 2026-05-27 at 151516.49.02 PM.jpeg', 'image'),
+    gridMedia('WhatsApp Im1313age 2026-05-27 at 6.49.02 PM.jpeg', 'image'),
+    gridMedia('WhatsApp Imag1313e 2026-05-27 at 6.49.03 PM.jpeg', 'image'),
+    gridMedia('WhatsApp13 Image 2026-05-27 at 6.49.03 PM.jpeg', 'image'),
+    gridMedia('WhatsApp Image 2026-1305-27 at 6.49.03 PM.jpeg', 'image'),
+    gridMedia('WhatsApp Image 202644-05-27 at 6.49.03 PM.jpeg', 'image'),
+    gridMedia('WhatsApp Image 2026-05-27 at 6.49.0135 PM.jpeg', 'image'),
+    gridMedia('WhatsApp Image 2026-05-27 at 6.49.014144 PM.jpeg', 'image'),
+    gridMedia('WhatsApp Image 2026-05-27 at 6.491414.04 PM.jpeg', 'image'),
+    gridMedia('WhatsApp Image 201226-05-27 at 6.49.01 PM.jpeg', 'image'),
+    gridMedia('WhatsApp Image 201326-05-27 at 6.49.05 PM.jpeg', 'image'),
+    gridMedia('WhatsApp Image 2026-05-2147 at 6.49.05 PM.jpeg', 'image'),
+    gridMedia('WhatsApp Image 2026-05-27 14at 6.49.05 PM.jpeg', 'image'),
+    gridMedia('WhatsApp Image 21026-05-27 at 6.49.05 PM.jpeg', 'image'),
+    gridMedia('WhatsApp Image 2026-05-27 6t 6.38.48 PM.jpeg', 'image'),
+    gridMedia('WhatsApp Image 212026-05-27 at 6.38.48 PM.jpeg', 'image'),
+    gridMedia('Wh88atsApp Image 2026-05-27 at 6.43.18 PM.jpeg', 'image'),
+    gridMedia('WhatsAp5p Image 2026-05-27 at 6.43.18 PM.jpeg', 'image'),
+    gridMedia('WhatsApp31313 Image 2026-05-27 at 6.49.02 PM.jpeg', 'image'),
+  ],
+}
+
 export const hopeGallery = {
   label: 'Our Impact',
   title: 'Expert Care in Every Session',
@@ -156,7 +197,7 @@ export const whyChooseUs = {
 export const video = {
   youtubeId: 'EyIvs6DKl-Y',
   youtubeUrl: 'https://youtu.be/EyIvs6DKl-Y',
-  poster: '/images/video1.jpeg',
+  poster: '/images/watchvideo.jpeg',
   title: 'Center for Autism Research — Award Ceremony',
   paragraphs: [
     'This video captures Dr. Wael Al-Dakroury at the Center for Autism Research award ceremony — recognition of his dedication to children with autism, their families, and the field of communication sciences.',
@@ -677,6 +718,23 @@ export const testimonials = [
       'When our son was 3, we began noticing that he had limited eye contact, communication-related difficulties, and was only using a few words. Like any parents, we felt worried, confused, and unsure of what to do next. Meeting Dr. Wael during that time gave us a real sense of relief. He listened patiently, understood our concerns, and explained everything in a calm, clear, and reassuring way. What truly stood out was not only his assessment but also the way he worked with our son in each session. His sessions were thoughtful, engaging, and tailored to our son\'s specific needs. He knew how to make him feel comfortable and safe, which helped him respond better and open up little by little. Every session felt purposeful, with clear progress, practical strategies, and guidance that we could continue at home. Over time, we saw real changes. Our son became more confident, improved in communication, and started connecting better with others. We are deeply grateful for the care, patience, and consistency throughout the journey. For any parent feeling worried about communication or developmental concerns, I can honestly say that finding the right support early can make all the difference.',
   },
 ]
+
+export const contactDetails = {
+  workplace: {
+    name: 'Psych Care Complex',
+    department: 'Communication Disorders Department',
+    city: 'Riyadh, Saudi Arabia',
+  },
+  schedule: [
+    { day: 'Sunday', hours: '9:00 AM – 5:00 PM' },
+    { day: 'Monday', hours: '9:00 AM – 5:00 PM' },
+    { day: 'Tuesday', hours: '9:00 AM – 5:00 PM' },
+    { day: 'Wednesday', hours: '9:00 AM – 5:00 PM' },
+    { day: 'Thursday', hours: '9:00 AM – 3:00 PM' },
+    { day: 'Friday', hours: 'Weekend', weekend: true },
+    { day: 'Saturday', hours: 'Weekend', weekend: true },
+  ],
+}
 
 export const footerServices = [
   'Assessment',
