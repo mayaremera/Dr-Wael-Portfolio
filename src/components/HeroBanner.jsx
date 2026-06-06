@@ -11,8 +11,8 @@ export default function HeroBanner() {
       <div className="absolute inset-0 bg-gradient-to-r from-ink/85 via-ink/60 to-ink/30" />
 
       <div className="relative mx-auto flex min-h-[70vh] max-w-6xl flex-col justify-end px-6 pt-44 pb-16 lg:min-h-[85vh] lg:px-8 lg:pt-48 lg:pb-24">
-        <p className="text-sm font-medium tracking-[0.25em] text-white uppercase drop-shadow-md">
-          {site.title} · {site.languages.join(' & ')}
+        <p className="max-w-4xl text-sm font-medium tracking-[0.12em] text-white drop-shadow-md md:text-base">
+          {site.title}
         </p>
         <h1 className="mt-4 max-w-3xl font-serif text-4xl leading-[1.12] font-medium text-white drop-shadow-md md:text-5xl lg:text-6xl">
           {profileDetails.name}

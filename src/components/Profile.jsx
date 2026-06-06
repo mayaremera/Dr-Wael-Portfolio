@@ -22,8 +22,47 @@ function AffiliationHoverOverlay({ company }) {
   )
 }
 
+function AffiliationBadge({ logo, label }) {
+  return (
+    <div
+      className="pointer-events-none absolute right-1.5 bottom-2 z-4 sm:right-2 sm:bottom-2.5"
+      title={label}
+    >
+      <div className="relative transition-transform duration-500 ease-out group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-focus-within:-translate-y-0.5 group-focus-within:translate-x-0.5">
+        <svg
+          className="absolute -left-[1.15rem] top-1/2 h-5 w-5 -translate-y-[85%] text-accent"
+          viewBox="0 0 20 20"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M18 14 C12 16, 6 12, 3 4"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+        </svg>
+
+        <div className="flex items-center gap-1 rounded-full border border-white/90 bg-brand/95 py-0.5 pr-2 pl-0.5 shadow-[0_4px_14px_rgba(0,0,0,0.5)] backdrop-blur-sm sm:gap-1.5 sm:pr-2.5">
+          <div className="relative h-7 w-7 shrink-0 overflow-hidden rounded-full sm:h-8 sm:w-8">
+            <img src={logo} alt={label || ''} className="h-full w-full object-cover" />
+            <div
+              className="pointer-events-none absolute inset-0 rounded-full ring-2 ring-inset ring-white/25"
+              aria-hidden="true"
+            />
+          </div>
+          <span className="text-[0.5rem] font-bold tracking-[0.22em] text-white uppercase sm:text-[0.5625rem]">
+            ARC
+          </span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function AffiliationTile({ company }) {
   const [logoFailed, setLogoFailed] = useState(false)
+  const fullCover = company.logoFit === 'cover'
 
   return (
     <article
@@ -32,14 +71,25 @@ function AffiliationTile({ company }) {
     >
       <div className="relative h-full w-full overflow-hidden">
         {!logoFailed ? (
-          <div className="flex h-full w-full items-center justify-center">
-            <img
-              src={company.logo}
-              alt={company.name}
-              onError={() => setLogoFailed(true)}
-              className="max-h-[82%] w-auto max-w-[88%] object-contain transition-all duration-500 ease-out group-hover:scale-[0.88] group-hover:opacity-25 group-focus-within:scale-[0.88] group-focus-within:opacity-25"
-            />
-          </div>
+          fullCover ? (
+            <div className="absolute inset-0">
+              <img
+                src={company.logo}
+                alt={company.name}
+                onError={() => setLogoFailed(true)}
+                className="h-full w-full object-cover scale-[0.97] transition-all duration-500 ease-out group-hover:scale-100 group-hover:opacity-25 group-focus-within:scale-100 group-focus-within:opacity-25"
+              />
+            </div>
+          ) : (
+            <div className="flex h-full w-full items-center justify-center">
+              <img
+                src={company.logo}
+                alt={company.name}
+                onError={() => setLogoFailed(true)}
+                className="max-h-[82%] w-auto max-w-[88%] object-contain transition-all duration-500 ease-out group-hover:scale-[0.88] group-hover:opacity-25 group-focus-within:scale-[0.88] group-focus-within:opacity-25"
+              />
+            </div>
+          )
         ) : (
           <div className="flex h-full w-full items-center justify-center">
             <div className="flex h-20 w-20 items-center justify-center rounded-full border border-brand/15 bg-brand-muted/50 transition-opacity duration-500 group-hover:opacity-25 group-focus-within:opacity-25">
@@ -48,39 +98,19 @@ function AffiliationTile({ company }) {
           </div>
         )}
 
+        {company.badgeLogo ? (
+          <AffiliationBadge logo={company.badgeLogo} label={company.badgeLabel} />
+        ) : null}
+
         <AffiliationHoverOverlay company={company} />
       </div>
     </article>
   )
 }
 
-function RecognitionTile({ company }) {
-  return (
-    <article className="relative h-32 overflow-hidden rounded-sm border border-brand/20 bg-brand-muted shadow-sm sm:h-36">
-      <div className="relative flex h-full flex-col justify-between p-3.5 sm:p-4">
-        <div className="flex items-start gap-2.5">
-          <span className="mt-0.5 h-9 w-0.5 shrink-0 bg-brand/40 sm:h-10" aria-hidden="true" />
-          <div className="min-w-0">
-            <p className="text-[0.55rem] font-bold tracking-[0.18em] text-brand uppercase sm:text-[0.58rem]">
-              {company.shortName}
-            </p>
-            <p className="mt-1 font-serif text-xs leading-snug text-ink sm:text-[0.8125rem]">{company.name}</p>
-          </div>
-        </div>
-
-        <p className="line-clamp-2 pl-3 text-[0.625rem] leading-snug text-ink-muted sm:text-[0.6875rem]">
-          {company.role}
-        </p>
-      </div>
-    </article>
-  )
-}
-
 function AffiliationGrid({ companies }) {
-  const featured = companies.find((company) => company.featured)
-  const standard = companies.filter((company) => !company.featured)
-  const rowOne = standard.slice(0, 4)
-  const rowTwo = standard.slice(4, 6)
+  const rowOne = companies.slice(0, 4)
+  const rowTwo = companies.slice(4, 7)
 
   return (
     <div className="space-y-3 sm:space-y-4">
@@ -94,11 +124,6 @@ function AffiliationGrid({ companies }) {
         {rowTwo.map((company) => (
           <AffiliationTile key={company.id} company={company} />
         ))}
-        {featured ? (
-          <div className="col-span-2 sm:col-span-1">
-            <RecognitionTile company={featured} />
-          </div>
-        ) : null}
       </div>
     </div>
   )

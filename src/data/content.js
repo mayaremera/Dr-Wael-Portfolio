@@ -2,7 +2,8 @@
 
 export const site = {
   name: 'Dr. Wael A. Al-Dakroury',
-  title: 'Speech-Language Pathologist',
+  title:
+    'Consultant Bilingual Speech Language Pathologist & Associate Professor in Speech Language Pathology',
   suffix: 'SLP',
   domain: 'drwaelslp.com',
   email: 'info@drwaelslp.com',
@@ -162,8 +163,8 @@ export const video = {
 
 export const profileDetails = {
   name: 'Dr. Wael A. Al-Dakroury',
-  title: 'Speech-Language Pathologist (SLP)',
-  credentials: ['PhD', 'ASHA Fellow', 'CCC-SLP'],
+  title: site.title,
+  credentials: ['Ph.D.', 'CCC-SLP', 'ASHA Fellow'],
   tagline: site.tagline,
   highlights: [
     { label: 'Experience', value: '30+ Years' },
@@ -201,7 +202,7 @@ export const trustedCompanies = {
       id: 'asha',
       name: 'American Speech-Language-Hearing Association',
       shortName: 'ASHA',
-      role: 'ASHA Fellow, CCC-SLP, International SLP Ambassador, and SIG 17 Committee Member.',
+      role: 'Ph.D., CCC-SLP, ASHA Fellow, International SLP Ambassador, and SIG 17 Committee Member.',
       logo: '/images/trusted1.jpg',
     },
     {
@@ -240,11 +241,14 @@ export const trustedCompanies = {
       logo: '/images/trusted7.png',
     },
     {
-      id: 'asha-achievement',
-      name: 'ASHA International Achievement',
-      shortName: '2023 Recognition',
-      role: 'Certificate of Recognition for Outstanding Contributions in International Achievement.',
-      featured: true,
+      id: 'cambridge',
+      name: 'University of Cambridge',
+      shortName: 'Cambridge',
+      role: 'Research affiliation with the Autism Research Centre, advancing evidence-based understanding of communication and neurodevelopment.',
+      logo: '/images/trusted8.png',
+      badgeLogo: '/images/trusted8banner.png',
+      badgeLabel: 'Autism Research Centre',
+      logoFit: 'cover',
     },
   ],
 }
