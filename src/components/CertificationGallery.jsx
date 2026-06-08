@@ -1,23 +1,8 @@
-import { useMemo, useState } from 'react'
-import { certificatePlaceholders } from '../data/content'
+import { useState } from 'react'
+import { useAboutContent } from '../hooks/useAboutContent'
 
-const CERTIFICATE_COUNT = 50
 const PAGE_SIZE = 9
 const MAX_VISIBLE_PAGES = 5
-
-function buildCertificates() {
-  return Array.from({ length: CERTIFICATE_COUNT }, (_, index) => {
-    const id = index + 1
-    const certificateLabel = `Certificate ${String(id).padStart(2, '0')}`
-    return {
-      id,
-      title: certificateLabel,
-      issuer: 'Professional Development',
-      description: 'Advanced clinical training and continuing professional education in speech-language pathology.',
-      image: certificatePlaceholders[index % certificatePlaceholders.length],
-    }
-  })
-}
 
 function getVisiblePages(currentPage, pageCount) {
   if (pageCount <= MAX_VISIBLE_PAGES) {
@@ -114,8 +99,8 @@ function Pagination({ page, pageCount, onChange }) {
 }
 
 export default function CertificationGallery() {
+  const { certificates } = useAboutContent()
   const [page, setPage] = useState(0)
-  const certificates = useMemo(() => buildCertificates(), [])
 
   const pageCount = Math.ceil(certificates.length / PAGE_SIZE)
   const safePage = Math.min(page, Math.max(pageCount - 1, 0))

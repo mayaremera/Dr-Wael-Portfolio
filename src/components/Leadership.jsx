@@ -1,4 +1,5 @@
-import { leadershipRoles, clinicalSpecializations } from '../data/content'
+import { clinicalSpecializations } from '../data/content'
+import { useAboutContent } from '../hooks/useAboutContent'
 
 const roleAccents = [
   {
@@ -36,6 +37,8 @@ const roleAccents = [
 const specDots = ['bg-brand', 'bg-accent', 'bg-brand-light', 'bg-ink-muted']
 
 export default function Leadership() {
+  const { leadershipRoles } = useAboutContent()
+
   return (
     <section id="leadership" className="relative overflow-hidden border-t border-slate-200 bg-surface-alt py-16 lg:py-20">
       <div className="pointer-events-none absolute -left-20 top-16 h-56 w-56 rounded-full bg-brand/10 blur-3xl" />

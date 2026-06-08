@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { images, profileDetails, trustedCompanies } from '../data/content'
+import { images, trustedCompanies } from '../data/content'
+import { useAboutContent } from '../hooks/useAboutContent'
 
 const sectionLinkClassName =
   'relative inline-block w-fit pb-1 text-xs font-semibold tracking-[0.12em] text-brand uppercase transition-colors after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-brand after:transition-transform after:duration-300 after:ease-out hover:text-brand-light hover:after:scale-x-100'
@@ -129,7 +130,9 @@ function TrustedCompanies() {
 }
 
 export default function Profile({ variant = 'home' }) {
+  const { profileDetails, profileImage } = useAboutContent()
   const { name, title, credentials, tagline, bio } = profileDetails
+  const photo = profileImage || images.drWael
   const isPage = variant === 'page'
 
   return (
@@ -141,7 +144,7 @@ export default function Profile({ variant = 'home' }) {
         <div className="grid gap-8 lg:grid-cols-[minmax(280px,380px)_1fr] lg:items-stretch lg:gap-12">
           <div className="relative aspect-[3/4] w-full overflow-hidden rounded-sm lg:aspect-auto lg:h-full lg:min-h-0">
             <img
-              src={images.drWael}
+              src={photo}
               alt={name}
               className="absolute inset-0 h-full w-full object-cover object-top"
             />

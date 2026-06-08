@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { drWaelActivity } from '../data/content'
+import { useDrWaelActivity } from '../hooks/useDrWaelActivity'
 
 const sectionLinkClassName =
   'relative inline-block w-fit pb-1 text-xs font-semibold tracking-[0.12em] text-brand uppercase transition-colors after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-brand after:transition-transform after:duration-300 after:ease-out hover:text-brand-light hover:after:scale-x-100'
@@ -142,19 +142,25 @@ function ActivityCard({ item, isUpcoming = false }) {
   )
 }
 
-export default function DrWaelActivity() {
-  const { label, title, description, upcoming, recent } = drWaelActivity
+export default function DrWaelActivity({ variant = 'preview' }) {
+  const { label, title, description, upcoming, recent } = useDrWaelActivity()
+  const isFullPage = variant === 'full'
 
   const featuredEvents = [
     ...upcoming.slice(0, 1).map((item) => ({ ...item, isUpcoming: true })),
     ...recent.slice(0, 2).map((item) => ({ ...item, isUpcoming: false })),
   ]
 
+  const allEvents = [
+    ...upcoming.map((item) => ({ ...item, isUpcoming: true })),
+    ...recent.map((item) => ({ ...item, isUpcoming: false })),
+  ]
+
   return (
     <section
       id="activity"
       aria-labelledby="activity-heading"
-      className="relative overflow-hidden border-t border-slate-200 bg-surface py-20 lg:py-28"
+      className={`relative overflow-hidden bg-surface py-20 lg:py-28 ${isFullPage ? '' : 'border-t border-slate-200'}`}
     >
       <div
         className="pointer-events-none absolute -left-16 top-20 h-56 w-56 rounded-full bg-brand/10 blur-3xl"
@@ -174,17 +180,27 @@ export default function DrWaelActivity() {
           <p className="mt-4 text-base leading-relaxed text-ink-muted md:text-lg">{description}</p>
         </header>
 
-        <div className="mt-10 mb-4 flex justify-end">
-          <a href="/in-the-field" className={sectionLinkClassName}>
-            View all events
-          </a>
-        </div>
+        {isFullPage ? (
+          <div className="mt-12 grid items-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {allEvents.map((item) => (
+              <ActivityCard key={item.id} item={item} isUpcoming={item.isUpcoming} />
+            ))}
+          </div>
+        ) : (
+          <>
+            <div className="mt-10 mb-4 flex justify-end">
+              <a href="/in-the-field" className={sectionLinkClassName}>
+                View all events
+              </a>
+            </div>
 
-        <div className="grid items-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {featuredEvents.map((item) => (
-            <ActivityCard key={item.id} item={item} isUpcoming={item.isUpcoming} />
-          ))}
-        </div>
+            <div className="grid items-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {featuredEvents.map((item) => (
+                <ActivityCard key={item.id} item={item} isUpcoming={item.isUpcoming} />
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </section>
   )

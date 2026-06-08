@@ -1,9 +1,4 @@
-import {
-  casesWeServe,
-  clinicalSpecializations,
-  speechLanguageServices,
-  therapyConcepts,
-} from '../data/content'
+import { useServicesContent } from '../hooks/useServicesContent'
 import ClinicalSpecializations from './ClinicalSpecializations'
 import ContactButton from './ContactButton'
 
@@ -165,6 +160,8 @@ function CasesPreviewRail({ cases }) {
 }
 
 export default function TherapyConcepts({ showCasesPreview = false, fullDetail = false }) {
+  const { speechLanguageServices, therapyConcepts, casesWeServe, clinicalSpecializations } =
+    useServicesContent()
   const ctaHref = showCasesPreview ? '/services' : '#contact'
 
   return (

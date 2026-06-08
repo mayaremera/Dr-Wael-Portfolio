@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { testimonials, testimonialsSection } from '../data/content'
+import { useEffect, useState } from 'react'
+import { useServicesContent } from '../hooks/useServicesContent'
 
 function excerpt(quote, max = 88) {
   if (quote.length <= max) return quote
@@ -122,7 +122,7 @@ function VoiceSelector({ item, index, isActive, onSelect, inert = false, light =
   )
 }
 
-function VoicesNavSizer({ light = false }) {
+function VoicesNavSizer({ testimonials, light = false }) {
   const sizerItems = testimonials.slice(0, VOICES_PAGE_SIZE)
   const labelClass = light
     ? 'text-xs font-semibold tracking-wide text-ink-muted uppercase'
@@ -155,10 +155,27 @@ function VoicesNavSizer({ light = false }) {
   )
 }
 
-function TestimonialsShowcase({ light = false }) {
+function TestimonialsShowcase({ testimonials, testimonialsSection, light = false }) {
   const [activeIndex, setActiveIndex] = useState(0)
   const [voicesPage, setVoicesPage] = useState(0)
   const active = testimonials[activeIndex]
+
+  useEffect(() => {
+    if (!testimonials.length) {
+      setActiveIndex(0)
+      setVoicesPage(0)
+      return
+    }
+
+    if (activeIndex >= testimonials.length) {
+      setActiveIndex(0)
+      setVoicesPage(0)
+    }
+  }, [activeIndex, testimonials.length])
+
+  if (!testimonials.length || !active) {
+    return null
+  }
 
   const voicesPageCount = Math.max(1, Math.ceil(testimonials.length / VOICES_PAGE_SIZE))
   const safeVoicesPage = Math.min(voicesPage, voicesPageCount - 1)
@@ -241,7 +258,7 @@ function TestimonialsShowcase({ light = false }) {
                 className="pointer-events-none invisible col-start-1 row-start-1 hidden min-w-0 lg:block"
                 aria-hidden="true"
               >
-                <VoicesNavSizer light={light} />
+                <VoicesNavSizer testimonials={testimonials} light={light} />
               </div>
 
               <div className="col-start-1 row-start-1 min-w-0 lg:col-start-1 lg:row-start-1">
@@ -401,7 +418,7 @@ function GalleryCard({ item, index }) {
   )
 }
 
-function TestimonialsGallery() {
+function TestimonialsGallery({ testimonials, testimonialsSection }) {
   return (
     <section id="testimonials" className="border-t border-slate-200 bg-surface-alt py-16 lg:py-24">
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
@@ -428,9 +445,17 @@ function TestimonialsGallery() {
 }
 
 export default function Testimonials({ variant = 'showcase' }) {
+  const { testimonialsSection, testimonials } = useServicesContent()
+
   if (variant === 'gallery') {
-    return <TestimonialsGallery />
+    return <TestimonialsGallery testimonials={testimonials} testimonialsSection={testimonialsSection} />
   }
 
-  return <TestimonialsShowcase light={variant === 'light'} />
+  return (
+    <TestimonialsShowcase
+      testimonials={testimonials}
+      testimonialsSection={testimonialsSection}
+      light={variant === 'light'}
+    />
+  )
 }

@@ -1,4 +1,4 @@
-import { careerTimeline } from '../data/content'
+import { useAboutContent } from '../hooks/useAboutContent'
 
 const typeStyles = {
   education: {
@@ -43,6 +43,8 @@ const typeLabels = {
 }
 
 export default function CareerTimeline() {
+  const { careerTimeline } = useAboutContent()
+
   return (
     <section id="timeline" className="border-t border-slate-200 bg-surface py-16 lg:py-20">
       <div className="mx-auto max-w-6xl px-6 lg:px-8">

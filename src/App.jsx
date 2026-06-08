@@ -16,7 +16,9 @@ import GalleryPageHeading from './components/GalleryPageHeading'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
 import ContactButton from './components/ContactButton'
-import { images, speechLanguageServices } from './data/content'
+import Dashboard from './components/dashboard/Dashboard'
+import { images } from './data/content'
+import { useServicesContent } from './hooks/useServicesContent'
 
 const HOME_PATH = '/'
 
@@ -161,14 +163,20 @@ function VibeBand({
 }
 
 function App() {
+  const { speechLanguageServices } = useServicesContent()
   const rawPath = window.location.pathname.replace(/\/+$/, '') || HOME_PATH
   const pathname = rawPath === '/cases' ? '/services' : rawPath
+  const isDashboard = pathname === '/dashboard' || pathname.startsWith('/dashboard/')
 
   useEffect(() => {
     if (rawPath === '/cases') {
       window.history.replaceState(null, '', '/services#cases')
     }
   }, [rawPath])
+
+  if (isDashboard) {
+    return <Dashboard />
+  }
 
   const pages = {
     [HOME_PATH]: <HomePage />,
@@ -237,7 +245,7 @@ function App() {
           imagePosition: 'top',
         }}
       >
-        <DrWaelActivity />
+        <DrWaelActivity variant="full" />
         <VibeBand
           label="Academic & Clinical Presence"
           title="Active Contributions Across Conferences and Institutions"

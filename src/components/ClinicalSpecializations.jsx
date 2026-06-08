@@ -1,7 +1,5 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { casesWeServe, clinicalSpecializations } from '../data/content'
-
-const filters = ['All', 'Neurodevelopmental', 'Language', 'Speech', 'Apraxia', 'Fluency']
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useServicesContent } from '../hooks/useServicesContent'
 
 const sectionLinkClassName =
   'relative inline-block w-fit pb-1 text-xs font-semibold tracking-[0.12em] text-white uppercase transition-colors after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-accent after:transition-transform after:duration-300 after:ease-out hover:text-accent hover:after:scale-x-100'
@@ -177,8 +175,14 @@ function CompactCaseTile({ item, isActive, onSelect }) {
 }
 
 export default function ClinicalSpecializations() {
+  const { casesWeServe, clinicalSpecializations } = useServicesContent()
+  const filters = useMemo(
+    () => ['All', ...new Set(clinicalSpecializations.map((item) => item.filterGroup).filter(Boolean))],
+    [clinicalSpecializations],
+  )
+
   const [activeFilter, setActiveFilter] = useState('All')
-  const [activeId, setActiveId] = useState(clinicalSpecializations[0].id)
+  const [activeId, setActiveId] = useState(clinicalSpecializations[0]?.id ?? '')
   const [browseHeight, setBrowseHeight] = useState(null)
 
   const browseRef = useRef(null)
@@ -192,10 +196,21 @@ export default function ClinicalSpecializations() {
     clinicalSpecializations.find((item) => item.id === activeId) ?? clinicalSpecializations[0]
 
   useEffect(() => {
-    if (!filtered.some((item) => item.id === activeId)) {
-      setActiveId(filtered[0]?.id ?? clinicalSpecializations[0].id)
+    if (!clinicalSpecializations.length) {
+      setActiveId('')
+      return
     }
-  }, [activeFilter, activeId, filtered])
+
+    if (!clinicalSpecializations.some((item) => item.id === activeId)) {
+      setActiveId(clinicalSpecializations[0].id)
+    }
+  }, [activeId, clinicalSpecializations])
+
+  useEffect(() => {
+    if (!filtered.some((item) => item.id === activeId)) {
+      setActiveId(filtered[0]?.id ?? clinicalSpecializations[0]?.id ?? '')
+    }
+  }, [activeFilter, activeId, filtered, clinicalSpecializations])
 
   useLayoutEffect(() => {
     const el = browseRef.current

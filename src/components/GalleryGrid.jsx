@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { mediaGallery } from '../data/content'
+import { useGalleryContent } from '../hooks/useGalleryContent'
 
 const imageAspects = ['aspect-[4/5]', 'aspect-square', 'aspect-[5/4]', 'aspect-[3/4]']
 
@@ -147,6 +147,7 @@ function GalleryTile({ item, aspectClass, onImageClick }) {
 }
 
 export default function GalleryGrid() {
+  const { mediaGallery } = useGalleryContent()
   const { label, title, items } = mediaGallery
   const [activeImage, setActiveImage] = useState(null)
   let imageIndex = 0

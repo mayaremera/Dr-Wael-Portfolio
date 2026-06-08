@@ -1,4 +1,4 @@
-import { site, contactDetails } from '../data/content'
+import { useContactContent } from '../hooks/useContactContent'
 import ContactButton from './ContactButton'
 
 const problemTypes = [
@@ -78,8 +78,7 @@ function ContactLink({ href, label, icon, external }) {
   )
 }
 
-function WeekSchedule() {
-  const { schedule } = contactDetails
+function WeekSchedule({ schedule }) {
   const weekdays = schedule.filter((entry) => !entry.weekend)
   const weekend = schedule.filter((entry) => entry.weekend)
 
@@ -126,6 +125,7 @@ const fieldClassName =
   'w-full rounded-lg border border-slate-200/90 bg-white px-4 py-3 text-sm text-ink outline-none transition-all placeholder:text-ink-muted/50 focus:border-brand/40 focus:ring-2 focus:ring-brand/15'
 
 export default function Contact() {
+  const { contactDetails, directContact } = useContactContent()
   const { workplace } = contactDetails
 
   return (
@@ -182,22 +182,22 @@ export default function Contact() {
                   <ClockIcon />
                   Office Hours
                 </div>
-                <WeekSchedule />
+                <WeekSchedule schedule={contactDetails.schedule} />
               </div>
             </div>
           </div>
 
           <div className="flex flex-col gap-4 lg:col-span-3">
             <p className="text-xs font-semibold tracking-[0.18em] text-brand uppercase">Direct Contact</p>
-            <ContactLink href={`mailto:${site.email}`} label={site.email} icon={<MailIcon />} />
+            <ContactLink href={`mailto:${directContact.email}`} label={directContact.email} icon={<MailIcon />} />
             <ContactLink
-              href={`tel:${site.phone.replace(/\s/g, '')}`}
-              label={site.phone}
+              href={`tel:${directContact.phone.replace(/\s/g, '')}`}
+              label={directContact.phone}
               icon={<PhoneIcon />}
             />
             <ContactLink
-              href={`https://${site.domain}/`}
-              label={site.domain}
+              href={`https://${directContact.domain}/`}
+              label={directContact.domain}
               icon={<GlobeIcon />}
               external
             />
@@ -235,7 +235,7 @@ export default function Contact() {
                 <label htmlFor="email" className="mb-1.5 block text-[0.65rem] font-semibold tracking-wide text-ink-muted uppercase">
                   Email
                 </label>
-                <input id="email" type="email" className={fieldClassName} placeholder={site.email} />
+                <input id="email" type="email" className={fieldClassName} placeholder={directContact.email} />
               </div>
 
               <div>
