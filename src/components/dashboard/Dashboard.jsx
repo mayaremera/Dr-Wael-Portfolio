@@ -5,7 +5,6 @@ import DashboardLogin from './DashboardLogin'
 
 const DEFAULT_SECTION = 'in-the-field'
 const VALID_SECTIONS = new Set([
-  'settings',
   'about-me',
   'services',
   'gallery',
@@ -52,7 +51,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-surface-alt lg:flex">
+    <div className="min-h-screen bg-surface-alt">
       <div
         className={`fixed inset-0 z-40 bg-ink/50 transition-opacity lg:hidden ${
           mobileNavOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
@@ -62,14 +61,14 @@ export default function Dashboard() {
       />
 
       <div
-        className={`fixed inset-y-0 left-0 z-50 w-[min(100%,20rem)] transition-transform duration-300 lg:static lg:z-auto lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-[min(100%,20rem)] transition-transform duration-300 lg:w-72 lg:translate-x-0 xl:w-80 ${
           mobileNavOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         <DashboardSidebar activeSection={activeSection} onSelect={navigateTo} />
       </div>
 
-      <div className="flex min-h-screen min-w-0 flex-1 flex-col">
+      <div className="flex min-h-screen min-w-0 flex-col lg:ml-72 xl:ml-80">
         <header className="sticky top-0 z-30 flex items-center justify-between gap-4 border-b border-slate-200 bg-white/95 px-5 py-4 backdrop-blur-sm lg:px-8">
           <div className="flex items-center gap-3">
             <button
@@ -89,9 +88,6 @@ export default function Dashboard() {
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="hidden rounded-full bg-brand-muted px-3 py-1 text-[0.65rem] font-semibold tracking-wide text-brand uppercase sm:inline-block">
-              Draft mode
-            </span>
             <button
               type="button"
               onClick={handleLogout}
