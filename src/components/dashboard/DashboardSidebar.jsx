@@ -120,32 +120,6 @@ const mainNavItems = [
 
 ]
 
-
-
-const settingsNavItem = {
-
-  id: 'settings',
-
-  label: 'Settings',
-
-  description: 'Site & general',
-
-  icon: (
-
-    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.75">
-
-      <circle cx="12" cy="12" r="3" />
-
-      <path strokeLinecap="round" d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
-
-    </svg>
-
-  ),
-
-}
-
-
-
 function SidebarLink({ item, active, onSelect }) {
 
   return (
@@ -293,23 +267,6 @@ export default function DashboardSidebar({ activeSection, onSelect }) {
           </div>
 
         </div>
-
-
-
-        <div className="mt-4 border-t border-white/10 pt-4">
-
-          <SidebarLink
-
-            item={settingsNavItem}
-
-            active={activeSection === settingsNavItem.id}
-
-            onSelect={onSelect}
-
-          />
-
-        </div>
-
       </nav>
 
 
