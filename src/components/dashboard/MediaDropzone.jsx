@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { isMediaStorageAvailable, uploadMediaToStorage } from '../../lib/mediaUpload'
 
 const MAX_FILE_SIZE_MB = 12
 
@@ -6,6 +7,7 @@ export default function MediaDropzone({ image, video, onChange, onClear }) {
   const inputRef = useRef(null)
   const [dragging, setDragging] = useState(false)
   const [error, setError] = useState('')
+  const [uploading, setUploading] = useState(false)
 
   const mediaSrc = video || image
   const isVideo = Boolean(video)
@@ -27,16 +29,45 @@ export default function MediaDropzone({ image, video, onChange, onClear }) {
     }
 
     setError('')
+    setUploading(true)
 
-    const reader = new FileReader()
-    reader.onload = () => {
-      onChange({
-        image: isImage ? reader.result : '',
-        video: isVideoFile ? reader.result : '',
-      })
+    const applyLocalFallback = () => {
+      const reader = new FileReader()
+      reader.onload = () => {
+        onChange({
+          image: isImage ? reader.result : '',
+          video: isVideoFile ? reader.result : '',
+        })
+        setUploading(false)
+      }
+      reader.onerror = () => {
+        setError('Could not read that file. Try another one.')
+        setUploading(false)
+      }
+      reader.readAsDataURL(file)
     }
-    reader.onerror = () => setError('Could not read that file. Try another one.')
-    reader.readAsDataURL(file)
+
+    isMediaStorageAvailable()
+      .then((canUpload) => {
+        if (!canUpload) {
+          applyLocalFallback()
+          return
+        }
+
+        return uploadMediaToStorage(file)
+          .then((result) => {
+            onChange({
+              image: result.isVideo ? '' : result.url,
+              video: result.isVideo ? result.url : '',
+            })
+            setUploading(false)
+          })
+          .catch((uploadError) => {
+            setError(uploadError?.message || 'Upload failed. Saved locally instead.')
+            applyLocalFallback()
+          })
+      })
+      .catch(() => applyLocalFallback())
   }
 
   const onDrop = (dropEvent) => {
@@ -113,7 +144,9 @@ export default function MediaDropzone({ image, video, onChange, onClear }) {
           <svg viewBox="0 0 24 24" className="mb-3 h-8 w-8 text-brand/70" fill="none" stroke="currentColor" strokeWidth="1.5">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 16V4m0 0l-4 4m4-4l4 4M4 20h16" />
           </svg>
-          <span className="text-sm font-medium text-ink">Drag & drop image or video</span>
+          <span className="text-sm font-medium text-ink">
+            {uploading ? 'Uploading…' : 'Drag & drop image or video'}
+          </span>
           <span className="mt-1 text-xs text-ink-muted">or click to browse · max {MAX_FILE_SIZE_MB} MB</span>
         </button>
       )}

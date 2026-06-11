@@ -6,10 +6,15 @@ import {
   leadershipRoles as defaultLeadershipRoles,
   profileDetails as defaultProfileDetails,
 } from './content'
-import { CONTENT_UPDATED_EVENT } from './contentStore'
+import {
+  CONTENT_SECTIONS,
+  loadSectionPrimary,
+  resetSectionPrimary,
+  saveSectionPrimary,
+} from './contentSync'
 import { createContentId } from './servicesContentStore'
 
-const ABOUT_STORAGE_KEY = 'drwael-about-content'
+export const ABOUT_STORAGE_KEY = 'drwael-about-content'
 
 function cloneContent(data) {
   return JSON.parse(JSON.stringify(data))
@@ -56,34 +61,31 @@ function mergeWithDefaults(saved) {
 }
 
 export function loadAboutContent() {
-  try {
-    const saved = localStorage.getItem(ABOUT_STORAGE_KEY)
-    if (saved) {
-      return mergeWithDefaults(JSON.parse(saved))
-    }
-  } catch {
-    // fall through
-  }
-
   return getDefaultAboutContent()
 }
 
-export function saveAboutContent(data) {
-  try {
-    localStorage.setItem(ABOUT_STORAGE_KEY, JSON.stringify(data))
-  } catch (error) {
-    if (error?.name === 'QuotaExceededError') {
-      throw new Error('Storage quota exceeded')
-    }
-    throw error
-  }
-
-  window.dispatchEvent(new Event(CONTENT_UPDATED_EVENT))
+export async function loadAboutContentRemote() {
+  return loadSectionPrimary({
+    section: CONTENT_SECTIONS.ABOUT,
+    storageKey: ABOUT_STORAGE_KEY,
+    mergeWithDefaults,
+    getDefaults: getDefaultAboutContent,
+  })
 }
 
-export function resetAboutContent() {
-  localStorage.removeItem(ABOUT_STORAGE_KEY)
-  window.dispatchEvent(new Event(CONTENT_UPDATED_EVENT))
+export async function saveAboutContent(data) {
+  return saveSectionPrimary({
+    section: CONTENT_SECTIONS.ABOUT,
+    storageKey: ABOUT_STORAGE_KEY,
+    data,
+  })
+}
+
+export async function resetAboutContent() {
+  return resetSectionPrimary({
+    section: CONTENT_SECTIONS.ABOUT,
+    storageKey: ABOUT_STORAGE_KEY,
+  })
 }
 
 export { createContentId }

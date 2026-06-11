@@ -6,9 +6,14 @@ import {
   testimonialsSection as defaultTestimonialsSection,
   therapyConcepts as defaultTherapyConcepts,
 } from './content'
-import { CONTENT_UPDATED_EVENT } from './contentStore'
+import {
+  CONTENT_SECTIONS,
+  loadSectionPrimary,
+  resetSectionPrimary,
+  saveSectionPrimary,
+} from './contentSync'
 
-const SERVICES_STORAGE_KEY = 'drwael-services-content'
+export const SERVICES_STORAGE_KEY = 'drwael-services-content'
 
 function cloneContent(data) {
   return JSON.parse(JSON.stringify(data))
@@ -50,34 +55,31 @@ function mergeWithDefaults(saved) {
 }
 
 export function loadServicesContent() {
-  try {
-    const saved = localStorage.getItem(SERVICES_STORAGE_KEY)
-    if (saved) {
-      return mergeWithDefaults(JSON.parse(saved))
-    }
-  } catch {
-    // fall through to defaults
-  }
-
   return getDefaultServicesContent()
 }
 
-export function saveServicesContent(data) {
-  try {
-    localStorage.setItem(SERVICES_STORAGE_KEY, JSON.stringify(data))
-  } catch (error) {
-    if (error?.name === 'QuotaExceededError') {
-      throw new Error('Storage quota exceeded')
-    }
-    throw error
-  }
-
-  window.dispatchEvent(new Event(CONTENT_UPDATED_EVENT))
+export async function loadServicesContentRemote() {
+  return loadSectionPrimary({
+    section: CONTENT_SECTIONS.SERVICES,
+    storageKey: SERVICES_STORAGE_KEY,
+    mergeWithDefaults,
+    getDefaults: getDefaultServicesContent,
+  })
 }
 
-export function resetServicesContent() {
-  localStorage.removeItem(SERVICES_STORAGE_KEY)
-  window.dispatchEvent(new Event(CONTENT_UPDATED_EVENT))
+export async function saveServicesContent(data) {
+  return saveSectionPrimary({
+    section: CONTENT_SECTIONS.SERVICES,
+    storageKey: SERVICES_STORAGE_KEY,
+    data,
+  })
+}
+
+export async function resetServicesContent() {
+  return resetSectionPrimary({
+    section: CONTENT_SECTIONS.SERVICES,
+    storageKey: SERVICES_STORAGE_KEY,
+  })
 }
 
 export function createContentId(title = 'item') {

@@ -6,10 +6,13 @@ import {
   createActivityId,
   emptyActivityEvent,
   getDefaultDrWaelActivity,
-  loadDrWaelActivity,
+  loadDrWaelActivityRemote,
   resetDrWaelActivity,
   saveDrWaelActivity,
 } from '../../data/contentStore'
+import { useDashboardSection } from '../../hooks/useDashboardSection'
+import DashboardSectionLoader from './DashboardSectionLoader'
+import { persistDashboardSection } from './persistDashboardSection'
 
 const fieldClassName =
   'w-full rounded-lg border border-slate-200/90 bg-white px-3 py-2.5 text-sm text-ink outline-none transition-all placeholder:text-ink-muted/50 focus:border-brand/40 focus:ring-2 focus:ring-brand/15'
@@ -235,7 +238,10 @@ function EventEditor({ initialEvent, initialStatus = 'upcoming', onSave, onCance
 }
 
 export default function InTheFieldPanel() {
-  const [activity, setActivity] = useState(loadDrWaelActivity)
+  const { content: activity, setContent: setActivity, loading, loadError } = useDashboardSection(
+    getDefaultDrWaelActivity,
+    loadDrWaelActivityRemote,
+  )
   const [editingId, setEditingId] = useState(null)
   const [savedMessage, setSavedMessage] = useState('')
   const [saveError, setSaveError] = useState('')
@@ -248,16 +254,16 @@ export default function InTheFieldPanel() {
     [activity],
   )
 
-  const persist = (nextActivity, message = 'Changes saved to this browser.') => {
-    try {
-      saveDrWaelActivity(nextActivity)
-      setActivity(nextActivity)
-      setSaveError('')
-      setSavedMessage(message)
-      window.setTimeout(() => setSavedMessage(''), 2500)
-    } catch {
-      setSaveError('Could not save — media may be too large for browser storage. Try a smaller file.')
-    }
+  const persist = (nextActivity, message = 'Changes saved.') => {
+    persistDashboardSection({
+      saveFn: saveDrWaelActivity,
+      nextContent: nextActivity,
+      setContent: setActivity,
+      setSaveError,
+      setSavedMessage,
+      message,
+      storageErrorMessage: 'Could not save — media may be too large. Try a smaller file.',
+    })
   }
 
   const updateMeta = (field, value) => {
@@ -316,8 +322,9 @@ export default function InTheFieldPanel() {
     <PanelShell
       eyebrow="In the Field"
       title="Professional activity"
-      description="Create, edit, and delete event cards for the live In the Field page. Drag and drop photos or videos — changes save in your browser and update the site immediately."
+      description="Create, edit, and delete event cards for the live In the Field page. Saves go to Supabase and update the website for all visitors."
     >
+      <DashboardSectionLoader loading={loading} loadError={loadError} />
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <a
           href="/in-the-field"

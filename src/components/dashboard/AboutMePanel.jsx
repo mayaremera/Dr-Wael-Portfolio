@@ -8,10 +8,13 @@ import {
   emptyLeadershipRole,
   emptyTimelineEntry,
   getDefaultAboutContent,
-  loadAboutContent,
+  loadAboutContentRemote,
   resetAboutContent,
   saveAboutContent,
 } from '../../data/aboutContentStore'
+import { useDashboardSection } from '../../hooks/useDashboardSection'
+import DashboardSectionLoader from './DashboardSectionLoader'
+import { persistDashboardSection } from './persistDashboardSection'
 
 const fieldClassName =
   'w-full rounded-lg border border-slate-200/90 bg-white px-3 py-2.5 text-sm text-ink outline-none transition-all placeholder:text-ink-muted/50 focus:border-brand/40 focus:ring-2 focus:ring-brand/15'
@@ -117,23 +120,26 @@ function LeadershipEditor({ initialItem, onSave, onCancel }) {
 }
 
 export default function AboutMePanel() {
-  const [content, setContent] = useState(loadAboutContent)
+  const { content, setContent, loading, loadError } = useDashboardSection(
+    getDefaultAboutContent,
+    loadAboutContentRemote,
+  )
   const [editingCertId, setEditingCertId] = useState(null)
   const [editingTimelineId, setEditingTimelineId] = useState(null)
   const [editingLeadershipId, setEditingLeadershipId] = useState(null)
   const [savedMessage, setSavedMessage] = useState('')
   const [saveError, setSaveError] = useState('')
 
-  const persist = (next, message = 'Changes saved to this browser.') => {
-    try {
-      saveAboutContent(next)
-      setContent(next)
-      setSaveError('')
-      setSavedMessage(message)
-      window.setTimeout(() => setSavedMessage(''), 2500)
-    } catch {
-      setSaveError('Could not save — images may be too large for browser storage.')
-    }
+  const persist = (next, message = 'Changes saved.') => {
+    persistDashboardSection({
+      saveFn: saveAboutContent,
+      nextContent: next,
+      setContent,
+      setSaveError,
+      setSavedMessage,
+      message,
+      storageErrorMessage: 'Could not save — images may be too large. Try a smaller file.',
+    })
   }
 
   const updateProfile = (field, value) => setContent((c) => ({ ...c, profileDetails: { ...c.profileDetails, [field]: value } }))
@@ -165,6 +171,7 @@ export default function AboutMePanel() {
 
   return (
     <PanelShell eyebrow="About Me" title="Profile, certificates & career" description="Manage Dr. Wael's biography, certificates, career timeline, and leadership roles on the About Me page.">
+      <DashboardSectionLoader loading={loading} loadError={loadError} />
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <a href="/about-me" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-brand">Preview live page →</a>
         <div className="flex gap-2">

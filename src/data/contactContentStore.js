@@ -1,7 +1,12 @@
 import { contactDetails as defaultContactDetails, site as defaultSite } from './content'
-import { CONTENT_UPDATED_EVENT } from './contentStore'
+import {
+  CONTENT_SECTIONS,
+  loadSectionPrimary,
+  resetSectionPrimary,
+  saveSectionPrimary,
+} from './contentSync'
 
-const CONTACT_STORAGE_KEY = 'drwael-contact-content'
+export const CONTACT_STORAGE_KEY = 'drwael-contact-content'
 
 function cloneContent(data) {
   return JSON.parse(JSON.stringify(data))
@@ -41,32 +46,29 @@ function mergeWithDefaults(saved) {
 }
 
 export function loadContactContent() {
-  try {
-    const saved = localStorage.getItem(CONTACT_STORAGE_KEY)
-    if (saved) {
-      return mergeWithDefaults(JSON.parse(saved))
-    }
-  } catch {
-    // fall through
-  }
-
   return getDefaultContactContent()
 }
 
-export function saveContactContent(data) {
-  try {
-    localStorage.setItem(CONTACT_STORAGE_KEY, JSON.stringify(data))
-  } catch (error) {
-    if (error?.name === 'QuotaExceededError') {
-      throw new Error('Storage quota exceeded')
-    }
-    throw error
-  }
-
-  window.dispatchEvent(new Event(CONTENT_UPDATED_EVENT))
+export async function loadContactContentRemote() {
+  return loadSectionPrimary({
+    section: CONTENT_SECTIONS.CONTACT,
+    storageKey: CONTACT_STORAGE_KEY,
+    mergeWithDefaults,
+    getDefaults: getDefaultContactContent,
+  })
 }
 
-export function resetContactContent() {
-  localStorage.removeItem(CONTACT_STORAGE_KEY)
-  window.dispatchEvent(new Event(CONTENT_UPDATED_EVENT))
+export async function saveContactContent(data) {
+  return saveSectionPrimary({
+    section: CONTENT_SECTIONS.CONTACT,
+    storageKey: CONTACT_STORAGE_KEY,
+    data,
+  })
+}
+
+export async function resetContactContent() {
+  return resetSectionPrimary({
+    section: CONTENT_SECTIONS.CONTACT,
+    storageKey: CONTACT_STORAGE_KEY,
+  })
 }

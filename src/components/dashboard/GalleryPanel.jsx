@@ -5,10 +5,13 @@ import {
   createGalleryItemId,
   emptyGalleryItem,
   getDefaultGalleryContent,
-  loadGalleryContent,
+  loadGalleryContentRemote,
   resetGalleryContent,
   saveGalleryContent,
 } from '../../data/galleryContentStore'
+import { useDashboardSection } from '../../hooks/useDashboardSection'
+import DashboardSectionLoader from './DashboardSectionLoader'
+import { persistDashboardSection } from './persistDashboardSection'
 
 const fieldClassName =
   'w-full rounded-lg border border-slate-200/90 bg-white px-3 py-2.5 text-sm text-ink outline-none transition-all placeholder:text-ink-muted/50 focus:border-brand/40 focus:ring-2 focus:ring-brand/15'
@@ -116,21 +119,24 @@ function GalleryItemEditor({ initialItem, onSave, onCancel }) {
 }
 
 export default function GalleryPanel() {
-  const [content, setContent] = useState(loadGalleryContent)
+  const { content, setContent, loading, loadError } = useDashboardSection(
+    getDefaultGalleryContent,
+    loadGalleryContentRemote,
+  )
   const [editingId, setEditingId] = useState(null)
   const [savedMessage, setSavedMessage] = useState('')
   const [saveError, setSaveError] = useState('')
 
-  const persist = (nextContent, message = 'Changes saved to this browser.') => {
-    try {
-      saveGalleryContent(nextContent)
-      setContent(nextContent)
-      setSaveError('')
-      setSavedMessage(message)
-      window.setTimeout(() => setSavedMessage(''), 2500)
-    } catch {
-      setSaveError('Could not save — media may be too large for browser storage.')
-    }
+  const persist = (nextContent, message = 'Changes saved.') => {
+    persistDashboardSection({
+      saveFn: saveGalleryContent,
+      nextContent,
+      setContent,
+      setSaveError,
+      setSavedMessage,
+      message,
+      storageErrorMessage: 'Could not save — media may be too large. Try a smaller file.',
+    })
   }
 
   const updateGalleryMeta = (field, value) => {
@@ -188,6 +194,7 @@ export default function GalleryPanel() {
       title="Photo & video gallery"
       description="Add, edit, and remove images and videos in the gallery grid on the Video & Gallery page."
     >
+      <DashboardSectionLoader loading={loading} loadError={loadError} />
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <a href="/video-gallery#gallery" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-brand transition-colors hover:text-brand-light">
           Preview live page →

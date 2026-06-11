@@ -1,7 +1,12 @@
 import { mediaGallery as defaultMediaGallery } from './content'
-import { CONTENT_UPDATED_EVENT } from './contentStore'
+import {
+  CONTENT_SECTIONS,
+  loadSectionPrimary,
+  resetSectionPrimary,
+  saveSectionPrimary,
+} from './contentSync'
 
-const GALLERY_STORAGE_KEY = 'drwael-gallery-content'
+export const GALLERY_STORAGE_KEY = 'drwael-gallery-content'
 
 function cloneContent(data) {
   return JSON.parse(JSON.stringify(data))
@@ -37,34 +42,31 @@ function mergeWithDefaults(saved) {
 }
 
 export function loadGalleryContent() {
-  try {
-    const saved = localStorage.getItem(GALLERY_STORAGE_KEY)
-    if (saved) {
-      return mergeWithDefaults(JSON.parse(saved))
-    }
-  } catch {
-    // fall through
-  }
-
   return getDefaultGalleryContent()
 }
 
-export function saveGalleryContent(data) {
-  try {
-    localStorage.setItem(GALLERY_STORAGE_KEY, JSON.stringify(data))
-  } catch (error) {
-    if (error?.name === 'QuotaExceededError') {
-      throw new Error('Storage quota exceeded')
-    }
-    throw error
-  }
-
-  window.dispatchEvent(new Event(CONTENT_UPDATED_EVENT))
+export async function loadGalleryContentRemote() {
+  return loadSectionPrimary({
+    section: CONTENT_SECTIONS.GALLERY,
+    storageKey: GALLERY_STORAGE_KEY,
+    mergeWithDefaults,
+    getDefaults: getDefaultGalleryContent,
+  })
 }
 
-export function resetGalleryContent() {
-  localStorage.removeItem(GALLERY_STORAGE_KEY)
-  window.dispatchEvent(new Event(CONTENT_UPDATED_EVENT))
+export async function saveGalleryContent(data) {
+  return saveSectionPrimary({
+    section: CONTENT_SECTIONS.GALLERY,
+    storageKey: GALLERY_STORAGE_KEY,
+    data,
+  })
+}
+
+export async function resetGalleryContent() {
+  return resetSectionPrimary({
+    section: CONTENT_SECTIONS.GALLERY,
+    storageKey: GALLERY_STORAGE_KEY,
+  })
 }
 
 export function createGalleryItemId() {

@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from 'react'
 import DashboardSidebar from './DashboardSidebar'
 import { DashboardPanel } from './DashboardPanels'
 import DashboardLogin from './DashboardLogin'
+import DashboardCloudAuth from './DashboardCloudAuth'
+import { getSupabaseSession, isSupabaseConfigured, signOutFromSupabase } from '../../lib/supabase'
 
 const DEFAULT_SECTION = 'in-the-field'
 const VALID_SECTIONS = new Set([
@@ -24,9 +26,18 @@ function sectionToPath(section) {
 }
 
 export default function Dashboard() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isPinAuthenticated, setIsPinAuthenticated] = useState(false)
+  const [isCloudAuthenticated, setIsCloudAuthenticated] = useState(!isSupabaseConfigured)
   const [activeSection, setActiveSection] = useState(getDashboardSection)
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
+
+  useEffect(() => {
+    if (!isSupabaseConfigured) return
+
+    getSupabaseSession().then((session) => {
+      if (session) setIsCloudAuthenticated(true)
+    })
+  }, [])
 
   useEffect(() => {
     const syncSection = () => setActiveSection(getDashboardSection())
@@ -42,13 +53,19 @@ export default function Dashboard() {
     setMobileNavOpen(false)
   }, [])
 
-  const handleLogout = () => {
-    setIsAuthenticated(false)
+  const handleLogout = async () => {
+    await signOutFromSupabase()
+    setIsPinAuthenticated(false)
+    setIsCloudAuthenticated(!isSupabaseConfigured)
     setMobileNavOpen(false)
   }
 
-  if (!isAuthenticated) {
-    return <DashboardLogin onAuthenticated={() => setIsAuthenticated(true)} />
+  if (!isPinAuthenticated) {
+    return <DashboardLogin onAuthenticated={() => setIsPinAuthenticated(true)} />
+  }
+
+  if (!isCloudAuthenticated) {
+    return <DashboardCloudAuth onAuthenticated={() => setIsCloudAuthenticated(true)} />
   }
 
   return (
@@ -90,7 +107,7 @@ export default function Dashboard() {
 
           <div className="flex items-center gap-3">
             <span className="hidden rounded-full bg-brand-muted px-3 py-1 text-[0.65rem] font-semibold tracking-wide text-brand uppercase sm:inline-block">
-              Draft mode
+              {isSupabaseConfigured ? 'Cloud sync on' : 'Local only'}
             </span>
             <button
               type="button"

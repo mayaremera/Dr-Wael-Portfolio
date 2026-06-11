@@ -8,10 +8,13 @@ import {
   emptyTestimonial,
   emptyTherapyConcept,
   getDefaultServicesContent,
-  loadServicesContent,
+  loadServicesContentRemote,
   resetServicesContent,
   saveServicesContent,
 } from '../../data/servicesContentStore'
+import { useDashboardSection } from '../../hooks/useDashboardSection'
+import DashboardSectionLoader from './DashboardSectionLoader'
+import { persistDashboardSection } from './persistDashboardSection'
 
 const fieldClassName =
   'w-full rounded-lg border border-slate-200/90 bg-white px-3 py-2.5 text-sm text-ink outline-none transition-all placeholder:text-ink-muted/50 focus:border-brand/40 focus:ring-2 focus:ring-brand/15'
@@ -387,23 +390,26 @@ function TestimonialEditor({ initialTestimonial, onSave, onCancel }) {
 }
 
 export default function ServicesPanel() {
-  const [content, setContent] = useState(loadServicesContent)
+  const { content, setContent, loading, loadError } = useDashboardSection(
+    getDefaultServicesContent,
+    loadServicesContentRemote,
+  )
   const [editingServiceId, setEditingServiceId] = useState(null)
   const [editingCaseId, setEditingCaseId] = useState(null)
   const [editingTestimonialId, setEditingTestimonialId] = useState(null)
   const [savedMessage, setSavedMessage] = useState('')
   const [saveError, setSaveError] = useState('')
 
-  const persist = (nextContent, message = 'Changes saved to this browser.') => {
-    try {
-      saveServicesContent(nextContent)
-      setContent(nextContent)
-      setSaveError('')
-      setSavedMessage(message)
-      window.setTimeout(() => setSavedMessage(''), 2500)
-    } catch {
-      setSaveError('Could not save — images may be too large for browser storage. Try smaller files.')
-    }
+  const persist = (nextContent, message = 'Changes saved.') => {
+    persistDashboardSection({
+      saveFn: saveServicesContent,
+      nextContent,
+      setContent,
+      setSaveError,
+      setSavedMessage,
+      message,
+      storageErrorMessage: 'Could not save — images may be too large. Try smaller files.',
+    })
   }
 
   const updateServicesHeader = (field, value) => {
@@ -507,8 +513,9 @@ export default function ServicesPanel() {
     <PanelShell
       eyebrow="Service"
       title="Therapy services, cases & testimonials"
-      description="Manage service pathway cards, clinical cases, and family testimonials shown on the live Services page and homepage. Drag and drop photos — changes save in your browser and update the site immediately."
+      description="Manage service pathway cards, clinical cases, and family testimonials shown on the live Services page and homepage. Saves go to Supabase."
     >
+      <DashboardSectionLoader loading={loading} loadError={loadError} />
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <a href="/services" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-brand transition-colors hover:text-brand-light">
           Preview live page →

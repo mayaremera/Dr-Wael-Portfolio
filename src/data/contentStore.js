@@ -1,8 +1,14 @@
 import { drWaelActivity as defaultDrWaelActivity } from './content'
+import {
+  CONTENT_SECTIONS,
+  loadSectionPrimary,
+  resetSectionPrimary,
+  saveSectionPrimary,
+} from './contentSync'
 
-const ACTIVITY_STORAGE_KEY = 'drwael-activity-content'
+export const ACTIVITY_STORAGE_KEY = 'drwael-activity-content'
 
-export const CONTENT_UPDATED_EVENT = 'drwael-content-updated'
+export { CONTENT_UPDATED_EVENT } from './contentSync'
 
 function cloneActivity(data) {
   return JSON.parse(JSON.stringify(data))
@@ -24,34 +30,31 @@ function mergeWithDefaults(saved) {
 }
 
 export function loadDrWaelActivity() {
-  try {
-    const saved = localStorage.getItem(ACTIVITY_STORAGE_KEY)
-    if (saved) {
-      return mergeWithDefaults(JSON.parse(saved))
-    }
-  } catch {
-    // fall through to defaults
-  }
-
   return getDefaultDrWaelActivity()
 }
 
-export function saveDrWaelActivity(data) {
-  try {
-    localStorage.setItem(ACTIVITY_STORAGE_KEY, JSON.stringify(data))
-  } catch (error) {
-    if (error?.name === 'QuotaExceededError') {
-      throw new Error('Storage quota exceeded')
-    }
-    throw error
-  }
-
-  window.dispatchEvent(new Event(CONTENT_UPDATED_EVENT))
+export async function loadDrWaelActivityRemote() {
+  return loadSectionPrimary({
+    section: CONTENT_SECTIONS.ACTIVITY,
+    storageKey: ACTIVITY_STORAGE_KEY,
+    mergeWithDefaults,
+    getDefaults: getDefaultDrWaelActivity,
+  })
 }
 
-export function resetDrWaelActivity() {
-  localStorage.removeItem(ACTIVITY_STORAGE_KEY)
-  window.dispatchEvent(new Event(CONTENT_UPDATED_EVENT))
+export async function saveDrWaelActivity(data) {
+  return saveSectionPrimary({
+    section: CONTENT_SECTIONS.ACTIVITY,
+    storageKey: ACTIVITY_STORAGE_KEY,
+    data,
+  })
+}
+
+export async function resetDrWaelActivity() {
+  return resetSectionPrimary({
+    section: CONTENT_SECTIONS.ACTIVITY,
+    storageKey: ACTIVITY_STORAGE_KEY,
+  })
 }
 
 export function createActivityId(title = 'event') {

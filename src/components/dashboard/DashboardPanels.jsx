@@ -3,6 +3,7 @@ import ContactPanel from './ContactPanel'
 import GalleryPanel from './GalleryPanel'
 import InTheFieldPanel from './InTheFieldPanel'
 import ServicesPanel from './ServicesPanel'
+import SettingsPanel from './SettingsPanel'
 
 function PanelShell({ eyebrow, title, description, children }) {
   return (
@@ -33,27 +34,6 @@ function PlaceholderCard({ title, items }) {
         ))}
       </ul>
     </article>
-  )
-}
-
-export function SettingsPanel() {
-  return (
-    <PanelShell
-      eyebrow="Settings"
-      title="Site settings"
-      description="Manage global site details, branding, and footer information."
-    >
-      <div className="grid gap-5 md:grid-cols-2">
-        <PlaceholderCard
-          title="General"
-          items={['Site title & tagline', 'Contact email & phone', 'Social media links']}
-        />
-        <PlaceholderCard
-          title="Branding"
-          items={['Logo & favicon', 'Hero banner image', 'Footer tagline']}
-        />
-      </div>
-    </PanelShell>
   )
 }
 

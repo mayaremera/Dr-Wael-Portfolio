@@ -2,10 +2,13 @@ import { useState } from 'react'
 import { DashboardPagination, useDashboardPagination } from './DashboardItemList'
 import {
   getDefaultContactContent,
-  loadContactContent,
+  loadContactContentRemote,
   resetContactContent,
   saveContactContent,
 } from '../../data/contactContentStore'
+import { useDashboardSection } from '../../hooks/useDashboardSection'
+import DashboardSectionLoader from './DashboardSectionLoader'
+import { persistDashboardSection } from './persistDashboardSection'
 
 const fieldClassName =
   'w-full rounded-lg border border-slate-200/90 bg-white px-3 py-2.5 text-sm text-ink outline-none transition-all placeholder:text-ink-muted/50 focus:border-brand/40 focus:ring-2 focus:ring-brand/15'
@@ -26,21 +29,24 @@ function PanelShell({ eyebrow, title, description, children }) {
 }
 
 export default function ContactPanel() {
-  const [content, setContent] = useState(loadContactContent)
+  const { content, setContent, loading, loadError } = useDashboardSection(
+    getDefaultContactContent,
+    loadContactContentRemote,
+  )
   const [savedMessage, setSavedMessage] = useState('')
   const [saveError, setSaveError] = useState('')
   const schedulePagination = useDashboardPagination(content.contactDetails.schedule)
 
-  const persist = (nextContent, message = 'Changes saved to this browser.') => {
-    try {
-      saveContactContent(nextContent)
-      setContent(nextContent)
-      setSaveError('')
-      setSavedMessage(message)
-      window.setTimeout(() => setSavedMessage(''), 2500)
-    } catch {
-      setSaveError('Could not save changes.')
-    }
+  const persist = (nextContent, message = 'Changes saved.') => {
+    persistDashboardSection({
+      saveFn: saveContactContent,
+      nextContent,
+      setContent,
+      setSaveError,
+      setSavedMessage,
+      message,
+      storageErrorMessage: 'Could not save changes.',
+    })
   }
 
   const updateWorkplace = (field, value) => {
@@ -88,6 +94,7 @@ export default function ContactPanel() {
       title="Contact & appointments"
       description="Edit practice location, office hours, and direct contact details shown on the live Contact page."
     >
+      <DashboardSectionLoader loading={loading} loadError={loadError} />
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <a href="/contact" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-brand transition-colors hover:text-brand-light">
           Preview live page →

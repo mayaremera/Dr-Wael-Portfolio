@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { images, trustedCompanies } from '../data/content'
 import { useAboutContent } from '../hooks/useAboutContent'
+import CredentialCompass from './CredentialCompass'
 
 const sectionLinkClassName =
   'relative inline-block w-fit pb-1 text-xs font-semibold tracking-[0.12em] text-brand uppercase transition-colors after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-brand after:transition-transform after:duration-300 after:ease-out hover:text-brand-light hover:after:scale-x-100'
@@ -87,18 +88,19 @@ function AffiliationTile({ company }) {
 }
 
 function AffiliationGrid({ companies }) {
-  const rowOne = companies.slice(0, 4)
-  const rowTwo = companies.slice(4, 7)
+  const midpoint = Math.ceil(companies.length / 2)
+  const rowOne = companies.slice(0, midpoint)
+  const rowTwo = companies.slice(midpoint)
 
   return (
     <div className="space-y-3 sm:space-y-4">
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+      <div className={`grid grid-cols-2 gap-3 sm:gap-4 ${rowOne.length >= 4 ? 'sm:grid-cols-4' : 'sm:grid-cols-3'}`}>
         {rowOne.map((company) => (
           <AffiliationTile key={company.id} company={company} />
         ))}
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
+      <div className={`grid grid-cols-2 gap-3 sm:gap-4 ${rowTwo.length >= 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2'}`}>
         {rowTwo.map((company) => (
           <AffiliationTile key={company.id} company={company} />
         ))}
@@ -109,6 +111,7 @@ function AffiliationGrid({ companies }) {
 
 function TrustedCompanies() {
   const { title, subtitle, viewAllLabel, viewAllHref, companies } = trustedCompanies
+  const visibleCompanies = companies.filter((company) => company.id !== 'asha')
 
   return (
     <div className="mt-12 border-t border-slate-200/80 pt-10 lg:mt-14 lg:pt-12">
@@ -124,7 +127,7 @@ function TrustedCompanies() {
         </a>
       </div>
 
-      <AffiliationGrid companies={companies} />
+      <AffiliationGrid companies={visibleCompanies} />
     </div>
   )
 }
@@ -141,7 +144,11 @@ export default function Profile({ variant = 'home' }) {
       className="border-t border-slate-200 bg-surface py-16 lg:py-20"
     >
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
-        <div className="grid gap-8 lg:grid-cols-[minmax(280px,380px)_1fr] lg:items-stretch lg:gap-12">
+        <div
+          className={`grid gap-8 lg:items-stretch lg:gap-10 ${
+            isPage ? 'lg:grid-cols-[minmax(280px,380px)_1fr]' : 'lg:grid-cols-[minmax(240px,320px)_1fr_minmax(220px,280px)]'
+          }`}
+        >
           <div className="relative aspect-[3/4] w-full overflow-hidden rounded-sm lg:aspect-auto lg:h-full lg:min-h-0">
             <img
               src={photo}
@@ -157,16 +164,18 @@ export default function Profile({ variant = 'home' }) {
             <h2 className="mt-2 font-serif text-2xl text-ink md:text-3xl">{name}</h2>
             <p className="mt-1 text-base text-brand">{title}</p>
 
-            <div className="mt-4 flex flex-wrap gap-2">
-              {credentials.map((cred) => (
-                <span
-                  key={cred}
-                  className="rounded-full border border-brand/20 bg-brand-muted/50 px-3 py-1 text-xs font-medium text-brand"
-                >
-                  {cred}
-                </span>
-              ))}
-            </div>
+            {isPage ? (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {credentials.map((cred) => (
+                  <span
+                    key={cred}
+                    className="rounded-full border border-brand/20 bg-brand-muted/50 px-3 py-1 text-xs font-medium text-brand"
+                  >
+                    {cred}
+                  </span>
+                ))}
+              </div>
+            ) : null}
 
             <blockquote className="mt-5">
               <p className="font-serif text-lg leading-relaxed text-ink italic md:text-xl">
@@ -199,6 +208,12 @@ export default function Profile({ variant = 'home' }) {
               </div>
             ) : null}
           </div>
+
+          {!isPage ? (
+            <div className="flex items-center justify-center lg:justify-end">
+              <CredentialCompass />
+            </div>
+          ) : null}
         </div>
 
         {!isPage ? <TrustedCompanies /> : null}
