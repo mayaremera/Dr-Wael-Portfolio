@@ -166,3 +166,247 @@ body {
 .animate-shake {
   animation: shake 0.45s ease-in-out;
 }
+
+@keyframes map-pulse-ring {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+.animate-map-pulse-ring {
+  animation: map-pulse-ring 2s ease-out infinite;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+
+@keyframes map-scan {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+.animate-map-scan {
+  animation: map-scan 6s linear infinite;
+}
+
+@keyframes map-beam {
+  0%,
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0.4;
+  }
+  50% {
+    stroke-dashoffset: 20;
+    opacity: 0.8;
+  }
+}
+
+.animate-map-beam {
+  animation: map-beam 2s ease-in-out infinite;
+}
+
+@keyframes map-event-in {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-map-event-in {
+  animation: map-event-in 0.45s ease-out forwards;
+  opacity: 0;
+}
+
+/* ── Globe section ── */
+.globe-section {
+  --globe-accent: #f08a5d;
+  --globe-brand: #2d6a7a;
+}
+
+@keyframes globe-star {
+  0%,
+  100% {
+    opacity: 0.15;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.4);
+  }
+}
+
+.animate-globe-star {
+  animation: globe-star 3s ease-in-out infinite;
+}
+
+@keyframes globe-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+.animate-globe-pulse {
+  animation: globe-pulse 2s ease-out infinite;
+}
+
+.globe-glow {
+  background: radial-gradient(circle at 50% 50%, rgba(45, 106, 122, 0.35) 0%, transparent 65%);
+}
+
+.globe-marker-btn {
+  position: absolute;
+  left: anchor(center);
+  top: anchor(center);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  transition:
+    opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.globe-marker-dot {
+  position: relative;
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--globe-accent);
+  box-shadow: 0 0 12px rgba(240, 138, 93, 0.6);
+  transition:
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.45s ease;
+}
+
+.globe-marker-dot::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 1px solid rgba(240, 138, 93, 0.4);
+  animation: globe-pulse 2s ease-out infinite;
+}
+
+.globe-marker-dot.is-hovered,
+.globe-marker-dot.is-active {
+  transform: scale(1.35);
+  box-shadow: 0 0 20px rgba(240, 138, 93, 0.9);
+}
+
+.globe-marker-dot.is-active {
+  background: #fff;
+  box-shadow: 0 0 24px rgba(255, 255, 255, 0.8);
+}
+
+.globe-marker-label {
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.85);
+  white-space: nowrap;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.8);
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+.globe-marker-btn:is(:hover, :focus-visible) .globe-marker-label,
+.globe-marker-dot.is-active + .globe-marker-label {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.globe-panel-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+
+@keyframes globe-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes globe-panel-in-desktop {
+  from {
+    opacity: 0;
+    transform: translate(24px, -50%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, -50%);
+  }
+}
+
+.animate-globe-panel-in {
+  animation: globe-panel-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@media (min-width: 1024px) {
+  .animate-globe-panel-in {
+    animation-name: globe-panel-in-desktop;
+  }
+}
+
+@keyframes globe-preview-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -8px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.animate-globe-preview-in {
+  animation: globe-preview-in 0.35s ease-out forwards;
+}
+
+@keyframes globe-event-in {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-globe-event-in {
+  animation: globe-event-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  opacity: 0;
+}

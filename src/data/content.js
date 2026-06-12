@@ -214,7 +214,7 @@ export const video = {
 export const profileDetails = {
   name: 'Dr. Wael A. Al-Dakroury',
   title: site.title,
-  credentials: ['Ph.D.', 'CCC-SLP', 'ASHA Fellow'],
+  credentials: ['Ph.D.', 'CCC-SLP', 'ASHA Fellow (F-ASHA)'],
   tagline: site.tagline,
   highlights: [
     { label: 'Experience', value: '30+ Years' },
@@ -225,6 +225,13 @@ export const profileDetails = {
   bio: [
     'Dr. Wael is an internationally recognized speech-language pathologist with 30+ years of experience. He directs the Communication Disorders Department at Psych Care Complex, Riyadh, serves as Associate Professor at Alfaisal University, and was named ASHA Fellow.',
     'He offers bilingual care in English and Arabic, specializing in autism, ADHD, language disorders, speech sound disorders, and fluency, with evidence-based, family-centered support at every step.',
+  ],
+  bioExtended: [
+    'Dr. Wael is an internationally recognized speech-language pathologist with 30+ years of experience. He directs the Communication Disorders Department at Psych Care Complex, Riyadh, and serves as Associate Professor at Alfaisal University.',
+    'Named ASHA Fellow (F-ASHA) — one of the highest honors awarded by the American Speech-Language-Hearing Association — he is also a clinical educator in graduate Speech-Language Pathology programs.',
+    'He offers bilingual care in English and Arabic, specializing in autism, ADHD, language disorders, speech sound disorders, and fluency, with evidence-based, family-centered support at every step.',
+    'As an international speaker, consultant, and professional mentor, he collaborates with universities, healthcare organizations, and professional associations worldwide — advancing communication sciences through clinical excellence, education, and leadership.',
+    'Communication connects people, families, cultures, and communities. His mission is to empower individuals through communication and advance the profession of Speech-Language Pathology through clinical excellence, education, leadership, and international collaboration.',
   ],
   education: [
     'PhD — Queen Margaret University, Edinburgh',
@@ -238,6 +245,139 @@ export const profileDetails = {
     'Member, IALP Child Language Committee (2025–2031)',
     'Honorary President — EACSL (Egyptian Association for Comm. Sciences)',
     'Editorial Board, JSLHR Language Section (2023–2025)',
+  ],
+}
+
+export const careerImpact = {
+  label: 'Career Impact',
+  title: 'A Career Dedicated to Communication, Education, and Impact',
+  stats: [
+    {
+      value: '30+',
+      label: 'Years of Experience',
+      detail: 'Dedicated experience in Speech-Language Pathology across clinical, academic, and international settings.',
+    },
+    {
+      value: '40,000+',
+      label: 'Therapy Sessions',
+      detail: 'Speech and language therapy sessions delivered across diverse clinical settings.',
+    },
+    {
+      value: '3,000+',
+      label: 'Diagnostic Evaluations',
+      detail: 'Comprehensive diagnostic evaluations completed for children and families.',
+    },
+    {
+      value: '50+',
+      label: 'Nationalities Served',
+      detail: 'Children and families representing more than fifty nationalities worldwide.',
+    },
+  ],
+}
+
+export const clinicalExpertise = {
+  label: 'Clinical Expertise',
+  title: 'Evidence-based care tailored to every child and family',
+  intro:
+    'For more than three decades, I have worked with children, families, schools, and healthcare teams to support communication development and improve quality of life. My clinical practice combines evidence-based intervention with a family-centered approach tailored to each individual\'s strengths, needs, and cultural background.',
+  areas: [
+    { name: 'Developmental Language Disorder', abbr: 'DLD' },
+    { name: 'Speech Sound Disorders', abbr: 'SSD' },
+    { name: 'Autism Spectrum Disorder', abbr: 'ASD' },
+    { name: 'Childhood Stuttering & Fluency Disorders' },
+    { name: 'Social Communication & Pragmatic Language Disorders' },
+    { name: 'Bilingual & Multilingual Language Development' },
+    { name: 'Language Learning Difficulties' },
+    { name: 'School-Age Language & Literacy Challenges' },
+    { name: 'Parent Coaching & Family Training' },
+  ],
+}
+
+export const academicLeadership = {
+  label: 'Academic Leadership',
+  title: 'Preparing the next generation of speech-language pathologists',
+  intro:
+    'As an educator and academic leader, I am committed to preparing the next generation of Speech-Language Pathologists through rigorous training, clinical supervision, mentorship, and professional development.',
+  interests: [
+    'Developmental Language Disorder',
+    'Multilingualism & Language Disorders',
+    'Autism Spectrum Disorder',
+    'Speech Sound Disorders',
+    'Pediatric Fluency Disorders',
+    'Clinical Assessment & Diagnosis',
+    'Evidence-Based Practice',
+    'Clinical Supervision',
+  ],
+}
+
+export const internationalLeadership = {
+  label: 'International Leadership & Professional Service',
+  title: 'Advancing the profession on a global stage',
+  intro:
+    'My professional service extends beyond clinical practice and academia to include leadership roles within international organizations dedicated to advancing the Speech-Language Pathology profession.',
+  summary:
+    'Current and recent leadership roles include ASHA Fellow (F-ASHA), Editor of Perspectives SIG 17, ASHA International Ambassador, Member of the IALP Child Language Committee, and recipient of the ASHA Certificate of Recognition for International Achievement.',
+}
+
+export const speakingTraining = {
+  label: 'Speaking, Training & Consultation',
+  title: 'Professional development for clinicians and institutions',
+  intro:
+    'I regularly provide professional development workshops, keynote presentations, conference lectures, and consultation services for universities, healthcare organizations, schools, and professional associations.',
+  topics: [
+    'Developmental Language Disorder',
+    'Multilingual Assessment & Intervention',
+    'Autism Spectrum Disorder',
+    'Speech Sound Disorders',
+    'Pediatric Stuttering',
+    'Aphasia',
+    'Clinical Supervision',
+    'Evidence-Based Practice',
+    'Artificial Intelligence in Speech-Language Pathology',
+    'Program Development',
+  ],
+}
+
+export const globalImpact = {
+  label: 'Global Impact',
+  title: 'Communication that connects cultures and communities',
+  paragraphs: [
+    'Communication connects people, families, cultures, and communities. Throughout my career, I have worked across multiple countries and healthcare systems, collaborating with professionals from diverse backgrounds and serving families representing more than fifty nationalities.',
+  ],
+  mission:
+    'My mission is to empower individuals through communication and to advance the profession of Speech-Language Pathology through clinical excellence, education, leadership, and international collaboration.',
+}
+
+export const professionalServices = {
+  label: 'Work With Dr. Wael',
+  title: 'Collaborate on communication, education, and impact',
+  intro:
+    'Whether you are seeking clinical consultation, professional training, conference presentations, academic collaboration, or expert guidance in Speech-Language Pathology, I welcome opportunities to work with individuals and organizations that share a commitment to communication and lifelong learning.',
+  availableFor: [
+    {
+      title: 'Professional Consultation',
+      description: 'Expert clinical guidance for complex cases, program design, and evidence-based practice.',
+    },
+    {
+      title: 'Speaking Engagements',
+      description: 'Keynotes, conference lectures, and panel discussions for professional audiences.',
+    },
+    {
+      title: 'Workshops & Training Programs',
+      description: 'Hands-on professional development for clinicians, educators, and healthcare teams.',
+    },
+    {
+      title: 'University Lectures',
+      description: 'Graduate-level teaching, guest lectures, and academic collaboration.',
+    },
+    {
+      title: 'Clinical Supervision & Mentorship',
+      description: 'Supervision and mentorship for emerging and practicing speech-language pathologists.',
+    },
+    {
+      title: 'International Collaboration Projects',
+      description: 'Cross-border partnerships advancing communication sciences and clinical standards.',
+    },
   ],
 }
 
@@ -454,6 +594,44 @@ export const therapyConcepts = [
       'You\'re welcome to observe or join sessions',
       'Simple home practice strategies for parents',
       'Fun exercises to enjoy outside the clinic',
+    ],
+    ctaLabel: 'Book a Session',
+  },
+  {
+    id: 'professional-training',
+    image: images.inTheFieldHero,
+    title: 'Professional Training',
+    subtitle: 'Workshops & Clinical Development',
+    summary:
+      'Hands-on professional development for speech-language pathologists, educators, and healthcare teams seeking evidence-based clinical growth.',
+    paragraphs: [
+      'Interactive workshops and seminars designed for clinicians, educators, and allied health professionals who want to deepen their expertise in communication sciences.',
+      'Sessions cover assessment frameworks, intervention strategies, bilingual practice, and the latest research — tailored to the needs of your team or institution.',
+    ],
+    bullets: [
+      'Clinical workshops for SLPs and educators',
+      'Evidence-based assessment and intervention training',
+      'Bilingual and culturally responsive practice',
+      'Custom programs for hospitals, schools, and universities',
+    ],
+    ctaLabel: 'Book a Session',
+  },
+  {
+    id: 'family-training',
+    image: images.family,
+    title: 'Family Training',
+    subtitle: 'Parent Coaching & Home Support',
+    summary:
+      'Practical coaching for parents and caregivers — building confidence and skills to support your child\'s communication at home and in everyday life.',
+    paragraphs: [
+      'Parent coaching sessions give you clear, actionable strategies to reinforce therapy goals in daily routines — from mealtimes and play to homework and social situations.',
+      'We work alongside your family to build a supportive home environment where your child\'s communication skills can grow naturally between clinic visits.',
+    ],
+    bullets: [
+      'Personalized home practice strategies',
+      'Guidance on supporting communication in daily routines',
+      'Collaboration with schools and other caregivers',
+      'Ongoing coaching as your child progresses',
     ],
     ctaLabel: 'Book a Session',
   },

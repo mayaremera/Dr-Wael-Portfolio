@@ -160,7 +160,7 @@ export default function DrWaelActivity({ variant = 'preview' }) {
     <section
       id="activity"
       aria-labelledby="activity-heading"
-      className={`relative overflow-hidden bg-surface py-20 lg:py-28 ${isFullPage ? '' : 'border-t border-slate-200'}`}
+      className="relative overflow-hidden border-t border-slate-200 bg-surface py-20 lg:py-28"
     >
       <div
         className="pointer-events-none absolute -left-16 top-20 h-56 w-56 rounded-full bg-brand/10 blur-3xl"

@@ -63,6 +63,8 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false)
   const currentPath = getCurrentPath()
   const isContactActive = currentPath === '/contact'
+  const isInTheField = currentPath === '/in-the-field'
+  const headerScrolled = scrolled || isInTheField
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40)
@@ -153,7 +155,7 @@ export default function Header() {
 
       <header
         className={`transition-all duration-300 ${
-          scrolled
+          headerScrolled
             ? 'border-b border-slate-100 bg-white/95 py-4 shadow-sm backdrop-blur-sm'
             : 'bg-transparent py-4 lg:py-5'
         }`}
@@ -164,7 +166,7 @@ export default function Header() {
             aria-label="Home"
             className="flex shrink-0 items-center transition-opacity hover:opacity-90"
           >
-            <Logo scrolled={scrolled} />
+            <Logo scrolled={headerScrolled} />
           </a>
 
           <nav className="hidden items-center gap-6 xl:gap-8 lg:flex">
@@ -173,7 +175,7 @@ export default function Header() {
                 key={link.href}
                 href={link.href}
                 label={link.label}
-                scrolled={scrolled}
+                scrolled={headerScrolled}
                 active={isLinkActive(link.href, currentPath)}
               />
             ))}
@@ -183,7 +185,7 @@ export default function Header() {
             href="/contact"
             aria-current={isContactActive ? 'page' : undefined}
             className="hidden lg:inline-flex"
-            headerState={{ active: isContactActive, scrolled }}
+            headerState={{ active: isContactActive, scrolled: headerScrolled }}
           >
             Contact Us Now
           </ContactButton>
@@ -198,7 +200,7 @@ export default function Header() {
               <span
                 key={i}
                 className={`block h-px w-6 transition-all ${
-                  scrolled ? 'bg-ink' : 'bg-white'
+                  headerScrolled ? 'bg-ink' : 'bg-white'
                 } ${open && i === 0 ? 'translate-y-[7px] rotate-45' : ''} ${
                   open && i === 1 ? 'opacity-0' : ''
                 } ${open && i === 2 ? '-translate-y-[7px] -rotate-45' : ''}`}

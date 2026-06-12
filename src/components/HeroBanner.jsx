@@ -19,9 +19,9 @@ export default function HeroBanner() {
           {profileDetails.name}
         </h1>
         <p className="mt-6 max-w-xl text-lg leading-relaxed text-white drop-shadow-md">
-          Over 30 years of clinical excellence, ASHA Fellow. Helping
-          children with autism, ADHD, and language disorders find their voice
-          through compassionate, evidence-based care in English and Arabic.
+          Over 30 years of clinical excellence, ASHA Fellow. Helping children with
+          autism, ADHD, and language disorders find their voice through compassionate,
+          evidence-based care in English and Arabic.
         </p>
         <div className="mt-10 flex flex-wrap gap-4">
           <ContactButton href="#contact" headerState={{ active: false, scrolled: false }}>

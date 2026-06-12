@@ -54,7 +54,7 @@ function ServiceDetailCard({ concept, index }) {
           <img
             src={concept.image}
             alt={`${concept.title}, ${concept.subtitle}`}
-            className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+            className="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.03]"
           />
           <div className={`pointer-events-none absolute inset-0 bg-linear-to-t ${accent.overlay}`} />
           <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
@@ -162,6 +162,9 @@ function CasesPreviewRail({ cases }) {
 export default function TherapyConcepts({ showCasesPreview = false, fullDetail = false }) {
   const { speechLanguageServices, therapyConcepts, casesWeServe, clinicalSpecializations } =
     useServicesContent()
+  const displayConcepts = fullDetail
+    ? therapyConcepts
+    : therapyConcepts.filter((concept) => !concept.pageOnly)
   const ctaHref = showCasesPreview ? '/services' : '#contact'
 
   return (
@@ -200,24 +203,26 @@ export default function TherapyConcepts({ showCasesPreview = false, fullDetail =
 
           {fullDetail ? (
             <div className="flex flex-col gap-6">
-              {[0, 2].map((rowStart) => (
-                <div
-                  key={rowStart}
-                  className="grid gap-6 md:grid-cols-2 md:grid-rows-[repeat(5,auto)]"
-                >
-                  {therapyConcepts.slice(rowStart, rowStart + 2).map((concept, offset) => (
-                    <ServiceDetailCard
-                      key={concept.id}
-                      concept={concept}
-                      index={rowStart + offset}
-                    />
-                  ))}
-                </div>
-              ))}
+              {Array.from({ length: Math.ceil(therapyConcepts.length / 2) }, (_, i) => i * 2).map(
+                (rowStart) => (
+                  <div
+                    key={rowStart}
+                    className="grid gap-6 md:grid-cols-2 md:grid-rows-[repeat(5,auto)]"
+                  >
+                    {therapyConcepts.slice(rowStart, rowStart + 2).map((concept, offset) => (
+                      <ServiceDetailCard
+                        key={concept.id}
+                        concept={concept}
+                        index={rowStart + offset}
+                      />
+                    ))}
+                  </div>
+                ),
+              )}
             </div>
           ) : (
             <div className="grid items-stretch gap-4 md:grid-cols-2">
-              {therapyConcepts.map((concept) => (
+              {therapyConcepts.slice(0, 4).map((concept) => (
                 <article
                   key={concept.id}
                   className="group flex h-full flex-col overflow-hidden rounded-sm border border-slate-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-brand/20 hover:shadow-md sm:flex-row"

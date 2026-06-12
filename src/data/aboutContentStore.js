@@ -49,6 +49,8 @@ function mergeWithDefaults(saved) {
     profileDetails: {
       ...defaults.profileDetails,
       ...saved.profileDetails,
+      bio: saved.profileDetails?.bio ?? defaults.profileDetails.bio,
+      bioExtended: saved.profileDetails?.bioExtended ?? defaults.profileDetails.bioExtended,
     },
     profileImage: saved.profileImage ?? defaults.profileImage,
     certificates: saved.certificates ?? defaults.certificates,

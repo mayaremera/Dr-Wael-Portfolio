@@ -6,7 +6,12 @@ const problemTypes = [
   'Assessment request',
   'Family counseling',
   'Therapy appointment',
-  'Professional collaboration',
+  'Professional consultation',
+  'Speaking engagement',
+  'Workshop or training program',
+  'University lecture',
+  'Clinical supervision & mentorship',
+  'International collaboration',
   'Other',
 ]
 
@@ -210,7 +215,7 @@ export default function Contact() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-lg shadow-brand/5 lg:col-span-4 lg:p-8">
+          <div id="contact-form" className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-lg shadow-brand/5 lg:col-span-4 lg:p-8">
             <p className="text-xs font-semibold tracking-[0.18em] text-accent uppercase">Appointment Request</p>
             <h3 className="mt-2 font-serif text-2xl text-ink">Send a message</h3>
             <p className="mt-2 text-sm text-ink-muted">We&apos;ll get back to you as soon as possible.</p>

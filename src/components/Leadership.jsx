@@ -1,4 +1,4 @@
-import { clinicalSpecializations } from '../data/content'
+import { internationalLeadership } from '../data/content'
 import { useAboutContent } from '../hooks/useAboutContent'
 
 const roleAccents = [
@@ -34,8 +34,6 @@ const roleAccents = [
   },
 ]
 
-const specDots = ['bg-brand', 'bg-accent', 'bg-brand-light', 'bg-ink-muted']
-
 export default function Leadership() {
   const { leadershipRoles } = useAboutContent()
 
@@ -48,39 +46,14 @@ export default function Leadership() {
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
           <div className="animate-fade-up">
             <p className="text-xs font-semibold tracking-[0.22em] text-brand uppercase">
-              Leadership & Research
+              {internationalLeadership.label}
             </p>
-            <h2 className="mt-3 font-serif text-3xl text-ink md:text-4xl">
-              Advancing the field through clinical and academic excellence
-            </h2>
-            <p className="mt-5 leading-relaxed text-ink-muted">
-              Dr. Wael&apos;s work spans direct patient care at Psych Care Complex,
-              university teaching at Alfaisal University, and international
-              professional leadership — ensuring families benefit from both
-              cutting-edge research and decades of hands-on clinical wisdom.
-            </p>
+            <h2 className="mt-3 font-serif text-3xl text-ink md:text-4xl">{internationalLeadership.title}</h2>
+            <p className="mt-5 leading-relaxed text-ink-muted">{internationalLeadership.intro}</p>
 
-            <div className="mt-10 rounded-sm border border-brand/15 bg-white/70 p-6 backdrop-blur-sm">
-              <p className="text-xs font-semibold tracking-[0.18em] text-accent uppercase">
-                Clinical Specializations
-              </p>
-              <ul className="mt-4 space-y-3">
-                {clinicalSpecializations.map((area, index) => (
-                  <li
-                    key={area.id}
-                    className="group flex items-start gap-3 text-ink-muted transition-colors duration-300 hover:text-ink"
-                  >
-                    <span
-                      className={`mt-2 h-1.5 w-1.5 shrink-0 rounded-full transition-transform duration-300 group-hover:scale-125 ${specDots[index % specDots.length]}`}
-                    />
-                    <span>
-                      <span className="font-medium text-ink">{area.title}</span>
-                      {' — '}
-                      {area.excerpt}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+            <div className="mt-8 rounded-sm border border-brand/15 bg-white/70 p-6 backdrop-blur-sm">
+              <p className="text-xs font-semibold tracking-[0.18em] text-accent uppercase">Current & Recent Roles</p>
+              <p className="mt-4 text-sm leading-relaxed text-ink-muted">{internationalLeadership.summary}</p>
             </div>
           </div>
 

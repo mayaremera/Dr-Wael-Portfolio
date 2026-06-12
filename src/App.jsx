@@ -3,9 +3,12 @@ import Header from './components/Header'
 import HeroBanner from './components/HeroBanner'
 import GalleryGrid from './components/GalleryGrid'
 import DrWaelActivity from './components/DrWaelActivity'
+import GlobalEventsMap from './components/GlobalEventsMap'
 import Profile from './components/Profile'
 import PromoVideoSection from './components/PromoVideoSection'
 import Leadership from './components/Leadership'
+import SpeakingTraining from './components/SpeakingTraining'
+import ProfessionalServices from './components/ProfessionalServices'
 import CertificationGallery from './components/CertificationGallery'
 import CareerTimeline from './components/CareerTimeline'
 import TherapyConcepts from './components/TherapyConcepts'
@@ -235,16 +238,9 @@ function App() {
       </PageLayout>
     ),
     '/in-the-field': (
-      <PageLayout
-        hero={{
-          eyebrow: 'In the Field',
-          title: 'Professional Activity & Events',
-          description:
-            'Follow recent conferences, lectures, and clinical engagements where Dr. Wael contributes his expertise.',
-          image: images.inTheFieldHero,
-          imagePosition: 'top',
-        }}
-      >
+      <>
+        <GlobalEventsMap />
+        <SpeakingTraining />
         <DrWaelActivity variant="full" />
         <VibeBand
           label="Academic & Clinical Presence"
@@ -255,7 +251,7 @@ function App() {
           secondaryHref="/services"
           secondaryLabel="Explore Services"
         />
-      </PageLayout>
+      </>
     ),
     '/contact': (
       <PageLayout
@@ -267,6 +263,7 @@ function App() {
           image: images.screening,
         }}
       >
+        <ProfessionalServices />
         <Contact />
         <VibeBand
           label="Your Next Step"

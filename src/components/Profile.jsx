@@ -1,7 +1,14 @@
 import { useState } from 'react'
-import { images, trustedCompanies } from '../data/content'
+import { careerImpact, images, trustedCompanies } from '../data/content'
 import { useAboutContent } from '../hooks/useAboutContent'
 import CredentialCompass from './CredentialCompass'
+
+const statAccents = [
+  'border-brand/20 bg-brand-muted/40',
+  'border-accent/20 bg-accent/5',
+  'border-brand-light/20 bg-brand/5',
+  'border-slate-200 bg-white',
+]
 
 const sectionLinkClassName =
   'relative inline-block w-fit pb-1 text-xs font-semibold tracking-[0.12em] text-brand uppercase transition-colors after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-brand after:transition-transform after:duration-300 after:ease-out hover:text-brand-light hover:after:scale-x-100'
@@ -134,9 +141,12 @@ function TrustedCompanies() {
 
 export default function Profile({ variant = 'home' }) {
   const { profileDetails, profileImage } = useAboutContent()
-  const { name, title, credentials, tagline, bio } = profileDetails
+  const { name, title, credentials, tagline } = profileDetails
   const photo = profileImage || images.drWael
   const isPage = variant === 'page'
+  const displayBio = isPage
+    ? (profileDetails.bioExtended ?? profileDetails.bio)
+    : profileDetails.bio
 
   return (
     <section
@@ -186,16 +196,20 @@ export default function Profile({ variant = 'home' }) {
               </footer>
             </blockquote>
 
-            <span className="mt-4 inline-flex w-fit items-center gap-1.5 rounded-full border border-brand/20 bg-brand-muted/50 px-3 py-1 text-xs font-medium text-brand">
-              <span className="font-semibold tabular-nums">30+</span>
-              Years of Experience
-            </span>
+            {!isPage ? (
+              <span className="mt-4 inline-flex w-fit items-center gap-1.5 rounded-full border border-brand/20 bg-brand-muted/50 px-3 py-1 text-xs font-medium text-brand">
+                <span className="font-semibold tabular-nums">30+</span>
+                Years of Experience
+              </span>
+            ) : null}
 
-            <div className="mt-6 space-y-3 text-sm leading-relaxed text-ink-muted md:text-base">
-              {bio.map((paragraph, i) => (
-                <p key={i}>{paragraph}</p>
-              ))}
-            </div>
+            {displayBio.length > 0 ? (
+              <div className="mt-6 space-y-3 text-sm leading-relaxed text-ink-muted md:text-base">
+                {displayBio.map((paragraph, i) => (
+                  <p key={i}>{paragraph}</p>
+                ))}
+              </div>
+            ) : null}
 
             {!isPage ? (
               <div className="mt-8">
@@ -215,6 +229,21 @@ export default function Profile({ variant = 'home' }) {
             </div>
           ) : null}
         </div>
+
+        {isPage ? (
+          <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
+            {careerImpact.stats.map((stat, index) => (
+              <article
+                key={stat.label}
+                className={`rounded-sm border p-5 text-center shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${statAccents[index % statAccents.length]}`}
+              >
+                <p className="font-serif text-3xl tabular-nums text-brand md:text-4xl">{stat.value}</p>
+                <p className="mt-2 text-xs font-semibold tracking-[0.14em] text-ink uppercase">{stat.label}</p>
+                <p className="mt-3 text-sm leading-relaxed text-ink-muted">{stat.detail}</p>
+              </article>
+            ))}
+          </div>
+        ) : null}
 
         {!isPage ? <TrustedCompanies /> : null}
       </div>
