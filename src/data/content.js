@@ -513,10 +513,9 @@ export const trustedCompanies = {
       name: 'University of Cambridge',
       shortName: 'Cambridge',
       role: 'Research affiliation with the Autism Research Centre, advancing evidence-based understanding of communication and neurodevelopment.',
-      logo: '/images/trusted8.png',
-      badgeLogo: '/images/trusted8banner.png',
-      badgeLabel: 'Autism Research Centre',
-      logoFit: 'cover',
+      logo: '/images/trusted8banner.png',
+      badgeLogo: '/images/trusted8.png',
+      badgeLabel: 'University of Cambridge',
     },
   ],
 }

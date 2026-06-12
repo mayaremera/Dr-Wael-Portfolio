@@ -34,14 +34,15 @@ function AffiliationHoverOverlay({ company }) {
 function AffiliationBadge({ logo, label }) {
   return (
     <div
-      className="pointer-events-none absolute right-1.5 bottom-1.5 z-[4] opacity-100 transition-opacity duration-300 group-hover:opacity-0 group-focus-within:opacity-0 sm:right-2 sm:bottom-2"
+      className="pointer-events-none absolute right-2 bottom-2 z-[4] opacity-100 transition-opacity duration-300 group-hover:opacity-0 group-focus-within:opacity-0 sm:right-2.5 sm:bottom-2.5"
       title={label}
     >
-      <img
-        src={logo}
-        alt=""
-        className="h-5 w-5 rounded-full object-cover shadow-sm ring-1 ring-white sm:h-6 sm:w-6"
-      />
+      <div className="flex items-center gap-1.5 rounded-md border border-slate-200/90 bg-white/95 px-2 py-1 shadow-md backdrop-blur-sm">
+        <img src={logo} alt="" className="h-5 w-5 shrink-0 object-contain sm:h-6 sm:w-6" />
+        <span className="hidden max-w-[5.5rem] truncate text-[0.55rem] font-semibold leading-tight text-ink sm:block sm:max-w-[6.5rem] sm:text-[0.6rem]">
+          {label}
+        </span>
+      </div>
     </div>
   )
 }

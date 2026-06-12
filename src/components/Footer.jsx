@@ -89,21 +89,10 @@ export default function Footer() {
           </FooterLinkColumn>
         </div>
 
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/15 pt-8 text-center sm:flex-row sm:text-left">
+        <div className="mt-12 border-t border-white/15 pt-8 text-center sm:text-left">
           <p className="text-sm text-white/50">
             &copy; {year} {site.name}. All Rights Reserved.
           </p>
-          <div className="flex items-center gap-4 text-sm text-white/50">
-            <a href="/contact" className="transition-colors hover:text-white">
-              Privacy Policy
-            </a>
-            <span className="text-white/25" aria-hidden="true">
-              |
-            </span>
-            <a href="/contact" className="transition-colors hover:text-white">
-              Terms of Use
-            </a>
-          </div>
         </div>
       </div>
     </footer>

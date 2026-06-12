@@ -100,61 +100,40 @@ function ServiceDetailCard({ concept, index }) {
   )
 }
 
-function CasesPreviewRail({ cases }) {
+function CasesPreviewGrid({ cases }) {
   return (
-    <div className="relative overflow-hidden rounded-sm border border-brand/10 bg-gradient-to-br from-brand-muted/70 via-white to-surface-alt p-5 sm:p-8 lg:p-10">
-      <div
-        className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-brand/8 blur-2xl"
-        aria-hidden="true"
-      />
-      <div
-        className="pointer-events-none absolute -bottom-8 left-1/4 h-32 w-32 rounded-full bg-accent/15 blur-2xl"
-        aria-hidden="true"
-      />
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {cases.map((item) => (
+        <article
+          key={item.id}
+          className="group flex h-full flex-col overflow-hidden rounded-sm border border-slate-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-brand/20 hover:shadow-md hover:shadow-brand/10"
+        >
+          <div className="relative h-36 w-full shrink-0 overflow-hidden">
+            <img
+              src={item.image}
+              alt={item.title}
+              className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+            <div
+              className="pointer-events-none absolute inset-0 bg-gradient-to-t from-brand/50 via-transparent to-transparent"
+              aria-hidden="true"
+            />
+            <span className="absolute left-3 top-3 rounded-full bg-white/95 px-2.5 py-0.5 text-[0.6rem] font-bold tracking-[0.12em] text-brand uppercase shadow-sm">
+              {item.category}
+            </span>
+          </div>
 
-      <ol className="relative space-y-5 sm:space-y-6">
-        {cases.map((item, index) => (
-          <li key={item.id} className="group relative flex gap-4 sm:gap-5">
-            {index < cases.length - 1 ? (
-              <span
-                className="absolute left-[1.125rem] top-11 bottom-[-1.25rem] w-px bg-gradient-to-b from-brand/35 to-brand/10 sm:left-5 sm:top-12"
-                aria-hidden="true"
-              />
+          <div className="flex flex-1 flex-col px-4 py-4 sm:px-5 sm:py-5">
+            <h4 className="font-serif text-lg leading-snug text-ink">{item.title}</h4>
+            {item.abbr ? (
+              <p className="mt-1 text-[0.65rem] font-semibold tracking-[0.12em] text-brand uppercase">
+                {item.abbr}
+              </p>
             ) : null}
-
-            <div className="relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-brand bg-white font-serif text-base text-brand shadow-sm transition-colors duration-300 group-hover:border-accent group-hover:text-accent sm:h-10 sm:w-10 sm:text-lg">
-              {String(index + 1).padStart(2, '0')}
-            </div>
-
-            <article className="flex min-w-0 flex-1 overflow-hidden rounded-sm border border-slate-100/90 bg-white shadow-sm transition-all duration-300 group-hover:-translate-y-0.5 group-hover:border-brand/25 group-hover:shadow-lg group-hover:shadow-brand/10 sm:flex-row">
-              <div className="relative h-28 w-full shrink-0 sm:h-auto sm:w-[38%] sm:max-w-[200px]">
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div
-                  className="pointer-events-none absolute inset-0 bg-gradient-to-t from-brand/50 via-transparent to-transparent sm:bg-gradient-to-r sm:from-brand/40"
-                  aria-hidden="true"
-                />
-                <span className="absolute left-3 top-3 rounded-full bg-white/95 px-2.5 py-0.5 text-[0.6rem] font-bold tracking-[0.12em] text-brand uppercase shadow-sm">
-                  {item.category}
-                </span>
-              </div>
-
-              <div className="flex flex-1 flex-col justify-center px-4 py-4 sm:px-5 sm:py-5">
-                <h4 className="font-serif text-lg leading-snug text-ink sm:text-xl">{item.title}</h4>
-                {item.abbr ? (
-                  <p className="mt-1 text-[0.65rem] font-semibold tracking-[0.12em] text-brand uppercase">
-                    {item.abbr}
-                  </p>
-                ) : null}
-                <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-ink-muted">{item.excerpt}</p>
-              </div>
-            </article>
-          </li>
-        ))}
-      </ol>
+            <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-ink-muted">{item.excerpt}</p>
+          </div>
+        </article>
+      ))}
     </div>
   )
 }
@@ -263,7 +242,7 @@ export default function TherapyConcepts({ showCasesPreview = false, fullDetail =
                 </a>
               </div>
 
-              <CasesPreviewRail cases={clinicalSpecializations.slice(0, 3)} />
+              <CasesPreviewGrid cases={clinicalSpecializations} />
             </div>
           ) : null}
         </div>

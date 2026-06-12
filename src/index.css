@@ -229,10 +229,11 @@ body {
   opacity: 0;
 }
 
-/* ── Globe section ── */
-.globe-section {
+/* ── Global presence section (avoid "globe-section" — blocked by some browsers/extensions) ── */
+.global-presence-section {
   --globe-accent: #f08a5d;
   --globe-brand: #2d6a7a;
+  --globe-ongoing: #6ee7c9;
 }
 
 @keyframes globe-star {
@@ -262,8 +263,41 @@ body {
   }
 }
 
+@keyframes globe-pulse-ongoing {
+  0% {
+    transform: scale(1);
+    opacity: 0.75;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
 .animate-globe-pulse {
   animation: globe-pulse 2s ease-out infinite;
+}
+
+.globe-stage {
+  width: 100%;
+}
+
+.globe-canvas-wrap {
+  background: transparent;
+}
+
+.globe-cobe-host {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.globe-cobe-host,
+.globe-canvas-wrap canvas,
+.globe-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .globe-glow {
@@ -272,19 +306,21 @@ body {
 
 .globe-marker-btn {
   position: absolute;
-  left: anchor(center);
-  top: anchor(center);
+  left: 0;
+  top: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
   border: none;
   background: transparent;
-  cursor: pointer;
   padding: 0;
+  pointer-events: none;
+  z-index: 10;
+  will-change: transform, opacity, left, top;
   transition:
-    opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .globe-marker-dot {
@@ -295,6 +331,8 @@ body {
   border-radius: 50%;
   background: var(--globe-accent);
   box-shadow: 0 0 12px rgba(240, 138, 93, 0.6);
+  cursor: inherit;
+  pointer-events: none;
   transition:
     transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 0.55s cubic-bezier(0.22, 1, 0.36, 1),
@@ -314,6 +352,21 @@ body {
 .globe-marker-dot.is-active {
   transform: scale(1.35);
   box-shadow: 0 0 20px rgba(240, 138, 93, 0.9);
+}
+
+.globe-marker-dot.is-ongoing {
+  background: var(--globe-ongoing);
+  box-shadow: 0 0 14px rgba(110, 231, 201, 0.75);
+}
+
+.globe-marker-dot.is-ongoing::before {
+  border-color: rgba(110, 231, 201, 0.55);
+  animation: globe-pulse-ongoing 2s ease-out infinite;
+}
+
+.globe-marker-dot.is-ongoing.is-hovered,
+.globe-marker-dot.is-ongoing.is-active {
+  box-shadow: 0 0 22px rgba(110, 231, 201, 0.95);
 }
 
 .globe-marker-dot.is-active {
@@ -338,7 +391,8 @@ body {
 }
 
 .globe-marker-btn:is(:hover, :focus-visible) .globe-marker-label,
-.globe-marker-dot.is-active + .globe-marker-label {
+.globe-marker-dot.is-active + .globe-marker-label,
+.globe-marker-dot.is-hovered + .globe-marker-label {
   opacity: 1;
   transform: translateY(0);
 }

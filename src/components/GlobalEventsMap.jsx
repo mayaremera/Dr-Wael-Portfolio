@@ -59,9 +59,7 @@ function EventTimelineCard({ event, index, total }) {
       ) : null}
 
       <div
-        className={`rounded-sm border bg-white/95 p-4 shadow-lg backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl ${
-          event.isUpcoming ? 'border-accent/35' : event.isMilestone ? 'border-brand/25' : 'border-white/20'
-        }`}
+        className="rounded-sm border border-slate-200 bg-white/95 p-4 shadow-lg backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl"
       >
         <div className="flex flex-wrap items-center gap-2">
           <span className="rounded-full bg-brand-muted px-2 py-0.5 text-[0.6rem] font-semibold tracking-wide text-brand uppercase">
@@ -165,7 +163,7 @@ export default function GlobalEventsMap() {
     <section
       id="global-presence"
       aria-labelledby="global-presence-heading"
-      className="globe-section relative min-h-screen overflow-hidden"
+      className="global-presence-section relative min-h-screen overflow-x-clip"
     >
       <Starfield />
 
@@ -205,7 +203,7 @@ export default function GlobalEventsMap() {
           </div>
         </header>
 
-        <div className="relative mx-auto mt-6 flex w-full max-w-[1100px] flex-1 flex-col items-center justify-center lg:mt-2">
+        <div className="relative mx-auto mt-6 w-full max-w-[1100px] shrink-0 pb-8 lg:mt-2">
           <EarthGlobe
             locations={locations}
             selectedId={selectedId}

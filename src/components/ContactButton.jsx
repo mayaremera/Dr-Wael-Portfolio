@@ -7,9 +7,7 @@ export const contactButtonClassName = `${contactButtonBaseClassName} ${contactBu
 
 export function getHeaderContactButtonClass({ active, scrolled }) {
   if (active) {
-    return scrolled
-      ? 'bg-brand-light text-white ring-2 ring-brand/30'
-      : 'bg-brand text-white ring-2 ring-white/40'
+    return 'bg-brand text-white hover:bg-brand-light'
   }
 
   if (scrolled) {

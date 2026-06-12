@@ -1,46 +1,76 @@
 import { useEffect, useRef } from 'react'
-import createGlobe from 'cobe'
-
-const BRAND_RGB = [0.102, 0.302, 0.361]
-const ACCENT_RGB = [0.941, 0.541, 0.365]
-const GLOW_RGB = [0.176, 0.416, 0.478]
+import { loadGlobeLandPoints } from '../lib/globeLandPoints.js'
+import {
+  pickNearestMarker,
+  project,
+  separateMarkerPositions,
+} from '../lib/globeProjection.js'
 
 const AUTO_ROTATE_SPEED = 0.0014
 const DRAG_SENSITIVITY = 0.0028
 const MOMENTUM_DECAY = 0.965
-const MARKER_LERP = 0.1
 const KEY_ROTATE_STEP = 0.05
+const GLOBE_PX = 780
+const GLOBE_MAX_PX = 880
+const HOVER_RADIUS = 40
+const DRAG_THRESHOLD = 6
 
-function lerp(current, target, amount) {
-  return current + (target - current) * amount
-}
+const BRAND_SOFT = 'rgba(45, 106, 122, 0.55)'
+const LAND = 'rgba(72, 140, 155, 0.92)'
+const LAND_DIM = 'rgba(45, 106, 122, 0.45)'
 
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value))
 }
 
-function getTargetMarkerSize(loc, selectedId, hoveredId) {
-  if (loc.id === selectedId) return 0.065
-  if (loc.id === hoveredId) return 0.05
-  return 0.035
-}
+function drawGlobe(ctx, size, landPoints, phi, theta) {
+  const cx = size / 2
+  const cy = size / 2
+  const radius = size * 0.4 * 1.05
 
-function buildAnimatedMarkers(locations, selectedId, hoveredId, sizesRef) {
-  return locations.map((loc) => {
-    const isActive = loc.id === selectedId
-    const isHovered = loc.id === hoveredId
-    const targetSize = getTargetMarkerSize(loc, selectedId, hoveredId)
-    const currentSize = sizesRef.current[loc.id] ?? targetSize
-    const nextSize = lerp(currentSize, targetSize, MARKER_LERP)
-    sizesRef.current[loc.id] = nextSize
+  ctx.clearRect(0, 0, size, size)
 
-    return {
-      location: [loc.lat, loc.lng],
-      size: nextSize,
-      id: loc.id,
-      color: isActive ? ACCENT_RGB : isHovered ? GLOW_RGB : ACCENT_RGB,
-    }
-  })
+  const glow = ctx.createRadialGradient(cx, cy, radius * 0.55, cx, cy, radius * 1.35)
+  glow.addColorStop(0, 'rgba(45, 106, 122, 0.22)')
+  glow.addColorStop(0.55, 'rgba(45, 106, 122, 0.08)')
+  glow.addColorStop(1, 'rgba(45, 106, 122, 0)')
+  ctx.fillStyle = glow
+  ctx.fillRect(0, 0, size, size)
+
+  const sphere = ctx.createRadialGradient(cx - radius * 0.25, cy - radius * 0.3, radius * 0.08, cx, cy, radius)
+  sphere.addColorStop(0, 'rgba(72, 140, 155, 0.35)')
+  sphere.addColorStop(0.55, BRAND_SOFT)
+  sphere.addColorStop(0.92, 'rgba(26, 58, 68, 0.5)')
+  sphere.addColorStop(1, 'rgba(10, 21, 32, 0)')
+  ctx.beginPath()
+  ctx.arc(cx, cy, radius, 0, Math.PI * 2)
+  ctx.fillStyle = sphere
+  ctx.fill()
+
+  ctx.save()
+  ctx.beginPath()
+  ctx.arc(cx, cy, radius, 0, Math.PI * 2)
+  ctx.clip()
+
+  const projectedLand = landPoints
+    .map(([lat, lng]) => {
+      const point = project(lat, lng, phi, theta, size)
+      return { ...point, lat, lng }
+    })
+    .filter((point) => point.visible)
+    .sort((a, b) => a.depth - b.depth)
+
+  for (const point of projectedLand) {
+    const alpha = 0.35 + point.depth * 0.65
+    ctx.fillStyle = point.depth > 0.35 ? LAND : LAND_DIM
+    ctx.globalAlpha = alpha
+    ctx.beginPath()
+    ctx.arc(point.x, point.y, 1.15 + point.depth * 0.8, 0, Math.PI * 2)
+    ctx.fill()
+  }
+
+  ctx.globalAlpha = 1
+  ctx.restore()
 }
 
 export default function EarthGlobe({
@@ -52,112 +82,239 @@ export default function EarthGlobe({
   className = '',
 }) {
   const canvasRef = useRef(null)
+  const containerRef = useRef(null)
   const wrapRef = useRef(null)
-  const globeRef = useRef(null)
+  const markerRefs = useRef({})
+  const markerPositionsRef = useRef([])
   const phiRef = useRef(0)
   const thetaRef = useRef(0.22)
   const pointerInteracting = useRef(null)
+  const pointerDownRef = useRef(null)
   const velocityRef = useRef(0)
-  const markerSizesRef = useRef({})
-  const sizeRef = useRef(600)
+  const sizeRef = useRef(GLOBE_PX)
+  const landPointsRef = useRef([])
 
   const locationsRef = useRef(locations)
   const selectedIdRef = useRef(selectedId)
   const hoveredIdRef = useRef(hoveredId)
+  const onMarkerHoverRef = useRef(onMarkerHover)
+  const onMarkerClickRef = useRef(onMarkerClick)
 
   locationsRef.current = locations
   selectedIdRef.current = selectedId
   hoveredIdRef.current = hoveredId
+  onMarkerHoverRef.current = onMarkerHover
+  onMarkerClickRef.current = onMarkerClick
+
+  useEffect(() => {
+    let cancelled = false
+    loadGlobeLandPoints().then((points) => {
+      if (!cancelled) landPointsRef.current = points
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   useEffect(() => {
     const canvas = canvasRef.current
-    if (!canvas) return
+    const container = containerRef.current
+    if (!canvas || !container) return
 
-    const container = canvas.parentElement
-    if (!container) return
-
-    const updateSize = () => {
-      const rect = container.getBoundingClientRect()
-      sizeRef.current = Math.min(rect.width, rect.height, 920)
-    }
-
-    updateSize()
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
 
     const dpr = Math.min(window.devicePixelRatio ?? 1, 2)
-    const size = sizeRef.current
-
-    const globe = createGlobe(canvas, {
-      devicePixelRatio: dpr,
-      width: size * dpr,
-      height: size * dpr,
-      phi: phiRef.current,
-      theta: thetaRef.current,
-      dark: 1,
-      diffuse: 1.35,
-      mapSamples: 24000,
-      mapBrightness: 10,
-      mapBaseBrightness: 0.05,
-      baseColor: BRAND_RGB,
-      markerColor: ACCENT_RGB,
-      glowColor: GLOW_RGB,
-      markerElevation: 0.025,
-      scale: 1.05,
-      offset: [0, 0],
-      markers: buildAnimatedMarkers(locationsRef.current, selectedIdRef.current, hoveredIdRef.current, markerSizesRef),
-    })
-
-    globeRef.current = globe
-
     let frameId = 0
+    let destroyed = false
+    let tabHidden = document.hidden
 
-    const animate = () => {
-      const currentLocations = locationsRef.current
-      const currentSelected = selectedIdRef.current
-      const currentHovered = hoveredIdRef.current
-      const isPaused =
-        currentHovered !== null || currentSelected !== null || pointerInteracting.current !== null
-
-      if (!isPaused) {
-        if (Math.abs(velocityRef.current) > 0.00005) {
-          phiRef.current += velocityRef.current
-          velocityRef.current *= MOMENTUM_DECAY
-        } else {
-          velocityRef.current = 0
-          phiRef.current += AUTO_ROTATE_SPEED
-        }
-      } else {
-        velocityRef.current = 0
-      }
-
-      thetaRef.current = clamp(thetaRef.current, -0.55, 0.55)
-
-      globe.update({
-        phi: phiRef.current,
-        theta: thetaRef.current,
-        markers: buildAnimatedMarkers(currentLocations, currentSelected, currentHovered, markerSizesRef),
-        arcs: [],
-      })
-
-      frameId = requestAnimationFrame(animate)
+    const readSize = () => {
+      const rect = container.getBoundingClientRect()
+      const measured = Math.floor(Math.min(rect.width, rect.height))
+      return measured > 100 ? Math.min(measured, GLOBE_MAX_PX) : GLOBE_PX
     }
 
-    frameId = requestAnimationFrame(animate)
+    const resizeCanvas = (size) => {
+      sizeRef.current = size
+      canvas.width = size * dpr
+      canvas.height = size * dpr
+      canvas.style.width = `${size}px`
+      canvas.style.height = `${size}px`
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+    }
 
-    const resizeObserver = new ResizeObserver(() => {
-      updateSize()
-      const nextSize = sizeRef.current
-      globe.update({
-        width: nextSize * dpr,
-        height: nextSize * dpr,
+    const setHover = (id) => {
+      if (hoveredIdRef.current === id) return
+      hoveredIdRef.current = id
+      onMarkerHoverRef.current(id)
+    }
+
+    const localPointer = (event) => {
+      const rect = container.getBoundingClientRect()
+      return {
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top,
+      }
+    }
+
+    const updateMarkers = (phi, theta, size) => {
+      const raw = locationsRef.current.map((loc) => {
+        const point = project(loc.lat, loc.lng, phi, theta, size)
+        return {
+          id: loc.id,
+          country: loc.country,
+          x: point.x,
+          y: point.y,
+          visible: point.visible,
+          depth: point.depth,
+        }
       })
-    })
+
+      const visible = raw.filter((point) => point.visible)
+      const separated = separateMarkerPositions(visible, Math.max(20, size * 0.028))
+      markerPositionsRef.current = separated
+
+      for (const point of raw) {
+        const el = markerRefs.current[point.id]
+        if (!el) continue
+
+        const layout = separated.find((item) => item.id === point.id)
+        const displayX = layout?.displayX ?? point.x
+        const displayY = layout?.displayY ?? point.y
+        const active =
+          selectedIdRef.current === point.id ||
+          hoveredIdRef.current === point.id
+
+        el.style.left = `${displayX}px`
+        el.style.top = `${displayY}px`
+        el.style.opacity = point.visible ? '1' : '0'
+        el.style.transform = `translate(-50%, -50%) scale(${active ? 1.15 : 1})`
+        el.style.zIndex = String(active ? 30 : 10 + Math.round(point.depth * 10))
+      }
+    }
+
+    const updatePointerTarget = (localX, localY) => {
+      const nearest = pickNearestMarker(markerPositionsRef.current, localX, localY, HOVER_RADIUS)
+      setHover(nearest)
+      container.style.cursor = nearest ? 'pointer' : 'grab'
+    }
+
+    const tick = () => {
+      if (destroyed) return
+
+      if (!tabHidden) {
+        const currentSelected = selectedIdRef.current
+        const currentHovered = hoveredIdRef.current
+        const isPaused =
+          currentHovered !== null || currentSelected !== null || pointerInteracting.current !== null
+
+        if (!isPaused) {
+          if (Math.abs(velocityRef.current) > 0.00005) {
+            phiRef.current += velocityRef.current
+            velocityRef.current *= MOMENTUM_DECAY
+          } else {
+            velocityRef.current = 0
+            phiRef.current += AUTO_ROTATE_SPEED
+          }
+        } else {
+          velocityRef.current = 0
+        }
+
+        thetaRef.current = clamp(thetaRef.current, -0.55, 0.55)
+      }
+
+      const size = sizeRef.current
+      drawGlobe(ctx, size, landPointsRef.current, phiRef.current, thetaRef.current)
+      updateMarkers(phiRef.current, thetaRef.current, size)
+
+      frameId = requestAnimationFrame(tick)
+    }
+
+    const handleResize = () => {
+      resizeCanvas(readSize())
+    }
+
+    resizeCanvas(readSize())
+    frameId = requestAnimationFrame(tick)
+
+    const resizeObserver = new ResizeObserver(handleResize)
     resizeObserver.observe(container)
 
+    const handleVisibility = () => {
+      tabHidden = document.hidden
+    }
+
+    const handlePointerDown = (event) => {
+      pointerDownRef.current = { x: event.clientX, y: event.clientY }
+      pointerInteracting.current = event.clientX
+      velocityRef.current = 0
+      container.style.cursor = 'grabbing'
+    }
+
+    const handlePointerMove = (event) => {
+      if (pointerInteracting.current === null) return
+
+      const delta = event.clientX - pointerInteracting.current
+      pointerInteracting.current = event.clientX
+      phiRef.current += delta * DRAG_SENSITIVITY
+      velocityRef.current = delta * DRAG_SENSITIVITY * 0.85
+    }
+
+    const handlePointerUp = (event) => {
+      const down = pointerDownRef.current
+      pointerInteracting.current = null
+      pointerDownRef.current = null
+
+      if (down) {
+        const moved = Math.hypot(event.clientX - down.x, event.clientY - down.y)
+        if (moved <= DRAG_THRESHOLD) {
+          const { x, y } = localPointer(event)
+          const nearest = pickNearestMarker(markerPositionsRef.current, x, y, HOVER_RADIUS)
+          if (nearest) {
+            onMarkerClickRef.current(nearest)
+            container.style.cursor = 'pointer'
+            return
+          }
+        }
+      }
+
+      const { x, y } = localPointer(event)
+      updatePointerTarget(x, y)
+    }
+
+    const handleContainerPointerMove = (event) => {
+      if (pointerInteracting.current !== null) return
+      const { x, y } = localPointer(event)
+      updatePointerTarget(x, y)
+    }
+
+    const handleContainerPointerLeave = () => {
+      if (pointerInteracting.current !== null) return
+      setHover(null)
+      container.style.cursor = 'grab'
+    }
+
+    document.addEventListener('visibilitychange', handleVisibility)
+    container.addEventListener('pointerdown', handlePointerDown)
+    container.addEventListener('pointermove', handleContainerPointerMove)
+    container.addEventListener('pointerleave', handleContainerPointerLeave)
+    window.addEventListener('pointermove', handlePointerMove)
+    window.addEventListener('pointerup', handlePointerUp)
+    window.addEventListener('pointercancel', handlePointerUp)
+
     return () => {
+      destroyed = true
       cancelAnimationFrame(frameId)
       resizeObserver.disconnect()
-      globe.destroy()
-      globeRef.current = null
+      document.removeEventListener('visibilitychange', handleVisibility)
+      container.removeEventListener('pointerdown', handlePointerDown)
+      container.removeEventListener('pointermove', handleContainerPointerMove)
+      container.removeEventListener('pointerleave', handleContainerPointerLeave)
+      window.removeEventListener('pointermove', handlePointerMove)
+      window.removeEventListener('pointerup', handlePointerUp)
+      window.removeEventListener('pointercancel', handlePointerUp)
+      container.style.cursor = ''
     }
   }, [])
 
@@ -184,65 +341,38 @@ export default function EarthGlobe({
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
 
-  const handlePointerDown = (event) => {
-    pointerInteracting.current = event.clientX
-    velocityRef.current = 0
-    event.currentTarget.setPointerCapture(event.pointerId)
-  }
-
-  const handlePointerUp = (event) => {
-    pointerInteracting.current = null
-    event.currentTarget.releasePointerCapture(event.pointerId)
-  }
-
-  const handlePointerMove = (event) => {
-    if (pointerInteracting.current !== null) {
-      const delta = event.clientX - pointerInteracting.current
-      pointerInteracting.current = event.clientX
-      const rotation = delta * DRAG_SENSITIVITY
-      phiRef.current += rotation
-      velocityRef.current = rotation * 0.85
-    }
-  }
-
   return (
-    <div ref={wrapRef} className={`globe-stage relative ${className}`}>
+    <div ref={wrapRef} className={`globe-stage relative w-full ${className}`}>
       <div className="globe-glow pointer-events-none absolute inset-0 rounded-full" aria-hidden="true" />
 
       <div
-        className="globe-canvas-wrap relative mx-auto aspect-square w-full max-w-[min(92vw,920px)] touch-none select-none"
-        onPointerDown={handlePointerDown}
-        onPointerUp={handlePointerUp}
-        onPointerOut={handlePointerUp}
-        onPointerMove={handlePointerMove}
+        ref={containerRef}
+        className="globe-canvas-wrap relative mx-auto cursor-grab touch-none select-none"
+        style={{ width: GLOBE_PX, height: GLOBE_PX, maxWidth: `min(94vw, ${GLOBE_MAX_PX}px)`, maxHeight: `min(94vw, ${GLOBE_MAX_PX}px)` }}
       >
-        <canvas ref={canvasRef} className="h-full w-full" aria-hidden="true" />
+        <canvas ref={canvasRef} className="globe-canvas block h-full w-full" aria-hidden="true" />
 
         {locations.map((loc) => (
           <button
             key={loc.id}
+            ref={(node) => {
+              if (node) markerRefs.current[loc.id] = node
+              else delete markerRefs.current[loc.id]
+            }}
             type="button"
             className="globe-marker-btn"
-            style={{
-              positionAnchor: `--cobe-${loc.id}`,
-              opacity: `var(--cobe-visible-${loc.id}, 0)`,
-              transform: `translate(-50%, -50%) scale(calc(0.65 + var(--cobe-visible-${loc.id}, 0) * 0.35))`,
-              zIndex: selectedId === loc.id || hoveredId === loc.id ? 20 : 10,
-            }}
+            style={{ opacity: 0 }}
+            tabIndex={-1}
             aria-label={`${loc.country}, ${loc.city} — ${loc.eventCount} events`}
             aria-pressed={selectedId === loc.id}
-            onClick={() => onMarkerClick(loc.id)}
-            onMouseEnter={() => onMarkerHover(loc.id)}
-            onMouseLeave={() => onMarkerHover(null)}
-            onFocus={() => onMarkerHover(loc.id)}
-            onBlur={() => onMarkerHover(null)}
           >
             <span
-              className={`globe-marker-dot ${selectedId === loc.id ? 'is-active' : ''} ${hoveredId === loc.id ? 'is-hovered' : ''}`}
+              className={`globe-marker-dot ${loc.hasOngoingEvents ? 'is-ongoing' : ''} ${selectedId === loc.id ? 'is-active' : ''} ${hoveredId === loc.id ? 'is-hovered' : ''}`}
             />
             <span className="globe-marker-label">{loc.country}</span>
           </button>
         ))}
+
       </div>
 
       <p className="pointer-events-none mt-4 text-center text-[0.65rem] font-medium tracking-[0.2em] text-white/40 uppercase">

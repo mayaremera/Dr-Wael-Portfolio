@@ -96,9 +96,7 @@ function ActivityCard({ item, isUpcoming = false }) {
   return (
     <article
       tabIndex={0}
-      className={`group/card relative w-full self-start overflow-hidden rounded-sm border bg-white shadow-sm outline-none transition-shadow duration-300 hover:shadow-md focus-visible:ring-2 focus-visible:ring-brand/40 ${
-        isUpcoming ? 'border-accent/30' : 'border-brand/15'
-      }`}
+      className="group/card relative w-full self-start overflow-hidden rounded-sm border border-slate-200 bg-white shadow-sm outline-none transition-shadow duration-300 hover:shadow-md focus-visible:ring-2 focus-visible:ring-brand/40"
     >
       {isUpcoming ? (
         <div className="h-1 bg-accent" aria-hidden="true" />

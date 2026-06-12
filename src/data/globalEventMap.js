@@ -490,6 +490,10 @@ export function inferMapLocationId(location = '') {
   return hint?.id ?? 'saudi-arabia'
 }
 
+export function isOngoingEvent(event) {
+  return event.isUpcoming === true || event.date === 'Ongoing' || event.period === 'Present'
+}
+
 export function locationToAngles(lat, lng) {
   return {
     phi: Math.PI + (lng * Math.PI) / 180,
@@ -513,6 +517,7 @@ export function buildMapLocationsWithEvents(activity) {
       ...location,
       eventCount: allEvents.length,
       events: allEvents,
+      hasOngoingEvents: allEvents.some(isOngoingEvent),
     }
   })
 }
