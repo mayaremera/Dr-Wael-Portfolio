@@ -35,7 +35,7 @@ function PageHeading({ eyebrow, title, backgroundImage, imagePosition = 'center'
 
   return (
     <section className="relative overflow-hidden">
-      <div className="relative min-h-[300px] pt-36 sm:min-h-[340px] sm:pt-40">
+      <div className="relative min-h-[300px] pt-24 sm:min-h-[340px] sm:pt-28 lg:pt-36 xl:pt-40">
         <img
           src={backgroundImage}
           alt=""
@@ -58,7 +58,7 @@ function PageHeading({ eyebrow, title, backgroundImage, imagePosition = 'center'
 function ServicesPageHeading({ eyebrow, title, backgroundImage }) {
   return (
     <section className="relative overflow-hidden">
-      <div className="relative min-h-[300px] pt-36 sm:min-h-[340px] sm:pt-40">
+      <div className="relative min-h-[300px] pt-24 sm:min-h-[340px] sm:pt-28 lg:pt-36 xl:pt-40">
         <img
           src={backgroundImage}
           alt=""
@@ -282,7 +282,7 @@ function App() {
   const isHome = pathname === HOME_PATH
 
   return (
-    <div className="min-h-screen bg-surface">
+    <div className="min-h-screen bg-surface pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0">
       <Header />
       <main>
         {pageContent ?? (

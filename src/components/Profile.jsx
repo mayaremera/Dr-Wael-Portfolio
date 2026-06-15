@@ -21,27 +21,33 @@ function AffiliationHoverOverlay({ company }) {
         aria-hidden="true"
       />
 
-      <div className="pointer-events-none absolute inset-0 z-[3] flex translate-y-3 flex-col justify-end p-3.5 opacity-0 transition-all duration-500 delay-75 ease-out group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100 sm:p-4">
-        <span className="mb-2 inline-block h-0.5 w-0 origin-left bg-brand/40 transition-all duration-500 delay-150 group-hover:w-8 group-focus-within:w-8" />
-        <p className="text-[0.58rem] font-bold tracking-[0.16em] text-brand uppercase">{company.shortName}</p>
-        <p className="mt-1 font-serif text-xs leading-snug text-ink sm:text-[0.8125rem]">{company.name}</p>
-        <p className="mt-1.5 text-[0.6875rem] leading-snug text-ink-muted sm:text-xs">{company.role}</p>
+      <div className="pointer-events-none absolute inset-0 z-[3] flex translate-y-2 flex-col justify-end p-[0.55rem] opacity-0 transition-all duration-500 delay-75 ease-out group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100 lg:translate-y-3 lg:p-[1.1rem]">
+        <span className="mb-[0.41rem] inline-block h-0.5 w-0 origin-left bg-brand/40 transition-all duration-500 delay-150 group-hover:w-[1.65rem] group-focus-within:w-[1.65rem] lg:mb-[0.55rem] lg:group-hover:w-[2.2rem] lg:group-focus-within:w-[2.2rem]" />
+        <p className="text-[0.55rem] font-bold tracking-[0.14em] text-brand uppercase lg:text-[0.638rem] lg:tracking-[0.16em]">
+          {company.shortName}
+        </p>
+        <p className="mt-[0.14rem] font-serif text-[0.6875rem] leading-tight text-ink lg:mt-[0.275rem] lg:text-[0.894rem] lg:leading-snug">
+          {company.name}
+        </p>
+        <p className="mt-[0.275rem] line-clamp-4 text-[0.619rem] leading-tight text-ink-muted lg:mt-[0.4125rem] lg:line-clamp-none lg:text-[0.825rem] lg:leading-snug">
+          {company.role}
+        </p>
       </div>
     </>
   )
 }
 
-function AffiliationBadge({ logo, label }) {
+function AffiliationBadge({ logo, label, compact = false }) {
+  const imageClassName = compact
+    ? 'h-[2.68rem] w-auto max-w-[4.2rem] object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.35)] md:h-[3.06rem] md:max-w-[3.06rem] lg:h-[3.6rem] lg:max-w-[3.6rem]'
+    : 'h-[3.15rem] w-auto max-w-[4.95rem] object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.35)] lg:h-[3.6rem] lg:max-w-[3.6rem]'
+
   return (
     <div
-      className="pointer-events-none absolute right-2 bottom-2 z-[4] opacity-100 transition-opacity duration-300 group-hover:opacity-0 group-focus-within:opacity-0 sm:right-3 sm:bottom-1"
+      className="pointer-events-none absolute right-2 bottom-2 z-[4] opacity-100 transition-opacity duration-300 group-hover:opacity-0 group-focus-within:opacity-0 lg:right-3 lg:bottom-1"
       title={label}
     >
-      <img
-        src={logo}
-        alt={label}
-        className="h-[3.15rem] w-auto max-w-[4.95rem] object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.35)] sm:h-[3.6rem] sm:max-w-[3.6rem]"
-      />
+      <img src={logo} alt={label} className={imageClassName} />
     </div>
   )
 }
@@ -52,7 +58,7 @@ function AffiliationTile({ company }) {
 
   return (
     <article
-      className="group relative h-32 overflow-hidden rounded-sm border border-slate-200/80 bg-white shadow-sm transition-[box-shadow,border-color,transform] duration-300 hover:-translate-y-0.5 hover:border-brand/20 hover:shadow-md hover:shadow-brand/10 focus-within:-translate-y-0.5 focus-within:border-brand/20 focus-within:shadow-md focus-within:shadow-brand/10 sm:h-36"
+      className="group relative h-32 overflow-hidden rounded-sm border border-slate-200/80 bg-white shadow-sm transition-[box-shadow,border-color,transform] duration-300 hover:-translate-y-0.5 hover:border-brand/20 hover:shadow-md hover:shadow-brand/10 focus-within:-translate-y-0.5 focus-within:border-brand/20 focus-within:shadow-md focus-within:shadow-brand/10 lg:h-36"
       tabIndex={0}
     >
       <div className="relative h-full w-full overflow-hidden">
@@ -85,7 +91,11 @@ function AffiliationTile({ company }) {
         )}
 
         {company.badgeLogo ? (
-          <AffiliationBadge logo={company.badgeLogo} label={company.badgeLabel} />
+          <AffiliationBadge
+            logo={company.badgeLogo}
+            label={company.badgeLabel}
+            compact={company.id === 'cambridge'}
+          />
         ) : null}
 
         <AffiliationHoverOverlay company={company} />
@@ -100,19 +110,27 @@ function AffiliationGrid({ companies }) {
   const rowTwo = companies.slice(midpoint)
 
   return (
-    <div className="space-y-3 sm:space-y-4">
-      <div className={`grid grid-cols-2 gap-3 sm:gap-4 ${rowOne.length >= 4 ? 'sm:grid-cols-4' : 'sm:grid-cols-3'}`}>
-        {rowOne.map((company) => (
+    <>
+      <div className="grid grid-cols-2 gap-3 md:gap-3.5 lg:hidden">
+        {companies.map((company) => (
           <AffiliationTile key={company.id} company={company} />
         ))}
       </div>
 
-      <div className={`grid grid-cols-2 gap-3 sm:gap-4 ${rowTwo.length >= 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2'}`}>
-        {rowTwo.map((company) => (
-          <AffiliationTile key={company.id} company={company} />
-        ))}
+      <div className="hidden space-y-4 lg:block">
+        <div className={`grid gap-4 ${rowOne.length >= 4 ? 'grid-cols-4' : 'grid-cols-3'}`}>
+          {rowOne.map((company) => (
+            <AffiliationTile key={company.id} company={company} />
+          ))}
+        </div>
+
+        <div className={`grid gap-4 ${rowTwo.length >= 3 ? 'grid-cols-3' : 'grid-cols-2'}`}>
+          {rowTwo.map((company) => (
+            <AffiliationTile key={company.id} company={company} />
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   )
 }
 

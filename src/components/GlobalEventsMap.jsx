@@ -177,7 +177,7 @@ export default function GlobalEventsMap() {
         aria-hidden="true"
       />
 
-      <div className="relative z-10 flex min-h-screen flex-col px-4 pt-36 pb-8 sm:px-6 sm:pt-40 lg:px-8">
+      <div className="relative z-10 flex min-h-screen flex-col px-4 pt-24 pb-8 sm:px-6 sm:pt-28 lg:px-8 lg:pt-36 xl:pt-40">
         <header className="mx-auto max-w-3xl text-center">
           <p className="text-xs font-semibold tracking-[0.28em] text-accent uppercase">{globalPresenceMap.label}</p>
           <h2 id="global-presence-heading" className="mt-4 font-serif text-4xl leading-tight text-white md:text-5xl lg:text-6xl">

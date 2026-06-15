@@ -5,7 +5,7 @@ export default function GalleryPageHeading({ eyebrow, title, galleryImages }) {
 
   return (
     <section className="relative overflow-hidden bg-brand-muted">
-      <div className="relative min-h-[300px] pt-36 sm:min-h-[340px] sm:pt-40">
+      <div className="relative min-h-[300px] pt-24 sm:min-h-[340px] sm:pt-28 lg:pt-36 xl:pt-40">
         <div className="absolute inset-0 grid grid-cols-3 bg-brand-muted">
           {images.map((src) => (
             <img
