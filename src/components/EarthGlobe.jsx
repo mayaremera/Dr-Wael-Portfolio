@@ -79,6 +79,7 @@ export default function EarthGlobe({
   hoveredId,
   onMarkerClick,
   onMarkerHover,
+  onActiveAnchorChange,
   className = '',
 }) {
   const canvasRef = useRef(null)
@@ -99,12 +100,14 @@ export default function EarthGlobe({
   const hoveredIdRef = useRef(hoveredId)
   const onMarkerHoverRef = useRef(onMarkerHover)
   const onMarkerClickRef = useRef(onMarkerClick)
+  const onActiveAnchorChangeRef = useRef(onActiveAnchorChange)
 
   locationsRef.current = locations
   selectedIdRef.current = selectedId
   hoveredIdRef.current = hoveredId
   onMarkerHoverRef.current = onMarkerHover
   onMarkerClickRef.current = onMarkerClick
+  onActiveAnchorChangeRef.current = onActiveAnchorChange
 
   useEffect(() => {
     let cancelled = false
@@ -144,7 +147,19 @@ export default function EarthGlobe({
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
     }
 
+    const getMarkerClientAnchor = (id) => {
+      const layout = markerPositionsRef.current.find((item) => item.id === id)
+      if (!layout || !containerRef.current) return null
+
+      const rect = containerRef.current.getBoundingClientRect()
+      return {
+        x: rect.left + (layout.displayX ?? layout.x),
+        y: rect.top + (layout.displayY ?? layout.y),
+      }
+    }
+
     const setHover = (id) => {
+      if (selectedIdRef.current !== null) return
       if (hoveredIdRef.current === id) return
       hoveredIdRef.current = id
       onMarkerHoverRef.current(id)
@@ -228,6 +243,9 @@ export default function EarthGlobe({
       drawGlobe(ctx, size, landPointsRef.current, phiRef.current, thetaRef.current)
       updateMarkers(phiRef.current, thetaRef.current, size)
 
+      const activeId = selectedIdRef.current ?? hoveredIdRef.current
+      onActiveAnchorChangeRef.current?.(activeId ? getMarkerClientAnchor(activeId) : null)
+
       frameId = requestAnimationFrame(tick)
     }
 
@@ -279,6 +297,11 @@ export default function EarthGlobe({
         }
       }
 
+      if (selectedIdRef.current !== null) {
+        container.style.cursor = 'pointer'
+        return
+      }
+
       const { x, y } = localPointer(event)
       updatePointerTarget(x, y)
     }
@@ -291,6 +314,7 @@ export default function EarthGlobe({
 
     const handleContainerPointerLeave = () => {
       if (pointerInteracting.current !== null) return
+      if (selectedIdRef.current !== null) return
       setHover(null)
       container.style.cursor = 'grab'
     }

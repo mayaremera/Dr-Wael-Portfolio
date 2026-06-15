@@ -432,6 +432,19 @@ body {
   .animate-globe-panel-in {
     animation-name: globe-panel-in-desktop;
   }
+
+  .globe-panel-anchored.animate-globe-panel-in {
+    animation-name: globe-panel-in-anchored;
+  }
+}
+
+@keyframes globe-panel-in-anchored {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes globe-preview-in {

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { useDrWaelActivity } from '../hooks/useDrWaelActivity'
 import { buildMapLocationsWithEvents, globalPresenceMap } from '../data/globalEventMap'
 import EarthGlobe from './EarthGlobe'
@@ -92,11 +92,63 @@ function EventTimelineCard({ event, index, total }) {
   )
 }
 
-function EventsPanel({ location, isPinned, onClose }) {
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value))
+}
+
+function EventsPanel({ location, isPinned, onClose, anchor }) {
+  const panelRef = useRef(null)
+  const [desktopPosition, setDesktopPosition] = useState(null)
+
+  useLayoutEffect(() => {
+    if (!location || !anchor || !panelRef.current) {
+      setDesktopPosition(null)
+      return
+    }
+
+    if (!window.matchMedia('(min-width: 1024px)').matches) {
+      setDesktopPosition(null)
+      return
+    }
+
+    const panel = panelRef.current
+    const parent = panel.offsetParent
+    if (!parent) return
+
+    const panelWidth = panel.offsetWidth
+    const panelHeight = panel.offsetHeight
+    const parentWidth = parent.clientWidth
+    const parentHeight = parent.clientHeight
+    const gap = 14
+
+    let left = anchor.x + gap
+    if (left + panelWidth > parentWidth - 12) {
+      left = anchor.x - panelWidth - gap
+    }
+    left = clamp(left, 12, parentWidth - panelWidth - 12)
+    const top = clamp(anchor.y, panelHeight / 2 + 12, parentHeight - panelHeight / 2 - 12)
+
+    setDesktopPosition({ left, top })
+  }, [location, anchor, location?.id])
+
   if (!location) return null
 
+  const anchoredDesktopStyle = desktopPosition
+    ? {
+        left: desktopPosition.left,
+        top: desktopPosition.top,
+        right: 'auto',
+        bottom: 'auto',
+        transform: 'translateY(-50%)',
+      }
+    : undefined
+
   return (
-    <div className="animate-globe-panel-in pointer-events-auto absolute inset-x-4 bottom-4 z-30 mx-auto max-h-[55vh] max-w-lg overflow-hidden rounded-sm border border-white/10 bg-[#0a1520]/90 shadow-2xl backdrop-blur-xl lg:inset-x-auto lg:top-1/2 lg:right-8 lg:bottom-auto lg:w-[380px] lg:max-h-[min(72vh,640px)]">
+    <div
+      ref={panelRef}
+      className={`animate-globe-panel-in pointer-events-auto absolute inset-x-4 bottom-4 z-30 mx-auto max-h-[55vh] max-w-lg overflow-hidden rounded-sm border border-white/10 bg-[#0a1520]/90 shadow-2xl backdrop-blur-xl lg:inset-x-auto lg:bottom-auto lg:w-[380px] lg:max-h-[min(72vh,640px)] ${desktopPosition ? 'globe-panel-anchored' : ''}`}
+      style={anchoredDesktopStyle}
+    >
       <div className="relative border-b border-white/10 bg-linear-to-r from-brand/20 to-transparent px-5 py-5">
         {isPinned ? (
           <button
@@ -144,19 +196,41 @@ function EventsPanel({ location, isPinned, onClose }) {
 
 export default function GlobalEventsMap() {
   const activity = useDrWaelActivity()
+  const mapAreaRef = useRef(null)
   const [selectedId, setSelectedId] = useState(null)
   const [hoveredId, setHoveredId] = useState(null)
+  const [anchor, setAnchor] = useState(null)
 
   const locations = useMemo(() => buildMapLocationsWithEvents(activity), [activity])
 
   const selectedLocation = locations.find((loc) => loc.id === selectedId) ?? null
   const hoveredLocation = locations.find((loc) => loc.id === hoveredId) ?? null
-  const activeLocation = hoveredLocation ?? selectedLocation
+  const activeLocation = selectedLocation ?? hoveredLocation
   const totalEvents = locations.reduce((sum, loc) => sum + loc.eventCount, 0)
   const countryCount = locations.length
 
   const handleSelect = useCallback((id) => {
     setSelectedId((current) => (current === id ? null : id))
+    setHoveredId(null)
+  }, [])
+
+  const handleActiveAnchorChange = useCallback((clientPoint) => {
+    if (!clientPoint || !mapAreaRef.current) {
+      setAnchor(null)
+      return
+    }
+
+    const rect = mapAreaRef.current.getBoundingClientRect()
+    const next = {
+      x: clientPoint.x - rect.left,
+      y: clientPoint.y - rect.top,
+    }
+
+    setAnchor((current) => {
+      if (!current) return next
+      if (Math.hypot(current.x - next.x, current.y - next.y) < 0.75) return current
+      return next
+    })
   }, [])
 
   return (
@@ -203,20 +277,25 @@ export default function GlobalEventsMap() {
           </div>
         </header>
 
-        <div className="relative mx-auto mt-6 w-full max-w-[1716px] shrink-0 pb-8 lg:mt-2">
+        <div ref={mapAreaRef} className="relative mx-auto mt-6 w-full max-w-[1716px] shrink-0 pb-8 lg:mt-2">
           <EarthGlobe
             locations={locations}
             selectedId={selectedId}
             hoveredId={hoveredId}
             onMarkerClick={handleSelect}
             onMarkerHover={setHoveredId}
+            onActiveAnchorChange={handleActiveAnchorChange}
             className="w-full"
           />
 
           <EventsPanel
             location={activeLocation}
             isPinned={Boolean(selectedLocation)}
-            onClose={() => setSelectedId(null)}
+            onClose={() => {
+              setSelectedId(null)
+              setHoveredId(null)
+            }}
+            anchor={anchor}
           />
         </div>
       </div>
