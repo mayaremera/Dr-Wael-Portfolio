@@ -10,9 +10,9 @@ const AUTO_ROTATE_SPEED = 0.0014
 const DRAG_SENSITIVITY = 0.0028
 const MOMENTUM_DECAY = 0.965
 const KEY_ROTATE_STEP = 0.05
-const GLOBE_PX = 780
-const GLOBE_MAX_PX = 880
-const HOVER_RADIUS = 40
+const GLOBE_PX = 1217
+const GLOBE_MAX_PX = 1373
+const HOVER_RADIUS = 62
 const DRAG_THRESHOLD = 6
 
 const BRAND_SOFT = 'rgba(45, 106, 122, 0.55)'
@@ -348,7 +348,7 @@ export default function EarthGlobe({
       <div
         ref={containerRef}
         className="globe-canvas-wrap relative mx-auto cursor-grab touch-none select-none"
-        style={{ width: GLOBE_PX, height: GLOBE_PX, maxWidth: `min(94vw, ${GLOBE_MAX_PX}px)`, maxHeight: `min(94vw, ${GLOBE_MAX_PX}px)` }}
+        style={{ width: GLOBE_PX, height: GLOBE_PX, maxWidth: `min(99vw, ${GLOBE_MAX_PX}px)`, maxHeight: `min(99vw, ${GLOBE_MAX_PX}px)` }}
       >
         <canvas ref={canvasRef} className="globe-canvas block h-full w-full" aria-hidden="true" />
 

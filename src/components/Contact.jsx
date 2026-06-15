@@ -43,14 +43,11 @@ function ClockIcon() {
   )
 }
 
-function GmailIcon() {
+function MailIcon() {
   return (
-    <svg viewBox="0 0 48 48" className="h-4 w-4" aria-hidden="true">
-      <path fill="#4caf50" d="M45,16.18l-5,4.34V27.6l5,4.34V16.18z" />
-      <path fill="#1e88e5" d="M27,42.18V31.49L15,42.18H27z" />
-      <path fill="#e53935" d="M27,8.07V16.18L45,27.06V16.18L27,8.07z" />
-      <path fill="#c62828" d="M27,8.07L9,16.18v10.88l18-10.88V8.07z" />
-      <path fill="#fbc02d" d="M9,27.06l18,10.88V31.49L9,25.49V27.06z" />
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3 7l9 6 9-6" />
     </svg>
   )
 }
@@ -198,7 +195,7 @@ export default function Contact() {
 
           <div className="flex flex-col gap-4 lg:col-span-3">
             <p className="text-xs font-semibold tracking-[0.18em] text-brand uppercase">Direct Contact</p>
-            <ContactLink href={`mailto:${directContact.email}`} label={directContact.email} icon={<GmailIcon />} />
+            <ContactLink href={`mailto:${directContact.email}`} label={directContact.email} icon={<MailIcon />} />
             <ContactLink
               href={`tel:${directContact.phone.replace(/\s/g, '')}`}
               label={directContact.phone}

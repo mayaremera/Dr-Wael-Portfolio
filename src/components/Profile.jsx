@@ -34,15 +34,14 @@ function AffiliationHoverOverlay({ company }) {
 function AffiliationBadge({ logo, label }) {
   return (
     <div
-      className="pointer-events-none absolute right-2 bottom-2 z-[4] opacity-100 transition-opacity duration-300 group-hover:opacity-0 group-focus-within:opacity-0 sm:right-2.5 sm:bottom-2.5"
+      className="pointer-events-none absolute right-2 bottom-2 z-[4] opacity-100 transition-opacity duration-300 group-hover:opacity-0 group-focus-within:opacity-0 sm:right-3 sm:bottom-1"
       title={label}
     >
-      <div className="flex items-center gap-1.5 rounded-md border border-slate-200/90 bg-white/95 px-2 py-1 shadow-md backdrop-blur-sm">
-        <img src={logo} alt="" className="h-5 w-5 shrink-0 object-contain sm:h-6 sm:w-6" />
-        <span className="hidden max-w-[5.5rem] truncate text-[0.55rem] font-semibold leading-tight text-ink sm:block sm:max-w-[6.5rem] sm:text-[0.6rem]">
-          {label}
-        </span>
-      </div>
+      <img
+        src={logo}
+        alt={label}
+        className="h-[3.15rem] w-auto max-w-[4.95rem] object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.35)] sm:h-[3.6rem] sm:max-w-[3.6rem]"
+      />
     </div>
   )
 }
@@ -64,7 +63,7 @@ function AffiliationTile({ company }) {
                 src={company.logo}
                 alt={company.name}
                 onError={() => setLogoFailed(true)}
-                className="h-full w-full object-cover scale-[0.97] transition-all duration-500 ease-out group-hover:scale-100 group-hover:opacity-25 group-focus-within:scale-100 group-focus-within:opacity-25"
+                className="h-full w-full object-cover transition-all duration-500 ease-out group-hover:opacity-25 group-focus-within:opacity-25"
               />
             </div>
           ) : (

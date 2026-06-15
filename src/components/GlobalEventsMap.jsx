@@ -203,7 +203,7 @@ export default function GlobalEventsMap() {
           </div>
         </header>
 
-        <div className="relative mx-auto mt-6 w-full max-w-[1100px] shrink-0 pb-8 lg:mt-2">
+        <div className="relative mx-auto mt-6 w-full max-w-[1716px] shrink-0 pb-8 lg:mt-2">
           <EarthGlobe
             locations={locations}
             selectedId={selectedId}

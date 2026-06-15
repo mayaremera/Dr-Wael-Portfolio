@@ -516,6 +516,7 @@ export const trustedCompanies = {
       logo: '/images/trusted8banner.png',
       badgeLogo: '/images/trusted8.png',
       badgeLabel: 'University of Cambridge',
+      logoFit: 'cover',
     },
   ],
 }
