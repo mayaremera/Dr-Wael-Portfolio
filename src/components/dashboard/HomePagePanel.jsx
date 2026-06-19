@@ -4,6 +4,7 @@ import MediaDropzone from './MediaDropzone'
 import {
   createContentId,
   emptyAffiliation,
+  emptyCredentialWheelItem,
   getDefaultHomeContent,
   loadHomeContentRemote,
   resetHomeContent,
@@ -158,10 +159,56 @@ function AffiliationPreview({ item }) {
   )
 }
 
-function extractYoutubeId(url) {
-  if (!url) return ''
-  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([^?&/]+)/)
-  return match?.[1] || url
+function CredentialWheelItemPreview({ item }) {
+  return (
+    <div>
+      <p className="text-sm font-semibold text-ink">{item.short || 'Untitled point'}</p>
+      <p className="mt-1 text-xs font-medium text-brand">{item.title}</p>
+      <p className="mt-1 line-clamp-2 text-xs text-ink-muted">{item.detail}</p>
+    </div>
+  )
+}
+
+function CredentialWheelItemEditor({ initialItem, onSave, onCancel }) {
+  const [item, setItem] = useState({ ...emptyCredentialWheelItem, ...initialItem })
+  const update = (field, value) => setItem((current) => ({ ...current, [field]: value }))
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault()
+        onSave({ ...item, id: item.id || createContentId(item.short || item.title) })
+      }}
+      className="rounded-xl border border-brand/20 bg-brand-muted/30 p-5"
+    >
+      <h3 className="font-serif text-xl text-ink">{item.id ? 'Edit credential point' : 'New credential point'}</h3>
+      <p className="mt-1 text-sm text-ink-muted">
+        Ring label is the short text on the wheel. Title and detail appear in the center when selected.
+      </p>
+      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        <div>
+          <label className={labelClassName}>Ring label</label>
+          <input className={fieldClassName} value={item.short} onChange={(e) => update('short', e.target.value)} placeholder="30+ Years" required />
+        </div>
+        <div>
+          <label className={labelClassName}>Center title</label>
+          <input className={fieldClassName} value={item.title} onChange={(e) => update('title', e.target.value)} placeholder="30+ Years" required />
+        </div>
+        <div className="sm:col-span-2">
+          <label className={labelClassName}>Detail text</label>
+          <textarea className={`${fieldClassName} min-h-24 resize-y`} value={item.detail} onChange={(e) => update('detail', e.target.value)} required />
+        </div>
+      </div>
+      <div className="mt-4 flex gap-3">
+        <button type="submit" className="rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase">
+          Save
+        </button>
+        <button type="button" onClick={onCancel} className="rounded-lg border border-slate-200 px-5 py-2.5 text-xs font-semibold tracking-wide text-ink-muted uppercase">
+          Cancel
+        </button>
+      </div>
+    </form>
+  )
 }
 
 export default function HomePagePanel() {
@@ -170,6 +217,7 @@ export default function HomePagePanel() {
     loadHomeContentRemote,
   )
   const [editingAffiliationId, setEditingAffiliationId] = useState(null)
+  const [editingCredentialWheelItemId, setEditingCredentialWheelItemId] = useState(null)
   const [savedMessage, setSavedMessage] = useState('')
   const [saveError, setSaveError] = useState('')
 
@@ -206,17 +254,17 @@ export default function HomePagePanel() {
     }))
   }
 
-  const updateWatchVideo = (field, value) => {
-    setContent((current) => ({
-      ...current,
-      watchVideo: { ...current.watchVideo, [field]: value },
-    }))
-  }
-
   const updatePromoVideo = (field, value) => {
     setContent((current) => ({
       ...current,
       promoVideo: { ...current.promoVideo, [field]: value },
+    }))
+  }
+
+  const updateCredentialWheel = (field, value) => {
+    setContent((current) => ({
+      ...current,
+      credentialWheel: { ...current.credentialWheel, [field]: value },
     }))
   }
 
@@ -251,15 +299,35 @@ export default function HomePagePanel() {
     if (editingAffiliationId === id) setEditingAffiliationId(null)
   }
 
-  const handleYoutubeUrlChange = (url) => {
-    setContent((current) => ({
-      ...current,
-      watchVideo: {
-        ...current.watchVideo,
-        youtubeUrl: url,
-        youtubeId: extractYoutubeId(url),
+  const saveCredentialWheelItem = (item) => {
+    const items = content.credentialWheel?.items ?? []
+    const exists = items.some((entry) => entry.id === item.id)
+    const nextItems = exists
+      ? items.map((entry) => (entry.id === item.id ? item : entry))
+      : [item, ...items]
+
+    persist(
+      {
+        ...content,
+        credentialWheel: { ...content.credentialWheel, items: nextItems },
       },
-    }))
+      exists ? 'Credential point updated.' : 'Credential point created.',
+    )
+    setEditingCredentialWheelItemId(null)
+  }
+
+  const deleteCredentialWheelItem = (id) => {
+    persist(
+      {
+        ...content,
+        credentialWheel: {
+          ...content.credentialWheel,
+          items: (content.credentialWheel?.items ?? []).filter((entry) => entry.id !== id),
+        },
+      },
+      'Credential point deleted.',
+    )
+    if (editingCredentialWheelItemId === id) setEditingCredentialWheelItemId(null)
   }
 
   const saveAll = () => persist(content)
@@ -269,6 +337,7 @@ export default function HomePagePanel() {
     resetHomeContent()
     setContent(getDefaultHomeContent())
     setEditingAffiliationId(null)
+    setEditingCredentialWheelItemId(null)
     setSavedMessage('Reset to default content.')
     window.setTimeout(() => setSavedMessage(''), 2500)
   }
@@ -324,6 +393,52 @@ export default function HomePagePanel() {
             label="Secondary button"
             cta={content.hero.secondaryCta}
             onChange={(cta) => updateHero('secondaryCta', cta)}
+          />
+        </div>
+      </section>
+
+      <section className="mt-6 rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
+        <h2 className="font-serif text-xl text-ink">Credentials wheel</h2>
+        <p className="mt-1 text-sm text-ink-muted">
+          The interactive compass in the About section on the home page. Each point is a credential highlight on the ring.
+        </p>
+        <div className="mt-4">
+          <label className={labelClassName}>Tagline</label>
+          <input
+            className={fieldClassName}
+            value={content.credentialWheel?.tagline ?? ''}
+            onChange={(e) => updateCredentialWheel('tagline', e.target.value)}
+          />
+        </div>
+        <div className="mt-6">
+          <DashboardItemList
+            title="Wheel points"
+            countLabel={`${content.credentialWheel?.items?.length ?? 0} point${content.credentialWheel?.items?.length === 1 ? '' : 's'}`}
+            items={content.credentialWheel?.items ?? []}
+            editingId={editingCredentialWheelItemId}
+            onAdd={() => setEditingCredentialWheelItemId('new')}
+            onEdit={setEditingCredentialWheelItemId}
+            onDelete={deleteCredentialWheelItem}
+            getItemId={(item) => item.id}
+            addLabel="Add point"
+            emptyMessage="No credential points yet."
+            renderPreview={(item) => <CredentialWheelItemPreview item={item} />}
+            renderEditor={(item) =>
+              item === 'new' ? (
+                <CredentialWheelItemEditor
+                  initialItem={emptyCredentialWheelItem}
+                  onSave={saveCredentialWheelItem}
+                  onCancel={() => setEditingCredentialWheelItemId(null)}
+                />
+              ) : (
+                <CredentialWheelItemEditor
+                  key={item.id}
+                  initialItem={item}
+                  onSave={saveCredentialWheelItem}
+                  onCancel={() => setEditingCredentialWheelItemId(null)}
+                />
+              )
+            }
           />
         </div>
       </section>
@@ -449,41 +564,6 @@ export default function HomePagePanel() {
             label="Secondary button"
             cta={content.promoVideo.secondary}
             onChange={(cta) => updatePromoVideo('secondary', cta)}
-          />
-        </div>
-      </section>
-
-      <section className="mt-6 rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
-        <h2 className="font-serif text-xl text-ink">Watch video section</h2>
-        <p className="mt-1 text-sm text-ink-muted">YouTube video with poster image and description (shown on the video gallery page).</p>
-        <div className="mt-4 grid gap-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <label className={labelClassName}>YouTube URL</label>
-              <input className={fieldClassName} value={content.watchVideo.youtubeUrl} onChange={(e) => handleYoutubeUrlChange(e.target.value)} />
-            </div>
-            <div>
-              <label className={labelClassName}>YouTube video ID</label>
-              <input className={fieldClassName} value={content.watchVideo.youtubeId} onChange={(e) => updateWatchVideo('youtubeId', e.target.value)} />
-            </div>
-          </div>
-          <div>
-            <label className={labelClassName}>Poster image</label>
-            <MediaDropzone
-              image={content.watchVideo.poster}
-              video=""
-              onChange={({ image }) => updateWatchVideo('poster', image)}
-              onClear={() => updateWatchVideo('poster', '')}
-            />
-          </div>
-          <div>
-            <label className={labelClassName}>Video title</label>
-            <input className={fieldClassName} value={content.watchVideo.title} onChange={(e) => updateWatchVideo('title', e.target.value)} />
-          </div>
-          <StringListEditor
-            label="Description paragraphs"
-            items={content.watchVideo.paragraphs}
-            onChange={(paragraphs) => updateWatchVideo('paragraphs', paragraphs)}
           />
         </div>
       </section>

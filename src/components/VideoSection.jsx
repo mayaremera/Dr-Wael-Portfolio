@@ -1,10 +1,9 @@
 import { useState } from 'react'
-import { useHomeContent } from '../hooks/useHomeContent'
+import { video } from '../data/content'
 
 export default function VideoSection({ variant = 'default' }) {
-  const { watchVideo } = useHomeContent()
   const [playing, setPlaying] = useState(false)
-  const embedUrl = `https://www.youtube.com/embed/${watchVideo.youtubeId}?rel=0&autoplay=1`
+  const embedUrl = `https://www.youtube.com/embed/${video.youtubeId}?rel=0&autoplay=1`
   const isLight = variant === 'light'
 
   return (
@@ -32,11 +31,11 @@ export default function VideoSection({ variant = 'default' }) {
           <div className="order-2 flex flex-col justify-center lg:order-1">
             <p className="text-xs font-semibold tracking-[0.22em] text-brand uppercase">Watch</p>
             <h2 className="mt-3 font-serif text-3xl leading-tight text-ink md:text-4xl lg:text-[2.75rem] xl:text-[3.1rem]">
-              {watchVideo.title}
+              {video.title}
             </h2>
 
             <div className="mt-8 space-y-4">
-              {watchVideo.paragraphs.map((paragraph) => (
+              {video.paragraphs.map((paragraph) => (
                 <p
                   key={paragraph}
                   className="text-base leading-relaxed text-ink-muted md:text-lg md:leading-relaxed"
@@ -52,7 +51,7 @@ export default function VideoSection({ variant = 'default' }) {
               {playing ? (
                 <iframe
                   src={embedUrl}
-                  title={watchVideo.title}
+                  title={video.title}
                   className="absolute inset-0 h-full w-full border-0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   allowFullScreen
@@ -60,7 +59,7 @@ export default function VideoSection({ variant = 'default' }) {
               ) : (
                 <div className="group/poster absolute inset-0">
                   <img
-                    src={watchVideo.poster}
+                    src={video.poster}
                     alt=""
                     className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover/poster:scale-[1.03]"
                   />
@@ -73,7 +72,7 @@ export default function VideoSection({ variant = 'default' }) {
                     type="button"
                     onClick={() => setPlaying(true)}
                     className="absolute inset-0 flex items-center justify-center"
-                    aria-label={`Play video: ${watchVideo.title}`}
+                    aria-label={`Play video: ${video.title}`}
                   >
                     <span className="relative grid h-12 w-12 place-items-center md:h-14 md:w-14">
                       <span

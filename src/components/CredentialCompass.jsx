@@ -1,56 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-
-const COMPASS_TAGLINE = 'A Career Dedicated to Communication, Education, and Impact'
-
-const COMPASS_ITEMS = [
-  {
-    short: '30+ Years',
-    title: '30+ Years',
-    detail: 'Over three decades of dedicated experience in Speech-Language Pathology.',
-  },
-  {
-    short: 'ASHA Fellow',
-    title: 'F-ASHA',
-    detail:
-      'ASHA Fellow — one of the highest honors awarded by the American Speech-Language-Hearing Association.',
-  },
-  {
-    short: '40K+ Sessions',
-    title: '40,000+ Sessions',
-    detail: 'Speech and language therapy sessions delivered across diverse clinical settings.',
-  },
-  {
-    short: '3K+ Evals',
-    title: '3,000+ Evaluations',
-    detail: 'Comprehensive diagnostic evaluations completed for children and families.',
-  },
-  {
-    short: '50+ Nations',
-    title: '50+ Nationalities',
-    detail: 'Served children and families representing more than fifty nationalities worldwide.',
-  },
-  {
-    short: 'Professor',
-    title: 'Clinical Educator',
-    detail:
-      'Associate Professor and clinical educator in graduate Speech-Language Pathology programs.',
-  },
-  {
-    short: 'SIG Editor',
-    title: 'SIG 17 Editor',
-    detail: 'Editor of Perspectives of the ASHA Special Interest Groups (SIG 17).',
-  },
-  {
-    short: 'Ambassador',
-    title: 'ASHA Ambassador',
-    detail: 'ASHA International Ambassador advancing global communication sciences.',
-  },
-  {
-    short: 'Global Mentor',
-    title: 'Speaker & Mentor',
-    detail: 'International speaker, consultant, and professional mentor to clinicians worldwide.',
-  },
-]
+import { useHomeContent } from '../hooks/useHomeContent'
 
 function CompassRose() {
   return (
@@ -71,17 +20,24 @@ function CompassRose() {
 }
 
 export default function CredentialCompass() {
+  const { credentialWheel } = useHomeContent()
+  const items = credentialWheel?.items ?? []
+  const tagline = credentialWheel?.tagline ?? ''
+
   const rootRef = useRef(null)
   const [activeIndex, setActiveIndex] = useState(0)
   const [previewIndex, setPreviewIndex] = useState(null)
   const lastStepRef = useRef(0)
 
-  const displayIndex = previewIndex ?? activeIndex
-  const displayItem = COMPASS_ITEMS[displayIndex]
+  useEffect(() => {
+    if (activeIndex >= items.length && items.length > 0) {
+      setActiveIndex(items.length - 1)
+    }
+  }, [activeIndex, items.length])
 
   useEffect(() => {
     const root = rootRef.current
-    if (!root) return
+    if (!root || items.length === 0) return
 
     const updateFromScroll = () => {
       const rect = root.getBoundingClientRect()
@@ -93,10 +49,7 @@ export default function CredentialCompass() {
       const scrollEnd = -sectionHeight * 0.35
       const range = scrollStart - scrollEnd
       const progress = Math.min(1, Math.max(0, (scrollStart - sectionTop) / range))
-      const step = Math.min(
-        COMPASS_ITEMS.length - 1,
-        Math.floor(progress * COMPASS_ITEMS.length),
-      )
+      const step = Math.min(items.length - 1, Math.floor(progress * items.length))
 
       if (step !== lastStepRef.current) {
         lastStepRef.current = step
@@ -112,9 +65,15 @@ export default function CredentialCompass() {
       window.removeEventListener('scroll', updateFromScroll)
       window.removeEventListener('resize', updateFromScroll)
     }
-  }, [])
+  }, [items.length])
 
-  const ringRotation = -(activeIndex * (360 / COMPASS_ITEMS.length))
+  if (items.length === 0) return null
+
+  const safeActiveIndex = Math.min(activeIndex, items.length - 1)
+  const displayIndex = previewIndex ?? safeActiveIndex
+  const displayItem = items[displayIndex] ?? items[0]
+
+  const ringRotation = -(safeActiveIndex * (360 / items.length))
 
   const selectItem = (index) => {
     lastStepRef.current = index
@@ -130,9 +89,11 @@ export default function CredentialCompass() {
       <p className="mb-1 text-center text-[0.65rem] font-semibold tracking-[0.2em] text-brand uppercase lg:text-left">
         Credentials
       </p>
-      <p className="mb-4 max-w-[260px] text-center text-[0.58rem] leading-snug text-ink-muted lg:max-w-none lg:text-left">
-        {COMPASS_TAGLINE}
-      </p>
+      {tagline ? (
+        <p className="mb-4 max-w-[260px] text-center text-[0.58rem] leading-snug text-ink-muted lg:max-w-none lg:text-left">
+          {tagline}
+        </p>
+      ) : null}
 
       <div className="relative aspect-square w-full max-w-[280px]">
         <div className="absolute inset-0 text-brand/80">
@@ -143,15 +104,15 @@ export default function CredentialCompass() {
           className="absolute inset-0 transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
           style={{ transform: `rotate(${ringRotation}deg)` }}
         >
-          {COMPASS_ITEMS.map((item, index) => {
-            const angle = (index / COMPASS_ITEMS.length) * 360 - 90
-            const isActive = index === activeIndex
+          {items.map((item, index) => {
+            const angle = (index / items.length) * 360 - 90
+            const isActive = index === safeActiveIndex
             const isPreview = index === previewIndex
             const isHighlighted = isActive || isPreview
 
             return (
               <div
-                key={item.short}
+                key={item.id || item.short}
                 className="absolute left-1/2 top-1/2 h-0 w-0"
                 style={{ transform: `rotate(${angle}deg) translateY(-118px)` }}
               >
@@ -195,15 +156,15 @@ export default function CredentialCompass() {
       </div>
 
       <div className="mt-5 flex max-w-[240px] flex-wrap items-center justify-center gap-1.5 sm:max-w-none">
-        {COMPASS_ITEMS.map((item, index) => (
+        {items.map((item, index) => (
           <button
-            key={item.short}
+            key={item.id || item.short}
             type="button"
             aria-label={`Show ${item.short}`}
-            aria-current={index === activeIndex ? 'true' : undefined}
+            aria-current={index === safeActiveIndex ? 'true' : undefined}
             onClick={() => selectItem(index)}
             className={`h-1.5 rounded-full transition-all duration-300 ${
-              index === activeIndex ? 'w-4 bg-brand' : 'w-1.5 bg-brand/20 hover:bg-brand/40'
+              index === safeActiveIndex ? 'w-4 bg-brand' : 'w-1.5 bg-brand/20 hover:bg-brand/40'
             }`}
           />
         ))}
