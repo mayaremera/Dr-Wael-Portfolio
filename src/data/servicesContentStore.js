@@ -92,7 +92,7 @@ export function createContentId(title = 'item') {
   return `${slug || 'item'}-${Date.now()}`
 }
 
-export const FILTER_GROUPS = ['Neurodevelopmental', 'Language', 'Speech', 'Apraxia', 'Fluency']
+export const FILTER_GROUPS = ['Neurodevelopmental', 'Learning', 'Developmental', 'Communication']
 
 export const emptyTherapyConcept = {
   id: '',

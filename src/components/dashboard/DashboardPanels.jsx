@@ -1,6 +1,7 @@
 import AboutMePanel from './AboutMePanel'
 import ContactPanel from './ContactPanel'
 import GalleryPanel from './GalleryPanel'
+import HomePagePanel from './HomePagePanel'
 import InTheFieldPanel from './InTheFieldPanel'
 import ServicesPanel from './ServicesPanel'
 import SettingsPanel from './SettingsPanel'
@@ -39,6 +40,7 @@ function PlaceholderCard({ title, items }) {
 
 const panels = {
   settings: SettingsPanel,
+  home: HomePagePanel,
   'about-me': AboutMePanel,
   services: ServicesPanel,
   gallery: GalleryPanel,

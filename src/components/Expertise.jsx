@@ -1,7 +1,9 @@
-import { images, whyChooseUs } from '../data/content'
+import { useHomeContent } from '../hooks/useHomeContent'
 import ContactButton from './ContactButton'
 
 export default function Expertise() {
+  const { whyChooseUs } = useHomeContent()
+
   return (
     <section id="expertise" className="border-t border-slate-200 bg-surface-alt py-20 lg:py-28">
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
@@ -35,7 +37,7 @@ export default function Expertise() {
 
           <div className="relative order-1 min-h-[260px] sm:min-h-[320px] lg:order-2 lg:min-h-[520px]">
             <img
-              src={images.family}
+              src={whyChooseUs.image}
               alt="Family receiving speech-language support"
               className="absolute inset-0 h-full w-full object-cover"
             />

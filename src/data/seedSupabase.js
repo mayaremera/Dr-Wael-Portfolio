@@ -3,9 +3,11 @@ import { getDefaultContactContent } from './contactContentStore'
 import { CONTENT_SECTIONS, listRemoteSections, saveRemoteSection } from './contentSync'
 import { getDefaultDrWaelActivity } from './contentStore'
 import { getDefaultGalleryContent } from './galleryContentStore'
+import { getDefaultHomeContent } from './homeContentStore'
 import { getDefaultServicesContent } from './servicesContentStore'
 
 export const SEED_SECTIONS = [
+  { section: CONTENT_SECTIONS.HOME, label: 'Home Page', getDefaults: getDefaultHomeContent },
   { section: CONTENT_SECTIONS.ACTIVITY, label: 'In the Field', getDefaults: getDefaultDrWaelActivity },
   { section: CONTENT_SECTIONS.SERVICES, label: 'Services', getDefaults: getDefaultServicesContent },
   { section: CONTENT_SECTIONS.GALLERY, label: 'Gallery', getDefaults: getDefaultGalleryContent },

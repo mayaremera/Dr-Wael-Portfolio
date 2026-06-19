@@ -6,6 +6,30 @@ const mainNavItems = [
 
   {
 
+    id: 'home',
+
+    label: 'Home Page',
+
+    description: 'Hero & sections',
+
+    icon: (
+
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.75">
+
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3 10.5L12 3l9 7.5" />
+
+        <path strokeLinecap="round" strokeLinejoin="round" d="M5 10v10h14V10" />
+
+        <path strokeLinecap="round" d="M10 20v-6h4v6" />
+
+      </svg>
+
+    ),
+
+  },
+
+  {
+
     id: 'in-the-field',
 
     label: 'In the Field',

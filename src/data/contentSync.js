@@ -8,6 +8,7 @@ export const CONTENT_SECTIONS = {
   GALLERY: 'gallery',
   ABOUT: 'about',
   CONTACT: 'contact',
+  HOME: 'home',
 }
 
 export function cacheSectionLocally(storageKey, data) {

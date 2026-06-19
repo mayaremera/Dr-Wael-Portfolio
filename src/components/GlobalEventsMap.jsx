@@ -201,6 +201,7 @@ export default function GlobalEventsMap() {
   const [hoveredId, setHoveredId] = useState(null)
   const [anchor, setAnchor] = useState(null)
 
+  const globeMeta = activity.globe ?? globalPresenceMap
   const locations = useMemo(() => buildMapLocationsWithEvents(activity), [activity])
 
   const selectedLocation = locations.find((loc) => loc.id === selectedId) ?? null
@@ -253,11 +254,11 @@ export default function GlobalEventsMap() {
 
       <div className="relative z-10 flex min-h-screen flex-col px-4 pt-24 pb-8 sm:px-6 sm:pt-28 lg:px-8 lg:pt-36 xl:pt-40">
         <header className="mx-auto max-w-3xl text-center">
-          <p className="text-xs font-semibold tracking-[0.28em] text-accent uppercase">{globalPresenceMap.label}</p>
+          <p className="text-xs font-semibold tracking-[0.28em] text-accent uppercase">{globeMeta.label}</p>
           <h2 id="global-presence-heading" className="mt-4 font-serif text-4xl leading-tight text-white md:text-5xl lg:text-6xl">
-            {globalPresenceMap.title}
+            {globeMeta.title}
           </h2>
-          <p className="mt-5 text-base leading-relaxed text-white/55 md:text-lg">{globalPresenceMap.description}</p>
+          <p className="mt-5 text-base leading-relaxed text-white/55 md:text-lg">{globeMeta.description}</p>
 
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 backdrop-blur-sm">

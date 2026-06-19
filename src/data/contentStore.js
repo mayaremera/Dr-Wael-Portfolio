@@ -1,4 +1,5 @@
 import { drWaelActivity as defaultDrWaelActivity } from './content'
+import { globalPresenceMap, mapLocations as defaultMapLocations } from './globalEventMap'
 import {
   CONTENT_SECTIONS,
   loadSectionPrimary,
@@ -14,8 +15,18 @@ function cloneActivity(data) {
   return JSON.parse(JSON.stringify(data))
 }
 
+export function getDefaultGlobeContent() {
+  return {
+    ...cloneActivity(globalPresenceMap),
+    locations: cloneActivity(defaultMapLocations),
+  }
+}
+
 export function getDefaultDrWaelActivity() {
-  return cloneActivity(defaultDrWaelActivity)
+  return {
+    ...cloneActivity(defaultDrWaelActivity),
+    globe: getDefaultGlobeContent(),
+  }
 }
 
 function mergeWithDefaults(saved) {
@@ -26,6 +37,23 @@ function mergeWithDefaults(saved) {
     ...saved,
     upcoming: saved.upcoming ?? defaults.upcoming,
     recent: saved.recent ?? defaults.recent,
+    globe: {
+      ...defaults.globe,
+      ...saved.globe,
+      locations: saved.globe?.locations?.length
+        ? saved.globe.locations.map((location, index) => ({
+            ...defaults.globe.locations[index],
+            ...location,
+            milestones: location.milestones?.length
+              ? location.milestones.map((milestone, milestoneIndex) => ({
+                  ...defaults.globe.locations[index]?.milestones?.[milestoneIndex],
+                  ...milestone,
+                  isMilestone: true,
+                }))
+              : (defaults.globe.locations[index]?.milestones ?? []),
+          }))
+        : defaults.globe.locations,
+    },
   }
 }
 
@@ -78,4 +106,26 @@ export const emptyActivityEvent = {
   video: '',
   imageAlt: '',
   note: '',
+}
+
+export const emptyGlobeMilestone = {
+  id: '',
+  period: '',
+  date: '',
+  type: '',
+  title: '',
+  location: '',
+  note: '',
+  isMilestone: true,
+}
+
+export const emptyGlobeLocation = {
+  id: '',
+  country: '',
+  city: '',
+  lat: 0,
+  lng: 0,
+  flag: '',
+  role: '',
+  milestones: [],
 }

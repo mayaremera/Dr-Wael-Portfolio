@@ -485,9 +485,21 @@ const LOCATION_HINTS = [
   { match: /asha|washington|convention|usa|united states|america|u\.s\./i, id: 'united-states' },
 ]
 
-export function inferMapLocationId(location = '') {
+export function inferMapLocationId(location = '', locations = mapLocations) {
   const hint = LOCATION_HINTS.find(({ match }) => match.test(location))
-  return hint?.id ?? 'saudi-arabia'
+  if (hint && locations.some((entry) => entry.id === hint.id)) {
+    return hint.id
+  }
+
+  const normalized = location.toLowerCase()
+  const matched = locations.find(
+    (entry) =>
+      normalized.includes(entry.country.toLowerCase()) ||
+      normalized.includes(entry.city.toLowerCase()) ||
+      entry.milestones?.some((milestone) => normalized.includes(milestone.location.toLowerCase())),
+  )
+
+  return matched?.id ?? locations[0]?.id ?? 'saudi-arabia'
 }
 
 export function isOngoingEvent(event) {
@@ -502,16 +514,17 @@ export function locationToAngles(lat, lng) {
 }
 
 export function buildMapLocationsWithEvents(activity) {
+  const sourceLocations = activity.globe?.locations?.length ? activity.globe.locations : mapLocations
   const liveEvents = [
     ...(activity.upcoming ?? []).map((event) => ({ ...event, isUpcoming: true })),
     ...(activity.recent ?? []).map((event) => ({ ...event, isUpcoming: false })),
   ]
 
-  return mapLocations.map((location) => {
+  return sourceLocations.map((location) => {
     const linkedEvents = liveEvents.filter(
-      (event) => inferMapLocationId(event.location) === location.id,
+      (event) => inferMapLocationId(event.location, sourceLocations) === location.id,
     )
-    const allEvents = [...linkedEvents, ...location.milestones]
+    const allEvents = [...linkedEvents, ...(location.milestones ?? [])]
 
     return {
       ...location,
@@ -522,6 +535,6 @@ export function buildMapLocationsWithEvents(activity) {
   })
 }
 
-export function getHomeBase() {
-  return mapLocations.find((loc) => loc.id === 'saudi-arabia')
+export function getHomeBase(locations = mapLocations) {
+  return locations.find((loc) => loc.id === 'saudi-arabia') ?? locations[0]
 }

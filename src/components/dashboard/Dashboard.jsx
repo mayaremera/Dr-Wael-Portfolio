@@ -7,6 +7,7 @@ import { getSupabaseSession, isSupabaseConfigured, signOutFromSupabase } from '.
 
 const DEFAULT_SECTION = 'in-the-field'
 const VALID_SECTIONS = new Set([
+  'home',
   'about-me',
   'services',
   'gallery',

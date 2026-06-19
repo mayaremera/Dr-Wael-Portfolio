@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { careerImpact, images, trustedCompanies } from '../data/content'
+import { careerImpact, images } from '../data/content'
 import { useAboutContent } from '../hooks/useAboutContent'
+import { useHomeContent } from '../hooks/useHomeContent'
 import CredentialCompass from './CredentialCompass'
 
 const statAccents = [
@@ -135,7 +136,8 @@ function AffiliationGrid({ companies }) {
 }
 
 function TrustedCompanies() {
-  const { title, subtitle, viewAllLabel, viewAllHref, companies } = trustedCompanies
+  const { affiliations } = useHomeContent()
+  const { title, subtitle, viewAllLabel, viewAllHref, companies } = affiliations
   const visibleCompanies = companies.filter((company) => company.id !== 'asha')
 
   return (

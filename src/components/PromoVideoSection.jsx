@@ -1,9 +1,10 @@
 import { useEffect, useRef } from 'react'
-import { promoVideo } from '../data/content'
+import { useHomeContent } from '../hooks/useHomeContent'
 
 const PROMO_PLAYBACK_RATE = 0.65
 
 export default function PromoVideoSection() {
+  const { promoVideo } = useHomeContent()
   const { src, label, titleHighlight, description, cta, secondary } = promoVideo
   const videoRef = useRef(null)
 
@@ -19,7 +20,7 @@ export default function PromoVideoSection() {
     video.addEventListener('loadedmetadata', setPlaybackRate)
 
     return () => video.removeEventListener('loadedmetadata', setPlaybackRate)
-  }, [])
+  }, [src])
 
   return (
     <section
