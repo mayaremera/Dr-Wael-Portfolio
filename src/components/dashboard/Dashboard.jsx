@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import DashboardSidebar from './DashboardSidebar'
 import { DashboardPanel } from './DashboardPanels'
-import DashboardLogin from './DashboardLogin'
 import DashboardCloudAuth from './DashboardCloudAuth'
 import { DeleteConfirmProvider } from './DeleteConfirmDialog'
 import { getSupabaseSession, isSupabaseConfigured, signOutFromSupabase } from '../../lib/supabase'
@@ -27,7 +26,6 @@ function sectionToPath(section) {
 }
 
 export default function Dashboard() {
-  const [isPinAuthenticated, setIsPinAuthenticated] = useState(false)
   const [isCloudAuthenticated, setIsCloudAuthenticated] = useState(!isSupabaseConfigured)
   const [activeSection, setActiveSection] = useState(getDashboardSection)
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
@@ -56,13 +54,8 @@ export default function Dashboard() {
 
   const handleLogout = async () => {
     await signOutFromSupabase()
-    setIsPinAuthenticated(false)
     setIsCloudAuthenticated(!isSupabaseConfigured)
     setMobileNavOpen(false)
-  }
-
-  if (!isPinAuthenticated) {
-    return <DashboardLogin onAuthenticated={() => setIsPinAuthenticated(true)} />
   }
 
   if (!isCloudAuthenticated) {

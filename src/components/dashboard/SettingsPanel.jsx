@@ -169,7 +169,7 @@ export default function SettingsPanel() {
         <article className="rounded-xl border border-dashed border-brand/20 bg-brand-muted/20 p-5">
           <h2 className="text-sm font-semibold text-ink">How to test</h2>
           <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm leading-relaxed text-ink-muted">
-            <li>Make sure you are signed in (PIN + Supabase admin email/password).</li>
+            <li>Make sure you are signed in with your Supabase admin email and password.</li>
             <li>Click <strong className="text-ink">Publish missing defaults</strong> once to create the first rows.</li>
             <li>Edit any tab (e.g. In the Field), save, then refresh this page — the timestamp should update.</li>
             <li>Open the live site in another browser/incognito — you should see the same content.</li>
