@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useConfirmDelete } from './DeleteConfirmDialog'
 
 export const DASHBOARD_PAGE_SIZE = 5
 
@@ -90,8 +91,19 @@ export default function DashboardItemList({
   addLabel = 'Add',
   emptyMessage = 'No items yet.',
   renderItem,
+  deleteTitle = 'Delete this item?',
+  deleteMessage = 'This action cannot be undone. Are you sure you want to delete it?',
 }) {
+  const confirmDelete = useConfirmDelete()
   const { pageItems, page, setPage, pageCount, needsPagination, pageSize } = useDashboardPagination(items)
+
+  const handleDelete = (id) => {
+    confirmDelete({
+      title: deleteTitle,
+      message: deleteMessage,
+      onConfirm: () => onDelete(id),
+    })
+  }
 
   useEffect(() => {
     if (!editingId || editingId === 'new') return
@@ -146,7 +158,7 @@ export default function DashboardItemList({
                         </button>
                         <button
                           type="button"
-                          onClick={() => onDelete(getItemId(item))}
+                          onClick={() => handleDelete(getItemId(item))}
                           className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold tracking-wide text-accent-hover uppercase transition-colors hover:border-accent/30"
                         >
                           Delete

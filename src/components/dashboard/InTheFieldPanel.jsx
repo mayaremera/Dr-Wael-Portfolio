@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import DashboardItemList from './DashboardItemList'
 import EventDatePicker from './EventDatePicker'
 import MediaDropzone from './MediaDropzone'
+import { useConfirmDelete } from './DeleteConfirmDialog'
 import {
   createActivityId,
   emptyActivityEvent,
@@ -312,6 +313,7 @@ function GlobeMilestoneEditor({ initialMilestone, onSave, onCancel }) {
 }
 
 function GlobeLocationEditor({ initialLocation, onSave, onCancel }) {
+  const confirmDelete = useConfirmDelete()
   const [location, setLocation] = useState({
     ...emptyGlobeLocation,
     ...initialLocation,
@@ -436,7 +438,13 @@ function GlobeLocationEditor({ initialLocation, onSave, onCancel }) {
                       </button>
                       <button
                         type="button"
-                        onClick={() => deleteMilestone(milestone.id)}
+                        onClick={() =>
+                          confirmDelete({
+                            title: 'Delete this milestone?',
+                            message: 'This milestone will be removed from this globe location.',
+                            onConfirm: () => deleteMilestone(milestone.id),
+                          })
+                        }
                         className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold tracking-wide text-accent-hover uppercase"
                       >
                         Delete
@@ -460,6 +468,7 @@ function GlobeLocationEditor({ initialLocation, onSave, onCancel }) {
 }
 
 export default function InTheFieldPanel() {
+  const confirmDelete = useConfirmDelete()
   const { content: activity, setContent: setActivity, loading, loadError } = useDashboardSection(
     getDefaultDrWaelActivity,
     loadDrWaelActivityRemote,
@@ -684,7 +693,13 @@ export default function InTheFieldPanel() {
                         </button>
                         <button
                           type="button"
-                          onClick={() => handleDeleteEvent(event.id)}
+                          onClick={() =>
+                            confirmDelete({
+                              title: 'Delete this event?',
+                              message: 'This event will be permanently removed from the In the Field page.',
+                              onConfirm: () => handleDeleteEvent(event.id),
+                            })
+                          }
                           className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold tracking-wide text-accent-hover uppercase transition-colors hover:border-accent/30"
                         >
                           Delete

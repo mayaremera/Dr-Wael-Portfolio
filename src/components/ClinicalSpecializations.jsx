@@ -346,7 +346,7 @@ export default function ClinicalSpecializations() {
               {' '}
               specialization{filtered.length !== 1 ? 's' : ''} shown
             </p>
-            <a href="#contact" className={sectionLinkClassName}>
+            <a href="/contact" className={sectionLinkClassName}>
               Discuss your case
             </a>
           </div>

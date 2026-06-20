@@ -3,6 +3,7 @@ import DashboardSidebar from './DashboardSidebar'
 import { DashboardPanel } from './DashboardPanels'
 import DashboardLogin from './DashboardLogin'
 import DashboardCloudAuth from './DashboardCloudAuth'
+import { DeleteConfirmProvider } from './DeleteConfirmDialog'
 import { getSupabaseSession, isSupabaseConfigured, signOutFromSupabase } from '../../lib/supabase'
 
 const DEFAULT_SECTION = 'in-the-field'
@@ -69,6 +70,7 @@ export default function Dashboard() {
   }
 
   return (
+    <DeleteConfirmProvider>
     <div className="min-h-screen bg-surface-alt">
       <div
         className={`fixed inset-0 z-40 bg-ink/50 transition-opacity lg:hidden ${
@@ -126,5 +128,6 @@ export default function Dashboard() {
         </main>
       </div>
     </div>
+    </DeleteConfirmProvider>
   )
 }

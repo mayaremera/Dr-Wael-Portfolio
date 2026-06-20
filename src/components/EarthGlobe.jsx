@@ -10,8 +10,8 @@ const AUTO_ROTATE_SPEED = 0.0014
 const DRAG_SENSITIVITY = 0.0028
 const MOMENTUM_DECAY = 0.965
 const KEY_ROTATE_STEP = 0.05
-const GLOBE_PX = 1217
-const GLOBE_MAX_PX = 1373
+const GLOBE_PX = 1020
+const GLOBE_MAX_PX = 1150
 const HOVER_RADIUS = 62
 const DRAG_THRESHOLD = 6
 
@@ -26,31 +26,29 @@ function clamp(value, min, max) {
 function drawGlobe(ctx, size, landPoints, phi, theta) {
   const cx = size / 2
   const cy = size / 2
-  const radius = size * 0.4 * 1.05
+  const radius = size * 0.38 * 1.05
 
   ctx.clearRect(0, 0, size, size)
-
-  const glow = ctx.createRadialGradient(cx, cy, radius * 0.55, cx, cy, radius * 1.35)
-  glow.addColorStop(0, 'rgba(45, 106, 122, 0.22)')
-  glow.addColorStop(0.55, 'rgba(45, 106, 122, 0.08)')
-  glow.addColorStop(1, 'rgba(45, 106, 122, 0)')
-  ctx.fillStyle = glow
-  ctx.fillRect(0, 0, size, size)
-
-  const sphere = ctx.createRadialGradient(cx - radius * 0.25, cy - radius * 0.3, radius * 0.08, cx, cy, radius)
-  sphere.addColorStop(0, 'rgba(72, 140, 155, 0.35)')
-  sphere.addColorStop(0.55, BRAND_SOFT)
-  sphere.addColorStop(0.92, 'rgba(26, 58, 68, 0.5)')
-  sphere.addColorStop(1, 'rgba(10, 21, 32, 0)')
-  ctx.beginPath()
-  ctx.arc(cx, cy, radius, 0, Math.PI * 2)
-  ctx.fillStyle = sphere
-  ctx.fill()
 
   ctx.save()
   ctx.beginPath()
   ctx.arc(cx, cy, radius, 0, Math.PI * 2)
   ctx.clip()
+
+  const sphere = ctx.createRadialGradient(
+    cx - radius * 0.32,
+    cy - radius * 0.38,
+    radius * 0.06,
+    cx + radius * 0.12,
+    cy + radius * 0.18,
+    radius * 1.05,
+  )
+  sphere.addColorStop(0, 'rgba(88, 158, 172, 0.32)')
+  sphere.addColorStop(0.42, BRAND_SOFT)
+  sphere.addColorStop(0.78, 'rgba(22, 48, 58, 0.72)')
+  sphere.addColorStop(1, 'rgba(8, 16, 24, 0.88)')
+  ctx.fillStyle = sphere
+  ctx.fillRect(cx - radius, cy - radius, radius * 2, radius * 2)
 
   const projectedLand = landPoints
     .map(([lat, lng]) => {
@@ -71,6 +69,12 @@ function drawGlobe(ctx, size, landPoints, phi, theta) {
 
   ctx.globalAlpha = 1
   ctx.restore()
+
+  ctx.beginPath()
+  ctx.arc(cx, cy, radius, 0, Math.PI * 2)
+  ctx.strokeStyle = 'rgba(72, 140, 155, 0.14)'
+  ctx.lineWidth = 1
+  ctx.stroke()
 }
 
 export default function EarthGlobe({
@@ -367,8 +371,6 @@ export default function EarthGlobe({
 
   return (
     <div ref={wrapRef} className={`globe-stage relative w-full ${className}`}>
-      <div className="globe-glow pointer-events-none absolute inset-0 rounded-full" aria-hidden="true" />
-
       <div
         ref={containerRef}
         className="globe-canvas-wrap relative mx-auto cursor-grab touch-none select-none"

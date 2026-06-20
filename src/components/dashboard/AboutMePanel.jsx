@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import DashboardItemList from './DashboardItemList'
 import MediaDropzone from './MediaDropzone'
+import { useConfirmDelete } from './DeleteConfirmDialog'
 import {
   TIMELINE_TYPES,
   createContentId,
@@ -35,6 +36,8 @@ function PanelShell({ eyebrow, title, description, children }) {
 }
 
 function StringListEditor({ label, items, onChange, addLabel = 'Add line' }) {
+  const confirmDelete = useConfirmDelete()
+
   return (
     <div>
       <label className={labelClassName}>{label}</label>
@@ -42,7 +45,12 @@ function StringListEditor({ label, items, onChange, addLabel = 'Add line' }) {
         {items.map((item, index) => (
           <div key={`${label}-${index}`} className="flex gap-2">
             <textarea className={`${fieldClassName} min-h-20 resize-y`} value={item} onChange={(e) => onChange(items.map((entry, i) => (i === index ? e.target.value : entry)))} />
-            <button type="button" onClick={() => onChange(items.filter((_, i) => i !== index))} className="shrink-0 self-start rounded-lg border border-slate-200 px-2.5 py-2 text-xs font-semibold tracking-wide text-accent-hover uppercase">
+            <button type="button" onClick={() => confirmDelete({
+              title: 'Remove this line?',
+              message: 'This line will be removed from the list.',
+              confirmLabel: 'Remove',
+              onConfirm: () => onChange(items.filter((_, i) => i !== index)),
+            })} className="shrink-0 self-start rounded-lg border border-slate-200 px-2.5 py-2 text-xs font-semibold tracking-wide text-accent-hover uppercase">
               Remove
             </button>
           </div>

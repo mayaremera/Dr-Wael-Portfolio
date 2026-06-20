@@ -1,9 +1,11 @@
 import { useRef, useState } from 'react'
 import { isMediaStorageAvailable, uploadMediaToStorage } from '../../lib/mediaUpload'
+import { useConfirmDelete } from './DeleteConfirmDialog'
 
 const MAX_FILE_SIZE_MB = 12
 
 export default function MediaDropzone({ image, video, onChange, onClear }) {
+  const confirmDelete = useConfirmDelete()
   const inputRef = useRef(null)
   const [dragging, setDragging] = useState(false)
   const [error, setError] = useState('')
@@ -108,10 +110,17 @@ export default function MediaDropzone({ image, video, onChange, onClear }) {
             </button>
             <button
               type="button"
-              onClick={() => {
-                setError('')
-                onClear()
-              }}
+              onClick={() =>
+                confirmDelete({
+                  title: 'Remove this media?',
+                  message: 'The uploaded image or video will be cleared from this field.',
+                  confirmLabel: 'Remove',
+                  onConfirm: () => {
+                    setError('')
+                    onClear()
+                  },
+                })
+              }
               className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold tracking-wide text-accent-hover uppercase transition-colors hover:border-accent/30"
             >
               Remove

@@ -38,54 +38,46 @@ function Starfield() {
   )
 }
 
+function EventTypeBadge({ event }) {
+  const typeTone = event.isMilestone ? 'milestone' : 'default'
+
+  return (
+    <div className="flex flex-wrap items-center gap-1.5">
+      <span className={`globe-event-tag globe-event-tag--${typeTone}`}>{event.type}</span>
+      {event.isUpcoming ? <span className="globe-event-tag globe-event-tag--live">Upcoming</span> : null}
+      {event.isMilestone ? <span className="globe-event-tag globe-event-tag--milestone">Milestone</span> : null}
+    </div>
+  )
+}
+
 function EventTimelineCard({ event, index, total }) {
+  const tone = event.isUpcoming ? 'upcoming' : event.isMilestone ? 'milestone' : 'default'
+
   return (
     <article
-      className="animate-globe-event-in relative pl-8"
-      style={{ animationDelay: `${index * 70}ms` }}
+      className={`globe-event-card globe-event-card--${tone} animate-globe-event-in`}
+      style={{ animationDelay: `${index * 60}ms` }}
     >
-      <div className="absolute top-0 left-3 h-full w-px bg-linear-to-b from-brand/40 via-accent/30 to-transparent" aria-hidden="true" />
-      <div
-        className={`absolute top-5 left-0 flex h-6 w-6 items-center justify-center rounded-full border-2 border-[#0a1520] ${
-          event.isUpcoming ? 'bg-accent' : event.isMilestone ? 'bg-brand-light' : 'bg-brand'
-        }`}
-        aria-hidden="true"
-      >
-        <span className="h-1.5 w-1.5 rounded-full bg-white" />
+      <div className="globe-event-card__rail" aria-hidden="true">
+        <span className={`globe-event-card__node globe-event-card__node--${tone}`} />
+        {index < total - 1 ? <span className="globe-event-card__line" /> : null}
       </div>
 
-      {index < total - 1 ? (
-        <div className="absolute top-11 left-3 h-[calc(100%-2rem)] w-px bg-brand/15" aria-hidden="true" />
-      ) : null}
+      <div className="globe-event-card__body">
+        <EventTypeBadge event={event} />
 
-      <div
-        className="rounded-sm border border-slate-200 bg-white/95 p-4 shadow-lg backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl"
-      >
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-full bg-brand-muted px-2 py-0.5 text-[0.6rem] font-semibold tracking-wide text-brand uppercase">
-            {event.type}
-          </span>
-          {event.isUpcoming ? (
-            <span className="rounded-full bg-accent px-2 py-0.5 text-[0.6rem] font-semibold tracking-wide text-white uppercase">
-              Upcoming
-            </span>
-          ) : null}
-          {event.isMilestone ? (
-            <span className="rounded-full bg-surface-tint px-2 py-0.5 text-[0.6rem] font-semibold tracking-wide text-ink-muted uppercase">
-              Milestone
-            </span>
-          ) : null}
+        <div className="mt-3 flex items-end gap-2.5">
+          <p className="font-serif text-[1.35rem] leading-none text-white tabular-nums">{event.date}</p>
+          <p className="pb-0.5 text-[0.62rem] font-semibold tracking-[0.14em] text-white/35 uppercase">
+            {event.period}
+          </p>
         </div>
 
-        <div className="mt-2 flex items-baseline gap-2">
-          <p className="font-serif text-xl leading-none text-brand tabular-nums">{event.date}</p>
-          <p className="text-[0.65rem] font-medium tracking-wide text-ink-muted uppercase">{event.period}</p>
-        </div>
+        <h4 className="mt-2.5 font-serif text-[1.05rem] leading-snug text-white/92">{event.title}</h4>
+        <p className="mt-1.5 text-xs font-medium tracking-wide text-brand-light/90">{event.location}</p>
 
-        <h4 className="mt-2 font-serif text-base leading-snug text-ink">{event.title}</h4>
-        <p className="mt-1 text-xs font-medium text-brand">{event.location}</p>
         {event.note ? (
-          <p className="mt-3 border-t border-slate-100 pt-3 text-sm leading-relaxed text-ink-muted">{event.note}</p>
+          <p className="mt-3 border-t border-white/[0.06] pt-3 text-sm leading-relaxed text-white/48">{event.note}</p>
         ) : null}
       </div>
     </article>
@@ -146,50 +138,70 @@ function EventsPanel({ location, isPinned, onClose, anchor }) {
   return (
     <div
       ref={panelRef}
-      className={`animate-globe-panel-in pointer-events-auto absolute inset-x-4 bottom-4 z-30 mx-auto max-h-[55vh] max-w-lg overflow-hidden rounded-sm border border-white/10 bg-[#0a1520]/90 shadow-2xl backdrop-blur-xl lg:inset-x-auto lg:bottom-auto lg:w-[380px] lg:max-h-[min(72vh,640px)] ${desktopPosition ? 'globe-panel-anchored' : ''}`}
+      className={`globe-events-panel animate-globe-panel-in pointer-events-auto absolute inset-x-4 bottom-4 z-30 mx-auto max-h-[58vh] max-w-md overflow-hidden lg:inset-x-auto lg:bottom-auto lg:w-[400px] lg:max-h-[min(74vh,660px)] ${isPinned ? 'globe-events-panel--pinned' : 'globe-events-panel--preview'} ${desktopPosition ? 'globe-panel-anchored' : ''}`}
       style={anchoredDesktopStyle}
     >
-      <div className="relative border-b border-white/10 bg-linear-to-r from-brand/20 to-transparent px-5 py-5">
+      <div className="globe-events-panel__header">
+        <div className="globe-events-panel__header-glow" aria-hidden="true" />
+
         {isPinned ? (
           <button
             type="button"
             onClick={onClose}
-            className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full border border-white/10 text-white/60 transition-colors hover:border-white/25 hover:text-white"
+            className="globe-events-panel__close"
             aria-label="Close events panel"
           >
-            ×
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path d="M2 2l10 10M12 2 2 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
           </button>
         ) : null}
 
-        <p className="text-[0.65rem] font-semibold tracking-[0.2em] text-accent uppercase">
-          {isPinned ? 'Selected region' : 'Previewing region'}
-        </p>
-        <div className="mt-2 flex items-start gap-3">
-          <span className="text-3xl" aria-hidden="true">
-            {location.flag}
-          </span>
-          <div>
-            <h3 className="font-serif text-2xl text-white">{location.country}</h3>
-            <p className="text-sm font-medium text-brand-light">{location.city}</p>
-            <p className="mt-1 text-xs text-white/50">{location.role}</p>
+        <div className="relative flex items-start gap-3.5 pr-8">
+          <div className="globe-events-panel__flag" aria-hidden="true">
+            <span>{location.flag}</span>
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-[0.62rem] font-semibold tracking-[0.22em] text-accent uppercase">
+                {isPinned ? 'Selected region' : 'Previewing region'}
+              </p>
+              {!isPinned ? (
+                <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-[0.58rem] font-medium tracking-wide text-white/45 uppercase">
+                  <span className="h-1 w-1 rounded-full bg-accent animate-globe-pulse" />
+                  Hover preview
+                </span>
+              ) : null}
+            </div>
+
+            <h3 className="mt-2 font-serif text-[1.65rem] leading-tight text-white">{location.country}</h3>
+            <p className="mt-1 text-sm font-medium text-brand-light/95">{location.city}</p>
+            <p className="mt-1.5 text-xs leading-relaxed text-white/42">{location.role}</p>
           </div>
         </div>
 
-        <div className="mt-4 flex items-center gap-3">
-          <div className="h-px flex-1 bg-linear-to-r from-accent/60 to-transparent" aria-hidden="true" />
-          <span className="text-xs font-semibold tracking-wide text-white/60 uppercase tabular-nums">
+        <div className="relative mt-5 flex items-center justify-between gap-3">
+          <div className="h-px flex-1 bg-linear-to-r from-accent/50 via-white/10 to-transparent" aria-hidden="true" />
+          <span className="globe-events-panel__count">
             {location.eventCount} event{location.eventCount !== 1 ? 's' : ''}
           </span>
         </div>
       </div>
 
-      <div className="globe-panel-scroll max-h-[calc(55vh-140px)] overflow-y-auto px-5 py-5 lg:max-h-[calc(min(72vh,640px)-140px)]">
-        <div className="space-y-5" key={location.id}>
+      <div className="globe-panel-scroll globe-events-panel__scroll">
+        <div className="space-y-3" key={location.id}>
           {location.events.map((event, index) => (
             <EventTimelineCard key={event.id} event={event} index={index} total={location.events.length} />
           ))}
         </div>
       </div>
+
+      {!isPinned ? (
+        <div className="globe-events-panel__hint">
+          Click a marker to keep this panel open
+        </div>
+      ) : null}
     </div>
   )
 }
@@ -244,7 +256,7 @@ export default function GlobalEventsMap() {
 
       <div className="pointer-events-none absolute inset-0 bg-linear-to-b from-[#050c12] via-[#0a1520] to-[#0f2830]" aria-hidden="true" />
       <div
-        className="pointer-events-none absolute top-1/2 left-1/2 h-[min(120vw,900px)] w-[min(120vw,900px)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand/8 blur-[120px]"
+        className="pointer-events-none absolute top-[42%] left-1/2 h-[min(80vw,640px)] w-[min(80vw,640px)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand/5 blur-[100px]"
         aria-hidden="true"
       />
       <div

@@ -94,7 +94,7 @@ function ServiceDetailCard({ concept, index }) {
       </div>
 
       <div className="px-5 pt-5 pb-5 sm:px-6 sm:pb-6">
-        <ContactButton href="#contact">Contact Us Now</ContactButton>
+        <ContactButton href="/contact">Contact Us Now</ContactButton>
       </div>
     </article>
   )

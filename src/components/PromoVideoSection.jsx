@@ -3,7 +3,7 @@ import { useHomeContent } from '../hooks/useHomeContent'
 
 const PROMO_PLAYBACK_RATE = 0.65
 
-export default function PromoVideoSection() {
+export default function PromoVideoSection({ ctaHref, secondaryHref }) {
   const { promoVideo } = useHomeContent()
   const { src, label, titleHighlight, description, cta, secondary } = promoVideo
   const videoRef = useRef(null)
@@ -94,7 +94,7 @@ export default function PromoVideoSection() {
 
               <div className="animate-promo-fade-up animation-delay-300 mt-5 flex flex-col items-center justify-center gap-2.5 sm:flex-row sm:gap-3 lg:mt-8 lg:gap-5">
                 <a
-                  href={cta.href}
+                  href={ctaHref ?? cta.href}
                   className="group relative inline-flex items-center justify-center overflow-hidden rounded-sm bg-accent px-5 py-2 text-[0.6875rem] font-semibold tracking-wide text-white uppercase shadow-lg shadow-accent/30 transition-transform hover:scale-[1.03] hover:bg-accent-hover sm:px-6 sm:py-2.5 sm:text-xs lg:px-8 lg:py-3.5 lg:text-sm"
                 >
                   <span
@@ -104,7 +104,7 @@ export default function PromoVideoSection() {
                   {cta.label}
                 </a>
                 <a
-                  href={secondary.href}
+                  href={secondaryHref ?? secondary.href}
                   className="inline-flex items-center justify-center rounded-sm border-2 border-white/40 bg-white/10 px-5 py-2 text-[0.6875rem] font-semibold tracking-wide text-white uppercase backdrop-blur-sm transition-colors hover:border-white hover:bg-white/20 sm:px-6 sm:py-2.5 sm:text-xs lg:px-8 lg:py-3.5 lg:text-sm"
                 >
                   {secondary.label}

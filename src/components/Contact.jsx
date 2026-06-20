@@ -1,5 +1,26 @@
+import { useState } from 'react'
 import { useContactContent } from '../hooks/useContactContent'
 import ContactButton from './ContactButton'
+
+const CONTACT_RECIPIENT_EMAIL = 'youssefashour19@gmail.com'
+
+function buildEmailBody({ firstName, lastName, email, message }) {
+  const fullName = `${firstName.trim()} ${lastName.trim()}`.trim()
+
+  return [
+    'New Appointment Request',
+    '—'.repeat(32),
+    '',
+    `Name: ${fullName}`,
+    `Email: ${email.trim()}`,
+    '',
+    'Message:',
+    message.trim(),
+    '',
+    '—'.repeat(32),
+    'Sent via the Dr. Wael El Dakroury website contact form.',
+  ].join('\n')
+}
 
 const problemTypes = [
   'Screening inquiry',
@@ -124,6 +145,69 @@ const fieldClassName =
 export default function Contact() {
   const { contactDetails, directContact } = useContactContent()
   const { workplace } = contactDetails
+  const [form, setForm] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    subject: '',
+    message: '',
+  })
+  const [status, setStatus] = useState('idle')
+  const [errorMessage, setErrorMessage] = useState('')
+
+  const updateField = (field) => (event) => {
+    setForm((current) => ({ ...current, [field]: event.target.value }))
+    if (status !== 'idle') {
+      setStatus('idle')
+      setErrorMessage('')
+    }
+  }
+
+  const handleSubmit = async (event) => {
+    event.preventDefault()
+
+    const accessKey = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY
+    if (!accessKey) {
+      setStatus('error')
+      setErrorMessage('Email delivery is not configured yet. Please try again later or email us directly.')
+      return
+    }
+
+    if (!form.firstName.trim() || !form.lastName.trim() || !form.email.trim() || !form.subject || !form.message.trim()) {
+      setStatus('error')
+      setErrorMessage('Please fill in all fields before sending.')
+      return
+    }
+
+    setStatus('sending')
+    setErrorMessage('')
+
+    try {
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          access_key: accessKey,
+          subject: form.subject,
+          from_name: `${form.firstName.trim()} ${form.lastName.trim()}`,
+          email: form.email.trim(),
+          message: buildEmailBody(form),
+        }),
+      })
+
+      const result = await response.json()
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || 'Unable to send your message.')
+      }
+
+      setForm({ firstName: '', lastName: '', email: '', subject: '', message: '' })
+      setStatus('success')
+    } catch (error) {
+      setStatus('error')
+      setErrorMessage(error instanceof Error ? error.message : 'Unable to send your message. Please try again.')
+    }
+  }
 
   return (
     <section id="contact" className="relative overflow-hidden border-t border-slate-200 bg-surface-alt py-20 lg:py-28">
@@ -206,19 +290,39 @@ export default function Contact() {
             <h3 className="mt-2 font-serif text-2xl text-ink">Send a message</h3>
             <p className="mt-2 text-sm text-ink-muted">We&apos;ll get back to you as soon as possible.</p>
 
-            <form className="mt-6 space-y-4" onSubmit={(e) => e.preventDefault()}>
+            <form className="mt-6 space-y-4" onSubmit={handleSubmit} noValidate>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <label htmlFor="firstName" className="mb-1.5 block text-[0.65rem] font-semibold tracking-wide text-ink-muted uppercase">
                     First Name
                   </label>
-                  <input id="firstName" type="text" className={fieldClassName} placeholder="Your first name" />
+                  <input
+                    id="firstName"
+                    name="firstName"
+                    type="text"
+                    required
+                    autoComplete="given-name"
+                    value={form.firstName}
+                    onChange={updateField('firstName')}
+                    className={fieldClassName}
+                    placeholder="Your first name"
+                  />
                 </div>
                 <div>
                   <label htmlFor="lastName" className="mb-1.5 block text-[0.65rem] font-semibold tracking-wide text-ink-muted uppercase">
                     Last Name
                   </label>
-                  <input id="lastName" type="text" className={fieldClassName} placeholder="Your last name" />
+                  <input
+                    id="lastName"
+                    name="lastName"
+                    type="text"
+                    required
+                    autoComplete="family-name"
+                    value={form.lastName}
+                    onChange={updateField('lastName')}
+                    className={fieldClassName}
+                    placeholder="Your last name"
+                  />
                 </div>
               </div>
 
@@ -226,14 +330,31 @@ export default function Contact() {
                 <label htmlFor="email" className="mb-1.5 block text-[0.65rem] font-semibold tracking-wide text-ink-muted uppercase">
                   Email
                 </label>
-                <input id="email" type="email" className={fieldClassName} placeholder={directContact.email} />
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  autoComplete="email"
+                  value={form.email}
+                  onChange={updateField('email')}
+                  className={fieldClassName}
+                  placeholder={directContact.email}
+                />
               </div>
 
               <div>
                 <label htmlFor="subject" className="mb-1.5 block text-[0.65rem] font-semibold tracking-wide text-ink-muted uppercase">
                   Subject
                 </label>
-                <select id="subject" className={fieldClassName} defaultValue="">
+                <select
+                  id="subject"
+                  name="subject"
+                  required
+                  value={form.subject}
+                  onChange={updateField('subject')}
+                  className={fieldClassName}
+                >
                   <option value="" disabled>
                     Select a subject
                   </option>
@@ -251,14 +372,35 @@ export default function Contact() {
                 </label>
                 <textarea
                   id="message"
+                  name="message"
                   rows={4}
+                  required
+                  value={form.message}
+                  onChange={updateField('message')}
                   className={`${fieldClassName} resize-none`}
                   placeholder="How can we help?"
                 />
               </div>
 
-              <ContactButton as="button" type="submit" className="w-full">
-                Contact Us Now
+              <p className="rounded-lg border border-brand/15 bg-brand-muted/40 px-4 py-3 text-sm leading-relaxed text-ink-muted">
+                This message will be sent to the work mail of Dr. Wael El Dakroury ({CONTACT_RECIPIENT_EMAIL}) and you
+                will receive a response soon.
+              </p>
+
+              {status === 'success' && (
+                <p className="rounded-lg border border-brand/20 bg-brand/5 px-4 py-3 text-sm text-brand" role="status">
+                  Your message has been sent successfully. We will get back to you soon.
+                </p>
+              )}
+
+              {status === 'error' && errorMessage && (
+                <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
+                  {errorMessage}
+                </p>
+              )}
+
+              <ContactButton as="button" type="submit" className="w-full disabled:cursor-not-allowed disabled:opacity-60" disabled={status === 'sending'}>
+                {status === 'sending' ? 'Sending…' : 'Send Message'}
               </ContactButton>
             </form>
           </div>

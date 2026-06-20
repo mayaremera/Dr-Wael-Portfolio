@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import DashboardItemList from './DashboardItemList'
 import MediaDropzone from './MediaDropzone'
+import { useConfirmDelete } from './DeleteConfirmDialog'
 import {
   createContentId,
   emptyAffiliation,
@@ -33,6 +34,8 @@ function PanelShell({ eyebrow, title, description, children }) {
 }
 
 function StringListEditor({ label, items, onChange, addLabel = 'Add paragraph' }) {
+  const confirmDelete = useConfirmDelete()
+
   return (
     <div>
       <label className={labelClassName}>{label}</label>
@@ -46,7 +49,14 @@ function StringListEditor({ label, items, onChange, addLabel = 'Add paragraph' }
             />
             <button
               type="button"
-              onClick={() => onChange(items.filter((_, i) => i !== index))}
+              onClick={() =>
+                confirmDelete({
+                  title: 'Remove this paragraph?',
+                  message: 'This paragraph will be removed from the list.',
+                  confirmLabel: 'Remove',
+                  onConfirm: () => onChange(items.filter((_, i) => i !== index)),
+                })
+              }
               className="shrink-0 self-start rounded-lg border border-slate-200 px-2.5 py-2 text-xs font-semibold tracking-wide text-accent-hover uppercase"
             >
               Remove
@@ -124,6 +134,15 @@ function AffiliationEditor({ initialItem, onSave, onCancel }) {
           <label className={labelClassName}>Badge logo (optional)</label>
           <MediaDropzone image={item.badgeLogo || ''} video="" onChange={({ image }) => update('badgeLogo', image)} onClear={() => update('badgeLogo', '')} />
         </div>
+        {item.badgeLogo ? (
+          <div className="sm:col-span-2">
+            <label className={labelClassName}>Dual logo layout</label>
+            <select className={fieldClassName} value={item.logoLayout || 'split'} onChange={(e) => update('logoLayout', e.target.value)}>
+              <option value="split">Side by side (50 / 50)</option>
+              <option value="badge">Corner badge overlay</option>
+            </select>
+          </div>
+        ) : null}
         <div className="sm:col-span-2">
           <label className={labelClassName}>Badge label (optional)</label>
           <input className={fieldClassName} value={item.badgeLabel || ''} onChange={(e) => update('badgeLabel', e.target.value)} />
@@ -142,10 +161,32 @@ function AffiliationEditor({ initialItem, onSave, onCancel }) {
 }
 
 function AffiliationPreview({ item }) {
+  const showSplit = item.badgeLogo && (item.logoLayout || 'split') === 'split'
+
   return (
     <div className="flex gap-3">
-      <div className="h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-slate-100 ring-1 ring-slate-200/80">
-        {item.logo ? (
+      <div
+        className={`h-14 shrink-0 overflow-hidden rounded-lg bg-slate-100 ring-1 ring-slate-200/80 ${
+          showSplit ? 'flex w-24' : 'w-14'
+        }`}
+      >
+        {showSplit ? (
+          <>
+            <div className="flex w-[54%] items-center justify-center bg-white p-1">
+              <img src={item.badgeLogo} alt="" className="max-h-full max-w-full object-contain" />
+            </div>
+            <div
+              className="relative flex-1 overflow-hidden bg-[#1a3a7a]"
+              style={{ clipPath: 'polygon(14% 0, 100% 0, 100% 100%, 0 100%)' }}
+            >
+              {item.logo ? (
+                <img src={item.logo} alt="" className="h-full w-full object-cover object-center" />
+              ) : (
+                <div className="flex h-full items-center justify-center text-[0.55rem] text-white/70">Logo</div>
+              )}
+            </div>
+          </>
+        ) : item.logo ? (
           <img src={item.logo} alt="" className="h-full w-full object-contain p-1" />
         ) : (
           <div className="flex h-full items-center justify-center text-[0.6rem] text-ink-muted">No logo</div>

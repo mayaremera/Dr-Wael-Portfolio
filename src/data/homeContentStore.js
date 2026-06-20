@@ -117,10 +117,32 @@ function mergeWithDefaults(saved) {
       ...defaults.affiliations,
       ...saved.affiliations,
       companies: saved.affiliations?.companies?.length
-        ? saved.affiliations.companies.map((company, index) => ({
-            ...defaults.affiliations.companies[index],
-            ...company,
-          }))
+        ? saved.affiliations.companies.map((company, index) => {
+            const merged = {
+              ...defaults.affiliations.companies[index],
+              ...company,
+            }
+
+            const defaultCambridge = defaults.affiliations.companies.find((entry) => entry.id === 'cambridge')
+            const usesLegacyCambridgeAssets =
+              merged.id === 'cambridge' &&
+              (merged.logoLayout === 'split' ||
+                merged.badgeLogo ||
+                merged.logo?.includes('trusted8banner'))
+
+            if (usesLegacyCambridgeAssets && defaultCambridge) {
+              return {
+                ...merged,
+                logo: defaultCambridge.logo,
+                badgeLogo: defaultCambridge.badgeLogo ?? '',
+                badgeLabel: defaultCambridge.badgeLabel ?? '',
+                logoLayout: defaultCambridge.logoLayout ?? '',
+                logoFit: defaultCambridge.logoFit ?? 'cover',
+              }
+            }
+
+            return merged
+          })
         : defaults.affiliations.companies,
     },
     whyChooseUs: {
@@ -188,6 +210,7 @@ export const emptyAffiliation = {
   badgeLogo: '',
   badgeLabel: '',
   logoFit: '',
+  logoLayout: '',
 }
 
 export const emptyCredentialWheelItem = {

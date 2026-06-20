@@ -38,6 +38,34 @@ function AffiliationHoverOverlay({ company }) {
   )
 }
 
+function AffiliationSplitLogos({ primaryLogo, secondaryLogo, primaryLabel, secondaryLabel, onPrimaryError }) {
+  return (
+    <div className="absolute inset-0 bg-white transition-all duration-500 ease-out group-hover:opacity-25 group-focus-within:opacity-25">
+      {/* Cambridge — left, full width so the name is never clipped */}
+      <div className="absolute inset-y-0 left-0 z-[2] flex w-[54%] items-center justify-center px-2.5 py-2 sm:px-3">
+        <img
+          src={secondaryLogo}
+          alt={secondaryLabel}
+          className="max-h-[78%] w-full max-w-full object-contain"
+        />
+      </div>
+
+      {/* ARC — right, diagonal left edge (no fade, no overlap onto Cambridge) */}
+      <div
+        className="absolute inset-y-0 right-0 left-[46%] z-[1] overflow-hidden bg-[#1a3a7a]"
+        style={{ clipPath: 'polygon(14% 0, 100% 0, 100% 100%, 0 100%)' }}
+      >
+        <img
+          src={primaryLogo}
+          alt={primaryLabel}
+          onError={onPrimaryError}
+          className="h-full w-full object-cover object-center"
+        />
+      </div>
+    </div>
+  )
+}
+
 function AffiliationBadge({ logo, label, compact = false }) {
   const imageClassName = compact
     ? 'h-[2.68rem] w-auto max-w-[4.2rem] object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.35)] md:h-[3.06rem] md:max-w-[3.06rem] lg:h-[3.6rem] lg:max-w-[3.6rem]'
@@ -56,6 +84,9 @@ function AffiliationBadge({ logo, label, compact = false }) {
 function AffiliationTile({ company }) {
   const [logoFailed, setLogoFailed] = useState(false)
   const fullCover = company.logoFit === 'cover'
+  const logoLayout = company.logoLayout || (company.badgeLogo ? 'split' : 'single')
+  const useSplitLayout = company.badgeLogo && logoLayout === 'split'
+  const useBadgeLayout = company.badgeLogo && logoLayout === 'badge'
 
   return (
     <article
@@ -64,7 +95,15 @@ function AffiliationTile({ company }) {
     >
       <div className="relative h-full w-full overflow-hidden">
         {!logoFailed ? (
-          fullCover ? (
+          useSplitLayout ? (
+            <AffiliationSplitLogos
+              primaryLogo={company.logo}
+              secondaryLogo={company.badgeLogo}
+              primaryLabel={company.shortName}
+              secondaryLabel={company.badgeLabel || company.name}
+              onPrimaryError={() => setLogoFailed(true)}
+            />
+          ) : fullCover ? (
             <div className="absolute inset-0">
               <img
                 src={company.logo}
@@ -91,7 +130,7 @@ function AffiliationTile({ company }) {
           </div>
         )}
 
-        {company.badgeLogo ? (
+        {useBadgeLayout ? (
           <AffiliationBadge
             logo={company.badgeLogo}
             label={company.badgeLabel}

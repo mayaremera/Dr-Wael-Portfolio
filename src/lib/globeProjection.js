@@ -37,7 +37,7 @@ export function project(lat, lng, phi, theta, size, scale = 1.05) {
   v = rotateY(v, phi)
   v = rotateX(v, theta)
 
-  const radius = size * 0.4 * scale
+  const radius = size * 0.38 * scale
   const x = size / 2 + v.x * radius
   const y = size / 2 - v.y * radius
 

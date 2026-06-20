@@ -10,7 +10,7 @@ export default function SpeakingTraining() {
             <p className="text-xs font-semibold tracking-[0.22em] text-brand uppercase">{speakingTraining.label}</p>
             <h2 className="mt-3 font-serif text-3xl leading-tight text-ink md:text-4xl">{speakingTraining.title}</h2>
             <p className="mt-5 text-sm leading-relaxed text-ink-muted md:text-base">{speakingTraining.intro}</p>
-            <ContactButton href="/contact" className="mt-8">
+            <ContactButton href="/contact" className="mt-20">
               Request a Speaking Engagement
             </ContactButton>
           </div>

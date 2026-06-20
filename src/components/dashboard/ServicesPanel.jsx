@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import DashboardItemList from './DashboardItemList'
 import MediaDropzone from './MediaDropzone'
+import { useConfirmDelete } from './DeleteConfirmDialog'
 import {
   FILTER_GROUPS,
   createContentId,
@@ -35,6 +36,8 @@ function PanelShell({ eyebrow, title, description, children }) {
 }
 
 function StringListEditor({ label, items, onChange, addLabel = 'Add line' }) {
+  const confirmDelete = useConfirmDelete()
+
   const updateItem = (index, value) => {
     onChange(items.map((item, itemIndex) => (itemIndex === index ? value : item)))
   }
@@ -60,7 +63,14 @@ function StringListEditor({ label, items, onChange, addLabel = 'Add line' }) {
             />
             <button
               type="button"
-              onClick={() => removeItem(index)}
+              onClick={() =>
+                confirmDelete({
+                  title: 'Remove this line?',
+                  message: 'This line will be removed from the list.',
+                  confirmLabel: 'Remove',
+                  onConfirm: () => removeItem(index),
+                })
+              }
               className="shrink-0 self-start rounded-lg border border-slate-200 px-2.5 py-2 text-xs font-semibold tracking-wide text-accent-hover uppercase transition-colors hover:border-accent/30"
             >
               Remove

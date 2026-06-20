@@ -233,7 +233,7 @@ function App() {
         }}
       >
         <VideoSection variant="light" />
-        <PromoVideoSection />
+        <PromoVideoSection ctaHref="/contact" secondaryHref="/services" />
         <GalleryGrid />
       </PageLayout>
     ),
