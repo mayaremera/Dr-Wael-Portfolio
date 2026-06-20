@@ -23,6 +23,18 @@ export async function getSupabaseSession() {
   return data.session
 }
 
+export function subscribeToAuthChanges(onSessionChange) {
+  if (!supabase) return () => {}
+
+  const {
+    data: { subscription },
+  } = supabase.auth.onAuthStateChange((_event, session) => {
+    onSessionChange(session)
+  })
+
+  return () => subscription.unsubscribe()
+}
+
 export async function signInToSupabase(email, password) {
   if (!supabase) {
     throw new Error('Supabase is not configured.')
