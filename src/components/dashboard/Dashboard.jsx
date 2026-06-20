@@ -3,7 +3,12 @@ import DashboardSidebar from './DashboardSidebar'
 import { DashboardPanel } from './DashboardPanels'
 import DashboardCloudAuth from './DashboardCloudAuth'
 import { DeleteConfirmProvider } from './DeleteConfirmDialog'
-import { getSupabaseSession, isSupabaseConfigured, signOutFromSupabase } from '../../lib/supabase'
+import {
+  getSupabaseSession,
+  isSupabaseConfigured,
+  signOutFromSupabase,
+  subscribeToAuthChanges,
+} from '../../lib/supabase'
 
 const DEFAULT_SECTION = 'in-the-field'
 const VALID_SECTIONS = new Set([
@@ -25,7 +30,19 @@ function sectionToPath(section) {
   return section === DEFAULT_SECTION ? '/dashboard' : `/dashboard/${section}`
 }
 
+function DashboardAuthBootScreen() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-surface-alt">
+      <div className="flex flex-col items-center gap-3 text-center">
+        <span className="h-8 w-8 animate-spin rounded-full border-2 border-brand/20 border-t-brand" />
+        <p className="text-sm text-ink-muted">Checking your session…</p>
+      </div>
+    </div>
+  )
+}
+
 export default function Dashboard() {
+  const [authChecked, setAuthChecked] = useState(!isSupabaseConfigured)
   const [isCloudAuthenticated, setIsCloudAuthenticated] = useState(!isSupabaseConfigured)
   const [activeSection, setActiveSection] = useState(getDashboardSection)
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
@@ -33,9 +50,23 @@ export default function Dashboard() {
   useEffect(() => {
     if (!isSupabaseConfigured) return
 
+    let cancelled = false
+
     getSupabaseSession().then((session) => {
-      if (session) setIsCloudAuthenticated(true)
+      if (cancelled) return
+      setIsCloudAuthenticated(Boolean(session))
+      setAuthChecked(true)
     })
+
+    const unsubscribe = subscribeToAuthChanges((session) => {
+      setIsCloudAuthenticated(Boolean(session))
+      setAuthChecked(true)
+    })
+
+    return () => {
+      cancelled = true
+      unsubscribe()
+    }
   }, [])
 
   useEffect(() => {
@@ -56,6 +87,10 @@ export default function Dashboard() {
     await signOutFromSupabase()
     setIsCloudAuthenticated(!isSupabaseConfigured)
     setMobileNavOpen(false)
+  }
+
+  if (!authChecked) {
+    return <DashboardAuthBootScreen />
   }
 
   if (!isCloudAuthenticated) {
