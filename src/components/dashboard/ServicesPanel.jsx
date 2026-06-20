@@ -555,14 +555,6 @@ export default function ServicesPanel() {
             <label className={labelClassName}>Intro</label>
             <textarea className={`${fieldClassName} min-h-24 resize-y`} value={content.speechLanguageServices.intro} onChange={(e) => updateServicesHeader('intro', e.target.value)} />
           </div>
-          <div className="md:col-span-2">
-            <StringListEditor
-              label="Family benefits"
-              items={content.speechLanguageServices.familyBenefits}
-              onChange={(familyBenefits) => updateServicesHeader('familyBenefits', familyBenefits)}
-              addLabel="Add benefit"
-            />
-          </div>
         </div>
         <button type="button" onClick={saveServicesHeader} className="mt-4 rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase transition-colors hover:bg-brand-light">
           Save header
