@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-
 export function useDashboardSection(getDefaults, loadRemote) {
   const [content, setContent] = useState(getDefaults)
   const [loading, setLoading] = useState(true)

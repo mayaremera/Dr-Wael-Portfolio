@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Header from './components/Header'
 import HeroBanner from './components/HeroBanner'
 import GalleryGrid from './components/GalleryGrid'
@@ -19,6 +19,7 @@ import GalleryPageHeading from './components/GalleryPageHeading'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
 import ContactButton from './components/ContactButton'
+import PageLoader from './components/PageLoader'
 import Dashboard from './components/dashboard/Dashboard'
 import { images } from './data/content'
 import { useServicesContent } from './hooks/useServicesContent'
@@ -167,9 +168,17 @@ function VibeBand({
 
 function App() {
   const { speechLanguageServices } = useServicesContent()
+  const [showInitialLoader, setShowInitialLoader] = useState(true)
   const rawPath = window.location.pathname.replace(/\/+$/, '') || HOME_PATH
   const pathname = rawPath === '/cases' ? '/services' : rawPath
   const isDashboard = pathname === '/dashboard' || pathname.startsWith('/dashboard/')
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      requestAnimationFrame(() => setShowInitialLoader(false))
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [])
 
   useEffect(() => {
     if (rawPath === '/cases') {
@@ -178,7 +187,12 @@ function App() {
   }, [rawPath])
 
   if (isDashboard) {
-    return <Dashboard />
+    return (
+      <>
+        {showInitialLoader ? <PageLoader /> : null}
+        <Dashboard />
+      </>
+    )
   }
 
   const pages = {
@@ -283,6 +297,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-surface pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0">
+      {showInitialLoader ? <PageLoader /> : null}
       <Header />
       <main>
         {pageContent ?? (

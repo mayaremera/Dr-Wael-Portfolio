@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import logo from '../../assets/logo-wa-transparent.png'
+import Logo from '../Logo'
 import { isSupabaseConfigured, signInToSupabase } from '../../lib/supabase'
 
 const fieldClassName =
@@ -41,7 +41,7 @@ export default function DashboardCloudAuth({ onAuthenticated }) {
       <div className="relative w-full max-w-md">
         <div className="rounded-2xl border border-white/15 bg-white/95 p-8 shadow-2xl shadow-black/20 backdrop-blur-sm sm:p-10">
           <div className="text-center">
-            <img src={logo} alt="" className="mx-auto h-14 w-auto" />
+            <Logo scrolled markOnly className="mx-auto !h-14 justify-center" />
             <p className="mt-5 text-xs font-semibold tracking-[0.22em] text-brand uppercase">Cloud sync</p>
             <h1 className="mt-2 font-serif text-3xl text-ink">Sign in to publish</h1>
             <p className="mt-3 text-sm leading-relaxed text-ink-muted">

@@ -1,6 +1,4 @@
-import logo from '../../assets/logo-wa-transparent.png'
-
-
+import Logo from '../Logo'
 
 const mainNavItems = [
 
@@ -244,7 +242,7 @@ export default function DashboardSidebar({ activeSection, onSelect }) {
 
         <div className="flex items-center gap-3">
 
-          <img src={logo} alt="" className="h-11 w-auto brightness-0 invert" />
+          <Logo scrolled={false} markOnly className="!h-11" />
 
           <div>
 

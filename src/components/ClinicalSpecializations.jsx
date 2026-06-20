@@ -126,7 +126,7 @@ function CaseSpotlight({ item, height }) {
           </div>
 
           <a
-            href="#contact"
+            href="/contact"
             className="ml-auto inline-flex items-center gap-2 rounded-sm bg-accent px-4 py-2 text-[0.65rem] font-semibold tracking-wide text-white uppercase transition-colors hover:bg-accent-hover"
           >
             Consult
