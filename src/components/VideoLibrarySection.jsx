@@ -3,6 +3,42 @@ import { useGalleryContent } from '../hooks/useGalleryContent'
 import { parseYoutubeId } from '../data/galleryContentStore'
 import { blockMediaContext, protectedMediaProps, protectedShellProps, protectedVideoProps } from '../lib/mediaProtection'
 
+function VideoLibraryBackdrop() {
+  return (
+    <>
+      <div
+        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#0f2d36] via-brand to-[#1e5564]"
+        aria-hidden="true"
+      />
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent"
+        aria-hidden="true"
+      />
+      <div
+        className="pointer-events-none absolute left-1/2 top-[42%] h-[min(70vw,36rem)] w-[min(92vw,56rem)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/[0.08] blur-3xl"
+        aria-hidden="true"
+      />
+      <div
+        className="pointer-events-none absolute -right-16 top-16 h-64 w-64 rounded-full bg-accent/20 blur-[90px]"
+        aria-hidden="true"
+      />
+      <div
+        className="pointer-events-none absolute -left-20 bottom-8 h-72 w-72 rounded-full bg-brand-light/25 blur-[100px]"
+        aria-hidden="true"
+      />
+      <svg
+        viewBox="0 0 800 800"
+        className="pointer-events-none absolute left-1/2 top-1/2 h-[min(110vw,52rem)] w-[min(110vw,52rem)] -translate-x-1/2 -translate-y-1/2 text-white/[0.07]"
+        aria-hidden="true"
+      >
+        <circle cx="400" cy="400" r="300" fill="none" stroke="currentColor" strokeWidth="1" />
+        <circle cx="400" cy="400" r="220" fill="none" stroke="currentColor" strokeWidth="0.75" strokeDasharray="2 14" />
+        <circle cx="400" cy="400" r="140" fill="none" stroke="currentColor" strokeWidth="0.5" opacity="0.6" />
+      </svg>
+    </>
+  )
+}
+
 function getItemDescription(item) {
   return item.description?.trim() || item.subtitle?.trim() || ''
 }

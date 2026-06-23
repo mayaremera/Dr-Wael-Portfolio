@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { sortGalleryItems } from '../data/galleryContentStore'
 import { useGalleryContent } from '../hooks/useGalleryContent'
-import { protectedMediaProps, protectedVideoProps } from '../lib/mediaProtection'
+import { protectedMediaProps, protectedShellProps, protectedVideoProps } from '../lib/mediaProtection'
 
 const imageAspects = ['aspect-[4/5]', 'aspect-square', 'aspect-[5/4]', 'aspect-[3/4]']
 const GALLERY_VIDEO_HEIGHT = 'h-[20rem]'
@@ -38,6 +38,9 @@ function VideoSoundWaves() {
 }
 
 function GalleryModal({ item, onClose }) {
+  const videoRef = useRef(null)
+  const isVideo = item.type === 'video'
+
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.key === 'Escape') onClose()
@@ -52,12 +55,24 @@ function GalleryModal({ item, onClose }) {
     }
   }, [onClose])
 
+  useEffect(() => {
+    if (!isVideo) return undefined
+    const video = videoRef.current
+    if (!video) return undefined
+
+    video.play().catch(() => {})
+
+    return () => {
+      video.pause()
+    }
+  }, [isVideo, item.src])
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8"
       role="dialog"
       aria-modal="true"
-      aria-label="Image preview"
+      aria-label={isVideo ? 'Video preview' : 'Image preview'}
     >
       <button
         type="button"
@@ -66,7 +81,10 @@ function GalleryModal({ item, onClose }) {
         aria-label="Close preview"
       />
 
-      <div className="relative z-10 flex max-h-[90vh] max-w-5xl flex-col items-end gap-3">
+      <div
+        {...protectedShellProps}
+        className={`${protectedShellProps.className} relative z-10 flex max-h-[90vh] max-w-5xl flex-col items-end gap-3`}
+      >
         <button
           type="button"
           onClick={onClose}
@@ -75,20 +93,34 @@ function GalleryModal({ item, onClose }) {
           Close
         </button>
 
-        <div className="overflow-hidden rounded-xl bg-white p-1 shadow-2xl">
-          <img
-            src={encodeURI(item.src)}
-            alt={item.alt}
-            className="max-h-[calc(90vh-3rem)] w-auto max-w-[min(90vw,64rem)] select-none object-contain"
-            {...protectedMediaProps}
-          />
+        <div className="overflow-hidden rounded-xl bg-black p-1 shadow-2xl">
+          {isVideo ? (
+            <video
+              ref={videoRef}
+              className="max-h-[calc(90vh-3rem)] w-full max-w-[min(90vw,64rem)] select-none object-contain"
+              controls
+              autoPlay
+              playsInline
+              aria-label={item.alt}
+              {...protectedVideoProps}
+            >
+              <source src={encodeURI(item.src)} type="video/mp4" />
+            </video>
+          ) : (
+            <img
+              src={encodeURI(item.src)}
+              alt={item.alt}
+              className="max-h-[calc(90vh-3rem)] w-auto max-w-[min(90vw,64rem)] select-none object-contain"
+              {...protectedMediaProps}
+            />
+          )}
         </div>
       </div>
     </div>
   )
 }
 
-function GalleryTile({ item, aspectClass, onImageClick }) {
+function GalleryTile({ item, aspectClass, onItemClick }) {
   const videoRef = useRef(null)
   const isVideo = item.type === 'video'
 
@@ -109,18 +141,22 @@ function GalleryTile({ item, aspectClass, onImageClick }) {
 
   if (isVideo) {
     return (
-      <figure
-        className={`group relative w-full overflow-hidden rounded-2xl bg-slate-900 shadow-md ring-2 ring-brand/30 transition-shadow duration-300 hover:shadow-lg hover:shadow-brand/20 ${GALLERY_VIDEO_HEIGHT}`}
+      <button
+        type="button"
+        onClick={() => onItemClick(item)}
+        className={`group relative w-full cursor-pointer overflow-hidden rounded-2xl bg-slate-900 text-left shadow-md ring-2 ring-brand/30 transition-shadow duration-300 hover:shadow-lg hover:shadow-brand/20 ${GALLERY_VIDEO_HEIGHT}`}
+        aria-label={`Play ${item.alt}`}
       >
         <video
           ref={videoRef}
-          className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-[1.03] select-none"
+          className="pointer-events-none absolute inset-0 h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-[1.03] select-none"
           autoPlay
           muted
           loop
           playsInline
           preload="auto"
-          aria-label={item.alt}
+          tabIndex={-1}
+          aria-hidden="true"
           {...protectedVideoProps}
         >
           <source src={encodeURI(item.src)} type="video/mp4" />
@@ -132,8 +168,15 @@ function GalleryTile({ item, aspectClass, onImageClick }) {
           </svg>
           Video
         </span>
+        <span className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+          <span className="grid h-12 w-12 place-items-center rounded-full bg-white/90 text-brand shadow-lg">
+            <svg className="ml-0.5 h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M9 7.5v9l7.5-4.5L9 7.5z" />
+            </svg>
+          </span>
+        </span>
         <VideoSoundWaves />
-      </figure>
+      </button>
     )
   }
 
@@ -142,7 +185,7 @@ function GalleryTile({ item, aspectClass, onImageClick }) {
   return (
     <button
       type="button"
-      onClick={() => onImageClick(item)}
+      onClick={() => onItemClick(item)}
       className={`${tileClassName} block w-full cursor-zoom-in text-left`}
       aria-label={`View ${item.alt}`}
     >
@@ -161,10 +204,10 @@ function GalleryTile({ item, aspectClass, onImageClick }) {
 export default function GalleryGrid() {
   const { mediaGallery } = useGalleryContent()
   const { label, title, items } = mediaGallery
-  const [activeImage, setActiveImage] = useState(null)
+  const [activeItem, setActiveItem] = useState(null)
 
   const sortedItems = useMemo(() => sortGalleryItems(items), [items])
-  const closeModal = useCallback(() => setActiveImage(null), [])
+  const closeModal = useCallback(() => setActiveItem(null), [])
 
   return (
     <section id="gallery" className="border-t border-slate-200 bg-white py-16 lg:py-24">

@@ -1,9 +1,9 @@
 @import 'tailwindcss';
 
 @theme {
-  --font-serif: 'Cormorant Garamond', Georgia, serif;
-  --font-logo: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+  /* Sitewide typography: Source Sans 3 (body/UI) + Cormorant Garamond (headings/display) */
   --font-sans: 'Source Sans 3', system-ui, sans-serif;
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
   --color-brand: #1a4d5c;
   --color-brand-light: #2d6a7a;
   --color-brand-muted: #e8f1f3;
@@ -27,6 +27,23 @@ body {
   color: var(--color-ink);
   background-color: #ffffff;
   -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+}
+
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
 }
 
 /* ── Page loader ── */
