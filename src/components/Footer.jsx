@@ -1,4 +1,5 @@
 import { site, footerQuickLinks } from '../data/content'
+import ThreadsIcon from './icons/ThreadsIcon'
 
 function FooterSocialIcon({ href, label, children }) {
   return (
@@ -69,9 +70,7 @@ export default function Footer() {
                 </svg>
               </FooterSocialIcon>
               <FooterSocialIcon href={site.social.threads} label="Threads">
-                <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden="true">
-                  <path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.011v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.11.636c-.52-1.635-1.368-2.918-2.534-3.812C17.705 1.75 15.413 1.17 12.2 1.15h-.01c-3.01.022-5.312.911-6.838 2.647-1.433 1.635-2.17 3.985-2.196 6.973v.015c.026 2.988.763 5.338 2.196 6.973 1.526 1.736 3.828 2.625 6.838 2.647h.01c2.39-.017 4.223-.643 5.67-1.947 1.558-1.402 2.377-3.573 2.432-6.458v-.844H12.01v-2.11h5.84v1.086c-.053 3.31-1.148 6.168-3.278 8.078-1.874 1.692-4.467 2.542-7.786 2.564z" />
-                </svg>
+                <ThreadsIcon className="h-4 w-4" />
               </FooterSocialIcon>
               <FooterSocialIcon href={site.social.twitter} label="X / Twitter">
                 <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden="true">
