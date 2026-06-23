@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import DashboardSidebar from './DashboardSidebar'
 import { DashboardPanel } from './DashboardPanels'
 import DashboardCloudAuth from './DashboardCloudAuth'
+import PageLoader from '../PageLoader'
 import { DeleteConfirmProvider } from './DeleteConfirmDialog'
 import {
   getSupabaseSession,
@@ -41,7 +42,7 @@ function DashboardAuthBootScreen() {
   )
 }
 
-export default function Dashboard() {
+export default function Dashboard({ isPageLoading = false }) {
   const [authChecked, setAuthChecked] = useState(!isSupabaseConfigured)
   const [isCloudAuthenticated, setIsCloudAuthenticated] = useState(!isSupabaseConfigured)
   const [activeSection, setActiveSection] = useState(getDashboardSection)
@@ -116,7 +117,12 @@ export default function Dashboard() {
         <DashboardSidebar activeSection={activeSection} onSelect={navigateTo} />
       </div>
 
-      <div className="flex min-h-screen min-w-0 flex-col lg:ml-72 xl:ml-80">
+      <div
+        className={`relative flex min-h-screen min-w-0 flex-col lg:ml-72 xl:ml-80 ${
+          isPageLoading ? 'pointer-events-none select-none' : ''
+        }`}
+        aria-hidden={isPageLoading}
+      >
         <header className="sticky top-0 z-30 flex items-center justify-between gap-4 border-b border-slate-200 bg-white/95 px-5 py-4 backdrop-blur-sm lg:px-8">
           <div className="flex items-center gap-3">
             <button
@@ -155,6 +161,8 @@ export default function Dashboard() {
           </div>
         </main>
       </div>
+
+      {isPageLoading ? <PageLoader variant="dashboard" /> : null}
     </div>
     </DeleteConfirmProvider>
   )

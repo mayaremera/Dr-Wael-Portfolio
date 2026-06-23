@@ -125,17 +125,6 @@ export default function SettingsPanel() {
             </button>
             <button
               type="button"
-              onClick={() => {
-                if (!window.confirm('Overwrite all 5 sections in Supabase with the built-in defaults?')) return
-                handleSeed(true)
-              }}
-              disabled={seeding || !sessionEmail}
-              className="rounded-lg border border-slate-200 px-4 py-2.5 text-xs font-semibold tracking-wide text-ink-muted uppercase transition-colors hover:border-brand/25 hover:text-brand disabled:opacity-50"
-            >
-              Reset all to defaults
-            </button>
-            <button
-              type="button"
               onClick={refreshStatus}
               className="rounded-lg border border-slate-200 px-4 py-2.5 text-xs font-semibold tracking-wide text-ink-muted uppercase transition-colors hover:border-brand/25 hover:text-brand"
             >

@@ -26,6 +26,8 @@ export const images = {
   servicesHero: '/images/services-hero-v3.png',
   heroBanner: '/images/hero1.jpeg',
   family: '/images/family.jpg',
+  whyTrust: '/images/whytrust.jpg',
+  familyTraining: '/images/familytraining.jpg',
   screening: '/images/screening.jpg',
   familyCounseling: '/images/familycoun.jpeg',
   assessment: '/images/assesment.jpeg',
@@ -616,7 +618,7 @@ export const therapyConcepts = [
   },
   {
     id: 'family-training',
-    image: images.family,
+    image: images.familyTraining,
     title: 'Family Training',
     subtitle: 'Parent Coaching & Home Support',
     summary:

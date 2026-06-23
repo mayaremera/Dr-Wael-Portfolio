@@ -1,6 +1,18 @@
 import { useEffect, useRef, useState } from 'react'
 import { useHomeContent } from '../hooks/useHomeContent'
 
+const WHEEL_SCALE = 1.15
+const WHEEL_MAX_PX = Math.round(280 * WHEEL_SCALE)
+const LABEL_RADIUS_PX = Math.round(118 * WHEEL_SCALE)
+const HUB_SIZE_REM = 8.5 * WHEEL_SCALE
+
+function formatCredentialLabel(short = '') {
+  const words = short.trim().split(/\s+/).filter(Boolean)
+  if (words.length <= 2) return short.trim()
+
+  return `${words.slice(0, 2).join(' ')}..`
+}
+
 function CompassRose() {
   return (
     <svg viewBox="0 0 200 200" className="h-full w-full" aria-hidden="true">
@@ -74,6 +86,7 @@ export default function CredentialCompass() {
   const displayItem = items[displayIndex] ?? items[0]
 
   const ringRotation = -(safeActiveIndex * (360 / items.length))
+  const angleStep = 360 / items.length
 
   const selectItem = (index) => {
     lastStepRef.current = index
@@ -83,7 +96,7 @@ export default function CredentialCompass() {
   return (
     <div
       ref={rootRef}
-      className="relative mx-auto flex w-full max-w-[300px] flex-col items-center justify-center lg:mx-0 lg:max-w-none"
+      className="relative mx-auto flex w-full max-w-[345px] flex-col items-center justify-center lg:mx-0 lg:max-w-none"
       aria-label="Credentials compass"
     >
       <p className="mb-1 text-center text-[0.65rem] font-semibold tracking-[0.2em] text-brand uppercase lg:text-left">
@@ -95,7 +108,10 @@ export default function CredentialCompass() {
         </p>
       ) : null}
 
-      <div className="relative aspect-square w-full max-w-[280px]">
+      <div
+        className="relative aspect-square w-full"
+        style={{ maxWidth: `${WHEEL_MAX_PX}px` }}
+      >
         <div className="absolute inset-0 text-brand/80">
           <CompassRose />
         </div>
@@ -105,34 +121,36 @@ export default function CredentialCompass() {
           style={{ transform: `rotate(${ringRotation}deg)` }}
         >
           {items.map((item, index) => {
-            const angle = (index / items.length) * 360 - 90
+            const angle = -90 + index * angleStep
             const isActive = index === safeActiveIndex
             const isPreview = index === previewIndex
             const isHighlighted = isActive || isPreview
+            const label = formatCredentialLabel(item.short)
 
             return (
               <div
                 key={item.id || item.short}
                 className="absolute left-1/2 top-1/2 h-0 w-0"
-                style={{ transform: `rotate(${angle}deg) translateY(-118px)` }}
+                style={{ transform: `rotate(${angle}deg) translateY(-${LABEL_RADIUS_PX}px)` }}
               >
                 <button
                   type="button"
                   aria-label={`${item.short}: ${item.detail}`}
+                  title={item.short}
                   aria-current={isActive ? 'true' : undefined}
                   onClick={() => selectItem(index)}
                   onMouseEnter={() => setPreviewIndex(index)}
                   onMouseLeave={() => setPreviewIndex(null)}
                   onFocus={() => setPreviewIndex(index)}
                   onBlur={() => setPreviewIndex(null)}
-                  className={`absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 cursor-pointer whitespace-nowrap rounded-full border px-2 py-0.5 text-[0.56rem] font-semibold tracking-wide uppercase transition-all duration-500 sm:px-2.5 sm:py-1 sm:text-[0.62rem] ${
+                  className={`absolute left-1/2 top-0 flex h-[1.65rem] w-[4.85rem] -translate-x-1/2 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border px-1 text-[0.56rem] font-semibold tracking-wide uppercase transition-colors duration-500 sm:text-[0.62rem] ${
                     isHighlighted
-                      ? 'border-brand bg-brand text-white shadow-md shadow-brand/25 scale-110 z-10'
-                      : 'border-brand/20 bg-white/90 text-brand/70 scale-95 hover:border-brand/40 hover:bg-white hover:text-brand hover:scale-100'
+                      ? 'z-10 border-brand bg-brand text-white shadow-md shadow-brand/25'
+                      : 'z-0 border-brand/20 bg-white/90 text-brand/70 hover:border-brand/40 hover:bg-white hover:text-brand'
                   }`}
                   style={{ transform: `rotate(${-angle - ringRotation}deg)` }}
                 >
-                  {item.short}
+                  <span className="block max-w-full truncate">{label}</span>
                 </button>
               </div>
             )
@@ -142,7 +160,8 @@ export default function CredentialCompass() {
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
           <div
             key={displayIndex}
-            className="flex h-[8.5rem] w-[8.5rem] flex-col items-center justify-center rounded-full border border-brand/20 bg-white/95 px-3 text-center shadow-inner shadow-brand/10 backdrop-blur-sm transition-opacity duration-300 sm:h-36 sm:w-36"
+            className="flex flex-col items-center justify-center rounded-full border border-brand/20 bg-white/95 px-3 text-center shadow-inner shadow-brand/10 backdrop-blur-sm transition-opacity duration-300"
+            style={{ width: `${HUB_SIZE_REM}rem`, height: `${HUB_SIZE_REM}rem` }}
           >
             <span className="text-[0.5rem] font-semibold tracking-[0.18em] text-brand/60 uppercase">Focus</span>
             <span className="mt-0.5 font-serif text-sm leading-tight text-brand sm:text-[0.95rem]">

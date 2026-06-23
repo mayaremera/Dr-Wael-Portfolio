@@ -138,7 +138,7 @@ function EventsPanel({ location, isPinned, onClose, anchor }) {
   return (
     <div
       ref={panelRef}
-      className={`globe-events-panel animate-globe-panel-in pointer-events-auto absolute inset-x-4 bottom-4 z-30 mx-auto max-h-[58vh] max-w-md overflow-hidden lg:inset-x-auto lg:bottom-auto lg:w-[400px] lg:max-h-[min(74vh,660px)] ${isPinned ? 'globe-events-panel--pinned' : 'globe-events-panel--preview'} ${desktopPosition ? 'globe-panel-anchored' : ''}`}
+      className={`globe-events-panel animate-globe-panel-in pointer-events-auto absolute inset-x-4 bottom-4 z-30 mx-auto flex max-h-[62vh] max-w-md flex-col overflow-hidden lg:inset-x-auto lg:bottom-auto lg:w-[400px] lg:max-h-[min(78vh,720px)] ${isPinned ? 'globe-events-panel--pinned' : 'globe-events-panel--preview'} ${desktopPosition ? 'globe-panel-anchored' : ''}`}
       style={anchoredDesktopStyle}
     >
       <div className="globe-events-panel__header">
@@ -264,7 +264,7 @@ export default function GlobalEventsMap() {
         aria-hidden="true"
       />
 
-      <div className="relative z-10 flex min-h-screen flex-col px-4 pt-24 pb-8 sm:px-6 sm:pt-28 lg:px-8 lg:pt-36 xl:pt-40">
+      <div className="relative z-10 flex min-h-screen flex-col px-4 pt-[5rem] pb-8 sm:px-6 sm:pt-[7rem] lg:px-8 lg:pt-48 lg:pb-10">
         <header className="mx-auto max-w-3xl text-center">
           <p className="text-xs font-semibold tracking-[0.28em] text-accent uppercase">{globeMeta.label}</p>
           <h2 id="global-presence-heading" className="mt-4 font-serif text-4xl leading-tight text-white md:text-5xl lg:text-6xl">

@@ -91,7 +91,7 @@ export function getDefaultHomeContent() {
     affiliations: cloneContent(defaultTrustedCompanies),
     whyChooseUs: {
       ...cloneContent(defaultWhyChooseUs),
-      image: images.family,
+      image: images.whyTrust,
     },
     promoVideo: cloneContent(defaultPromoVideo),
     credentialWheel: {
@@ -99,6 +99,15 @@ export function getDefaultHomeContent() {
       items: cloneContent(defaultCredentialWheelItems),
     },
   }
+}
+
+function migrateImagePath(url, legacyPath, nextPath) {
+  if (!url) return url
+
+  const [base, query] = url.split('?')
+  if (base !== legacyPath) return url
+
+  return query ? `${nextPath}?${query}` : nextPath
 }
 
 function mergeWithDefaults(saved) {
@@ -148,6 +157,11 @@ function mergeWithDefaults(saved) {
     whyChooseUs: {
       ...defaults.whyChooseUs,
       ...saved.whyChooseUs,
+      image: migrateImagePath(
+        saved.whyChooseUs?.image ?? defaults.whyChooseUs.image,
+        '/images/family.jpg',
+        '/images/whytrust.jpg',
+      ),
       paragraphs: saved.whyChooseUs?.paragraphs?.length
         ? saved.whyChooseUs.paragraphs
         : defaults.whyChooseUs.paragraphs,

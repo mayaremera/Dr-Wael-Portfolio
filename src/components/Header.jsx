@@ -129,8 +129,7 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false)
   const currentPath = getCurrentPath()
   const isContactActive = currentPath === '/contact'
-  const isInTheField = currentPath === '/in-the-field'
-  const headerScrolled = scrolled || isInTheField
+  const headerScrolled = scrolled
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40)

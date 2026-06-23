@@ -1,4 +1,4 @@
-import { mediaGallery as defaultMediaGallery } from './content'
+import { mediaGallery as defaultMediaGallery, video as defaultWatchVideo } from './content'
 import {
   CONTENT_SECTIONS,
   loadSectionPrimary,
@@ -12,14 +12,67 @@ function cloneContent(data) {
   return JSON.parse(JSON.stringify(data))
 }
 
-export function getDefaultGalleryContent() {
+function parseDateFromSrc(src = '') {
+  const match = src.match(/(\d{4})-(\d{2})-(\d{2})/)
+  if (!match) return null
+
+  const [, year, month, day] = match
+  const timestamp = Date.parse(`${year}-${month}-${day}T12:00:00.000Z`)
+  return Number.isNaN(timestamp) ? null : timestamp
+}
+
+export function getGalleryItemSortTime(item, fallbackIndex = 0) {
+  if (item.createdAt) {
+    const timestamp = Date.parse(item.createdAt)
+    if (!Number.isNaN(timestamp)) return timestamp
+  }
+
+  const fromFilename = parseDateFromSrc(item.src)
+  if (fromFilename) return fromFilename
+
+  return fallbackIndex
+}
+
+export function sortGalleryItems(items = []) {
+  return [...items]
+    .map((item, index) => ({ item, index }))
+    .sort((a, b) => {
+      const timeDiff = getGalleryItemSortTime(b.item, b.index) - getGalleryItemSortTime(a.item, a.index)
+      if (timeDiff !== 0) return timeDiff
+      return a.index - b.index
+    })
+    .map(({ item }) => item)
+}
+
+function withGalleryItemDefaults(item, index) {
+  const createdAt =
+    item.createdAt ||
+    (parseDateFromSrc(item.src) ? new Date(parseDateFromSrc(item.src)).toISOString() : undefined)
+
   return {
+    id: item.id || `gallery-${index}`,
+    ...item,
+    ...(createdAt ? { createdAt } : {}),
+  }
+}
+
+export function getDefaultGalleryContent() {
+  const defaultItems = defaultMediaGallery.items.map((item, index) =>
+    withGalleryItemDefaults({ id: `gallery-${index}`, ...item }, index),
+  )
+
+  return {
+    watchSection: cloneContent(defaultWatchVideo),
+    videoLibrary: {
+      label: 'Video Library',
+      title: 'Moments That Matter',
+      description:
+        'Lectures, ceremonies, and clinical highlights — a curated collection of Dr. Wael’s work in communication sciences.',
+      items: [],
+    },
     mediaGallery: {
       ...cloneContent(defaultMediaGallery),
-      items: defaultMediaGallery.items.map((item, index) => ({
-        id: `gallery-${index}`,
-        ...item,
-      })),
+      items: sortGalleryItems(defaultItems),
     },
   }
 }
@@ -27,16 +80,34 @@ export function getDefaultGalleryContent() {
 function mergeWithDefaults(saved) {
   const defaults = getDefaultGalleryContent()
 
+  const mergedItems = (saved.mediaGallery?.items ?? defaults.mediaGallery.items).map((item, index) =>
+    withGalleryItemDefaults(item, index),
+  )
+
+  const mergedVideoItems = (saved.videoLibrary?.items ?? defaults.videoLibrary.items).map((item, index) => ({
+    id: item.id || `video-library-${index}`,
+    ...item,
+  }))
+
   return {
     ...defaults,
     ...saved,
+    watchSection: {
+      ...defaults.watchSection,
+      ...saved.watchSection,
+      paragraphs: saved.watchSection?.paragraphs?.length
+        ? saved.watchSection.paragraphs
+        : defaults.watchSection.paragraphs,
+    },
+    videoLibrary: {
+      ...defaults.videoLibrary,
+      ...saved.videoLibrary,
+      items: mergedVideoItems,
+    },
     mediaGallery: {
       ...defaults.mediaGallery,
       ...saved.mediaGallery,
-      items: (saved.mediaGallery?.items ?? defaults.mediaGallery.items).map((item, index) => ({
-        id: item.id || `gallery-${index}`,
-        ...item,
-      })),
+      items: sortGalleryItems(mergedItems),
     },
   }
 }
@@ -73,9 +144,32 @@ export function createGalleryItemId() {
   return `gallery-item-${Date.now()}`
 }
 
+export function createVideoLibraryItemId() {
+  return `video-library-${Date.now()}`
+}
+
+export function parseYoutubeId(value = '') {
+  const trimmed = value.trim()
+  if (!trimmed) return ''
+
+  const match = trimmed.match(/(?:youtu\.be\/|v=|embed\/)([a-zA-Z0-9_-]{11})/)
+  return match?.[1] ?? trimmed
+}
+
 export const emptyGalleryItem = {
   id: '',
   type: 'image',
   src: '',
   alt: '',
+  createdAt: '',
+}
+
+export const emptyVideoLibraryItem = {
+  id: '',
+  title: '',
+  subtitle: '',
+  type: 'youtube',
+  youtubeId: '',
+  videoSrc: '',
+  poster: '',
 }

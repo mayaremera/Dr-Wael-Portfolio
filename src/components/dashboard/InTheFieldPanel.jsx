@@ -10,7 +10,6 @@ import {
   emptyGlobeMilestone,
   getDefaultDrWaelActivity,
   loadDrWaelActivityRemote,
-  resetDrWaelActivity,
   saveDrWaelActivity,
 } from '../../data/contentStore'
 import { useDashboardSection } from '../../hooks/useDashboardSection'
@@ -583,18 +582,6 @@ export default function InTheFieldPanel() {
     if (editingId === eventId) setEditingId(null)
   }
 
-  const handleReset = () => {
-    if (!window.confirm('Reset all In the Field content back to the original defaults?')) return
-
-    resetDrWaelActivity()
-    setActivity(getDefaultDrWaelActivity())
-    setEditingId(null)
-    setEditingGlobeLocationId(null)
-    setSaveError('')
-    setSavedMessage('Reset to default content.')
-    window.setTimeout(() => setSavedMessage(''), 2500)
-  }
-
   return (
     <PanelShell
       eyebrow="In the Field"
@@ -781,16 +768,6 @@ export default function InTheFieldPanel() {
             )
           }
         />
-      </div>
-
-      <div className="mt-6">
-        <button
-          type="button"
-          onClick={handleReset}
-          className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold tracking-wide text-ink-muted uppercase transition-colors hover:border-accent/30 hover:text-accent-hover"
-        >
-          Reset to defaults
-        </button>
       </div>
     </PanelShell>
   )

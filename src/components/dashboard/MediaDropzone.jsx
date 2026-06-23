@@ -1,15 +1,17 @@
 import { useRef, useState } from 'react'
 import { isMediaStorageAvailable, uploadMediaToStorage } from '../../lib/mediaUpload'
+import { isSupabaseConfigured } from '../../lib/supabase'
 import { useConfirmDelete } from './DeleteConfirmDialog'
 
 const MAX_FILE_SIZE_MB = 12
 
-export default function MediaDropzone({ image, video, onChange, onClear }) {
+export default function MediaDropzone({ image, video, onChange, onUploaded, onClear }) {
   const confirmDelete = useConfirmDelete()
   const inputRef = useRef(null)
   const [dragging, setDragging] = useState(false)
   const [error, setError] = useState('')
   const [uploading, setUploading] = useState(false)
+  const [uploadStatus, setUploadStatus] = useState('')
 
   const mediaSrc = video || image
   const isVideo = Boolean(video)
@@ -31,15 +33,18 @@ export default function MediaDropzone({ image, video, onChange, onClear }) {
     }
 
     setError('')
+    setUploadStatus('')
     setUploading(true)
 
     const applyLocalFallback = () => {
       const reader = new FileReader()
       reader.onload = () => {
-        onChange({
+        const payload = {
           image: isImage ? reader.result : '',
           video: isVideoFile ? reader.result : '',
-        })
+        }
+        onChange(payload)
+        setUploadStatus('Saved locally only.')
         setUploading(false)
       }
       reader.onerror = () => {
@@ -51,6 +56,12 @@ export default function MediaDropzone({ image, video, onChange, onClear }) {
 
     isMediaStorageAvailable()
       .then((canUpload) => {
+        if (isSupabaseConfigured && !canUpload) {
+          setError('Sign in to Supabase before uploading media.')
+          setUploading(false)
+          return
+        }
+
         if (!canUpload) {
           applyLocalFallback()
           return
@@ -58,18 +69,29 @@ export default function MediaDropzone({ image, video, onChange, onClear }) {
 
         return uploadMediaToStorage(file)
           .then((result) => {
-            onChange({
+            const payload = {
               image: result.isVideo ? '' : result.url,
               video: result.isVideo ? result.url : '',
-            })
+            }
+            onChange(payload)
+            onUploaded?.(payload)
+            setUploadStatus('Uploaded to Supabase storage.')
             setUploading(false)
           })
           .catch((uploadError) => {
-            setError(uploadError?.message || 'Upload failed. Saved locally instead.')
-            applyLocalFallback()
+            setError(uploadError?.message || 'Upload failed. Please try again.')
+            setUploading(false)
           })
       })
-      .catch(() => applyLocalFallback())
+      .catch(() => {
+        if (isSupabaseConfigured) {
+          setError('Could not verify your Supabase session. Try signing in again.')
+          setUploading(false)
+          return
+        }
+
+        applyLocalFallback()
+      })
   }
 
   const onDrop = (dropEvent) => {
@@ -94,7 +116,7 @@ export default function MediaDropzone({ image, video, onChange, onClear }) {
             {isVideo ? (
               <video src={video} className="h-full w-full object-cover" muted playsInline controls />
             ) : (
-              <img src={image} alt="" className="h-full w-full object-cover" />
+              <img key={image} src={image} alt="" className="h-full w-full object-cover" />
             )}
             <span className="absolute left-3 top-3 rounded-full bg-black/50 px-2.5 py-1 text-[0.65rem] font-semibold tracking-wide text-white uppercase">
               {isVideo ? 'Video' : 'Image'}
@@ -117,6 +139,7 @@ export default function MediaDropzone({ image, video, onChange, onClear }) {
                   confirmLabel: 'Remove',
                   onConfirm: () => {
                     setError('')
+                    setUploadStatus('')
                     onClear()
                   },
                 })
@@ -160,6 +183,7 @@ export default function MediaDropzone({ image, video, onChange, onClear }) {
         </button>
       )}
 
+      {uploadStatus ? <p className="mt-2 text-xs text-brand">{uploadStatus}</p> : null}
       {error ? <p className="mt-2 text-xs text-accent-hover">{error}</p> : null}
     </div>
   )

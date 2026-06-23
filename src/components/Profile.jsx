@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { careerImpact, images } from '../data/content'
+import { images } from '../data/content'
 import { useAboutContent } from '../hooks/useAboutContent'
 import { useHomeContent } from '../hooks/useHomeContent'
 import CredentialCompass from './CredentialCompass'
@@ -199,7 +199,7 @@ function TrustedCompanies() {
 }
 
 export default function Profile({ variant = 'home' }) {
-  const { profileDetails, profileImage } = useAboutContent()
+  const { profileDetails, profileImage, careerImpact } = useAboutContent()
   const { name, title, credentials, tagline } = profileDetails
   const photo = profileImage || images.drWael
   const isPage = variant === 'page'

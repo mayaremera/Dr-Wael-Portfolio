@@ -10,7 +10,6 @@ import {
   emptyTimelineEntry,
   getDefaultAboutContent,
   loadAboutContentRemote,
-  resetAboutContent,
   saveAboutContent,
 } from '../../data/aboutContentStore'
 import { useDashboardSection } from '../../hooks/useDashboardSection'
@@ -59,6 +58,50 @@ function StringListEditor({ label, items, onChange, addLabel = 'Add line' }) {
       <button type="button" onClick={() => onChange([...items, ''])} className="mt-2 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold tracking-wide text-brand uppercase">
         {addLabel}
       </button>
+    </div>
+  )
+}
+
+function CareerStatsEditor({ stats, onChange }) {
+  const updateStat = (index, field, value) => {
+    onChange(stats.map((stat, i) => (i === index ? { ...stat, [field]: value } : stat)))
+  }
+
+  return (
+    <div className="space-y-4">
+      {stats.map((stat, index) => (
+        <div key={`career-stat-${index}`} className="rounded-lg border border-slate-200/80 bg-surface-alt/40 p-4">
+          <p className="mb-3 text-xs font-semibold tracking-wide text-brand uppercase">Card {index + 1}</p>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <label className={labelClassName}>Number</label>
+              <input
+                className={fieldClassName}
+                value={stat.value}
+                onChange={(e) => updateStat(index, 'value', e.target.value)}
+                placeholder="30+"
+              />
+            </div>
+            <div>
+              <label className={labelClassName}>Label</label>
+              <input
+                className={fieldClassName}
+                value={stat.label}
+                onChange={(e) => updateStat(index, 'label', e.target.value)}
+                placeholder="Years of Experience"
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <label className={labelClassName}>Description</label>
+              <textarea
+                className={`${fieldClassName} min-h-20 resize-y`}
+                value={stat.detail}
+                onChange={(e) => updateStat(index, 'detail', e.target.value)}
+              />
+            </div>
+          </div>
+        </div>
+      ))}
     </div>
   )
 }
@@ -151,7 +194,9 @@ export default function AboutMePanel() {
   }
 
   const updateProfile = (field, value) => setContent((c) => ({ ...c, profileDetails: { ...c.profileDetails, [field]: value } }))
+  const updateCareerImpact = (field, value) => setContent((c) => ({ ...c, careerImpact: { ...c.careerImpact, [field]: value } }))
   const saveProfile = () => persist(content, 'Profile saved.')
+  const saveCareerImpact = () => persist(content, 'Career impact cards saved.')
 
   const saveListItem = (listKey, item, setEditing) => {
     const list = content[listKey]
@@ -164,17 +209,6 @@ export default function AboutMePanel() {
   const deleteListItem = (listKey, id, setEditing, editingId) => {
     persist({ ...content, [listKey]: content[listKey].filter((entry) => entry.id !== id) }, 'Entry deleted.')
     if (editingId === id) setEditing(null)
-  }
-
-  const handleReset = () => {
-    if (!window.confirm('Reset all About Me content back to defaults?')) return
-    resetAboutContent()
-    setContent(getDefaultAboutContent())
-    setEditingCertId(null)
-    setEditingTimelineId(null)
-    setEditingLeadershipId(null)
-    setSavedMessage('Reset to default content.')
-    window.setTimeout(() => setSavedMessage(''), 2500)
   }
 
   return (
@@ -195,10 +229,49 @@ export default function AboutMePanel() {
           <div><label className={labelClassName}>Tagline</label><input className={fieldClassName} value={content.profileDetails.tagline} onChange={(e) => updateProfile('tagline', e.target.value)} /></div>
           <div className="md:col-span-2"><label className={labelClassName}>Title</label><textarea className={`${fieldClassName} min-h-20 resize-y`} value={content.profileDetails.title} onChange={(e) => updateProfile('title', e.target.value)} /></div>
           <div className="md:col-span-2"><StringListEditor label="Credentials" items={content.profileDetails.credentials} onChange={(credentials) => updateProfile('credentials', credentials)} addLabel="Add credential" /></div>
-          <div className="md:col-span-2"><StringListEditor label="Bio paragraphs" items={content.profileDetails.bio} onChange={(bio) => updateProfile('bio', bio)} addLabel="Add paragraph" /></div>
+          <div className="md:col-span-2">
+            <StringListEditor
+              label="Homepage bio (short preview)"
+              items={content.profileDetails.bio}
+              onChange={(bio) => updateProfile('bio', bio)}
+              addLabel="Add paragraph"
+            />
+            <p className="mt-1 text-xs text-ink-muted">Shown on the home page profile section (usually 2 short paragraphs).</p>
+          </div>
+          <div className="md:col-span-2">
+            <StringListEditor
+              label="About page bio (full)"
+              items={content.profileDetails.bioExtended ?? []}
+              onChange={(bioExtended) => updateProfile('bioExtended', bioExtended)}
+              addLabel="Add paragraph"
+            />
+            <p className="mt-1 text-xs text-ink-muted">All paragraphs shown on the About Me page under About Dr. Wael (currently 5).</p>
+          </div>
           <div className="md:col-span-2"><label className={labelClassName}>Profile photo</label><MediaDropzone image={content.profileImage} video="" onChange={({ image }) => setContent((c) => ({ ...c, profileImage: image }))} onClear={() => setContent((c) => ({ ...c, profileImage: '' }))} /></div>
         </div>
         <button type="button" onClick={saveProfile} className="mt-4 rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase">Save profile</button>
+      </section>
+
+      <section className="mt-6 rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm">
+        <h2 className="font-serif text-xl text-ink">Career impact cards</h2>
+        <p className="mt-1 text-sm text-ink-muted">The four stat cards below the About Dr. Wael section on the About Me page.</p>
+        <div className="mt-4 grid gap-4 md:grid-cols-2">
+          <div>
+            <label className={labelClassName}>Section label</label>
+            <input className={fieldClassName} value={content.careerImpact.label} onChange={(e) => updateCareerImpact('label', e.target.value)} />
+          </div>
+          <div>
+            <label className={labelClassName}>Section title</label>
+            <input className={fieldClassName} value={content.careerImpact.title} onChange={(e) => updateCareerImpact('title', e.target.value)} />
+          </div>
+        </div>
+        <div className="mt-4">
+          <CareerStatsEditor
+            stats={content.careerImpact.stats}
+            onChange={(stats) => updateCareerImpact('stats', stats)}
+          />
+        </div>
+        <button type="button" onClick={saveCareerImpact} className="mt-4 rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase">Save career cards</button>
       </section>
 
       <div className="mt-6">
@@ -220,10 +293,6 @@ export default function AboutMePanel() {
           renderPreview={(item) => (<div><p className="text-xs font-semibold text-brand uppercase">{item.year}</p><p className="font-medium text-ink">{item.title}</p><p className="text-sm text-ink-muted">{item.org}</p></div>)}
           renderEditor={(item) => item === 'new' ? <LeadershipEditor initialItem={emptyLeadershipRole} onSave={(entry) => saveListItem('leadershipRoles', entry, setEditingLeadershipId)} onCancel={() => setEditingLeadershipId(null)} /> : <LeadershipEditor key={item.id} initialItem={item} onSave={(entry) => saveListItem('leadershipRoles', entry, setEditingLeadershipId)} onCancel={() => setEditingLeadershipId(null)} />}
         />
-      </div>
-
-      <div className="mt-6">
-        <button type="button" onClick={handleReset} className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold tracking-wide text-ink-muted uppercase">Reset to defaults</button>
       </div>
     </PanelShell>
   )

@@ -1,4 +1,5 @@
 import {
+  careerImpact as defaultCareerImpact,
   careerTimeline as defaultCareerTimeline,
   certificatePlaceholders,
   certificates as defaultCertificates,
@@ -31,6 +32,7 @@ export function getDefaultAboutContent() {
   return {
     profileDetails: cloneContent(defaultProfileDetails),
     profileImage: images.drWael,
+    careerImpact: cloneContent(defaultCareerImpact),
     certificates: cloneContent(getDefaultCertificates()),
     careerTimeline: cloneContent(defaultCareerTimeline),
     leadershipRoles: cloneContent(defaultLeadershipRoles).map((role, index) => ({
@@ -49,10 +51,20 @@ function mergeWithDefaults(saved) {
     profileDetails: {
       ...defaults.profileDetails,
       ...saved.profileDetails,
-      bio: saved.profileDetails?.bio ?? defaults.profileDetails.bio,
-      bioExtended: saved.profileDetails?.bioExtended ?? defaults.profileDetails.bioExtended,
+      credentials: saved.profileDetails?.credentials?.length
+        ? saved.profileDetails.credentials
+        : defaults.profileDetails.credentials,
+      bio: saved.profileDetails?.bio?.length ? saved.profileDetails.bio : defaults.profileDetails.bio,
+      bioExtended: saved.profileDetails?.bioExtended?.length
+        ? saved.profileDetails.bioExtended
+        : defaults.profileDetails.bioExtended,
     },
     profileImage: saved.profileImage ?? defaults.profileImage,
+    careerImpact: {
+      ...defaults.careerImpact,
+      ...saved.careerImpact,
+      stats: saved.careerImpact?.stats?.length ? saved.careerImpact.stats : defaults.careerImpact.stats,
+    },
     certificates: saved.certificates ?? defaults.certificates,
     careerTimeline: saved.careerTimeline ?? defaults.careerTimeline,
     leadershipRoles: (saved.leadershipRoles ?? defaults.leadershipRoles).map((role, index) => ({

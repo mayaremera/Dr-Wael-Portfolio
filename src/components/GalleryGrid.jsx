@@ -1,14 +1,19 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { sortGalleryItems } from '../data/galleryContentStore'
 import { useGalleryContent } from '../hooks/useGalleryContent'
+import { protectedMediaProps, protectedVideoProps } from '../lib/mediaProtection'
 
 const imageAspects = ['aspect-[4/5]', 'aspect-square', 'aspect-[5/4]', 'aspect-[3/4]']
+const GALLERY_VIDEO_HEIGHT = 'h-[20rem]'
 
 const soundWaveHeights = [5, 8, 6, 10, 7, 9, 5, 8, 6, 11, 7, 9, 5, 8, 6, 10, 7, 8, 5, 9, 6, 7, 5, 8]
 
-const protectedMediaProps = {
-  draggable: false,
-  onContextMenu: (event) => event.preventDefault(),
-  onDragStart: (event) => event.preventDefault(),
+function stableAspectIndex(id = '') {
+  let hash = 0
+  for (let index = 0; index < id.length; index += 1) {
+    hash = (hash + id.charCodeAt(index)) % imageAspects.length
+  }
+  return hash
 }
 
 function VideoSoundWaves() {
@@ -102,11 +107,11 @@ function GalleryTile({ item, aspectClass, onImageClick }) {
     return () => video.removeEventListener('loadeddata', playVideo)
   }, [isVideo, item.src])
 
-  const tileClassName = `group relative w-full overflow-hidden rounded-2xl bg-slate-100 shadow-sm ring-1 ring-slate-200/70 transition-shadow duration-300 hover:shadow-md ${aspectClass}`
-
   if (isVideo) {
     return (
-      <figure className={tileClassName}>
+      <figure
+        className={`group relative w-full overflow-hidden rounded-2xl bg-slate-900 shadow-md ring-2 ring-brand/30 transition-shadow duration-300 hover:shadow-lg hover:shadow-brand/20 ${GALLERY_VIDEO_HEIGHT}`}
+      >
         <video
           ref={videoRef}
           className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-[1.03] select-none"
@@ -116,16 +121,23 @@ function GalleryTile({ item, aspectClass, onImageClick }) {
           playsInline
           preload="auto"
           aria-label={item.alt}
-          controlsList="nodownload"
-          {...protectedMediaProps}
+          {...protectedVideoProps}
         >
           <source src={encodeURI(item.src)} type="video/mp4" />
         </video>
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+        <span className="pointer-events-none absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-brand px-2.5 py-1 text-[0.6rem] font-semibold tracking-wide text-white uppercase shadow-md">
+          <svg className="h-3 w-3" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M9 7.5v9l7.5-4.5L9 7.5z" />
+          </svg>
+          Video
+        </span>
         <VideoSoundWaves />
       </figure>
     )
   }
+
+  const tileClassName = `group relative w-full overflow-hidden rounded-2xl bg-slate-100 shadow-sm ring-1 ring-slate-200/70 transition-shadow duration-300 hover:shadow-md ${aspectClass}`
 
   return (
     <button
@@ -150,9 +162,8 @@ export default function GalleryGrid() {
   const { mediaGallery } = useGalleryContent()
   const { label, title, items } = mediaGallery
   const [activeImage, setActiveImage] = useState(null)
-  let imageIndex = 0
-  let videoIndex = 0
 
+  const sortedItems = useMemo(() => sortGalleryItems(items), [items])
   const closeModal = useCallback(() => setActiveImage(null), [])
 
   return (
@@ -164,21 +175,12 @@ export default function GalleryGrid() {
         </header>
 
         <div className="mt-10 columns-2 gap-3 sm:columns-3 md:columns-4 lg:columns-5 [column-gap:0.75rem] sm:[column-gap:1rem]">
-          {items.map((item) => {
-            const aspectClass =
-              item.type === 'video'
-                ? videoIndex++ === 0
-                  ? 'aspect-[3/5]'
-                  : 'aspect-video'
-                : imageAspects[imageIndex++ % imageAspects.length]
+          {sortedItems.map((item) => {
+            const aspectClass = imageAspects[stableAspectIndex(item.id)]
 
             return (
-              <div key={item.src} className="mb-3 break-inside-avoid sm:mb-4">
-                <GalleryTile
-                  item={item}
-                  aspectClass={aspectClass}
-                  onImageClick={setActiveImage}
-                />
+              <div key={item.id} className="mb-3 break-inside-avoid sm:mb-4">
+                <GalleryTile item={item} aspectClass={aspectClass} onImageClick={setActiveImage} />
               </div>
             )
           })}

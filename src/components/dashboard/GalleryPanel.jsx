@@ -1,12 +1,15 @@
 import { useState } from 'react'
 import DashboardItemList from './DashboardItemList'
 import MediaDropzone from './MediaDropzone'
+import { useConfirmDelete } from './DeleteConfirmDialog'
 import {
   createGalleryItemId,
+  createVideoLibraryItemId,
   emptyGalleryItem,
+  emptyVideoLibraryItem,
   getDefaultGalleryContent,
   loadGalleryContentRemote,
-  resetGalleryContent,
+  parseYoutubeId,
   saveGalleryContent,
 } from '../../data/galleryContentStore'
 import { useDashboardSection } from '../../hooks/useDashboardSection'
@@ -27,6 +30,48 @@ function PanelShell({ eyebrow, title, description, children }) {
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink-muted md:text-base">{description}</p>
       </header>
       {children}
+    </div>
+  )
+}
+
+function StringListEditor({ label, items, onChange, addLabel = 'Add paragraph' }) {
+  const confirmDelete = useConfirmDelete()
+
+  return (
+    <div>
+      <label className={labelClassName}>{label}</label>
+      <div className="space-y-2">
+        {items.map((item, index) => (
+          <div key={`${label}-${index}`} className="flex gap-2">
+            <textarea
+              className={`${fieldClassName} min-h-20 resize-y`}
+              value={item}
+              onChange={(e) => onChange(items.map((entry, i) => (i === index ? e.target.value : entry)))}
+            />
+            <button
+              type="button"
+              onClick={() =>
+                confirmDelete({
+                  title: 'Remove this paragraph?',
+                  message: 'This paragraph will be removed from the list.',
+                  confirmLabel: 'Remove',
+                  onConfirm: () => onChange(items.filter((_, i) => i !== index)),
+                })
+              }
+              className="shrink-0 self-start rounded-lg border border-slate-200 px-2.5 py-2 text-xs font-semibold tracking-wide text-accent-hover uppercase"
+            >
+              Remove
+            </button>
+          </div>
+        ))}
+      </div>
+      <button
+        type="button"
+        onClick={() => onChange([...items, ''])}
+        className="mt-2 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold tracking-wide text-brand uppercase"
+      >
+        {addLabel}
+      </button>
     </div>
   )
 }
@@ -78,6 +123,7 @@ function GalleryItemEditor({ initialItem, onSave, onCancel }) {
     onSave({
       ...item,
       id: item.id || createGalleryItemId(),
+      createdAt: item.createdAt || new Date().toISOString(),
     })
   }
 
@@ -118,12 +164,123 @@ function GalleryItemEditor({ initialItem, onSave, onCancel }) {
   )
 }
 
+function VideoLibraryItemPreview({ item }) {
+  return (
+    <div className="flex gap-3">
+      <div className="h-16 w-28 shrink-0 overflow-hidden rounded-lg bg-slate-100 ring-1 ring-slate-200/80">
+        {item.poster ? (
+          <img src={item.poster} alt="" className="h-full w-full object-cover" />
+        ) : (
+          <div className="flex h-full items-center justify-center text-[0.6rem] text-ink-muted">No poster</div>
+        )}
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="font-medium text-ink">{item.title || 'Untitled video'}</p>
+        <p className="mt-1 line-clamp-2 text-sm text-ink-muted">{item.subtitle || item.youtubeId || item.videoSrc || 'No source'}</p>
+      </div>
+    </div>
+  )
+}
+
+function VideoLibraryItemEditor({ initialItem, onSave, onCancel }) {
+  const [item, setItem] = useState({ ...emptyVideoLibraryItem, ...initialItem })
+
+  const updateField = (field, value) => {
+    setItem((current) => ({ ...current, [field]: value }))
+  }
+
+  const handleSubmit = (event) => {
+    event.preventDefault()
+    if (!item.title) return
+
+    const youtubeId = item.type === 'youtube' ? parseYoutubeId(item.youtubeId) : ''
+    if (item.type === 'youtube' && !youtubeId) return
+    if (item.type === 'file' && !item.videoSrc) return
+
+    onSave({
+      ...item,
+      id: item.id || createVideoLibraryItemId(),
+      youtubeId,
+    })
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="rounded-xl border border-brand/20 bg-brand-muted/30 p-5 shadow-sm">
+      <div className="flex items-center justify-between gap-3">
+        <h3 className="font-serif text-xl text-ink">{item.id ? 'Edit library video' : 'New library video'}</h3>
+        <button type="button" onClick={onCancel} className="text-xs font-semibold tracking-wide text-ink-muted uppercase hover:text-brand">
+          Cancel
+        </button>
+      </div>
+
+      <div className="mt-5 grid gap-4 sm:grid-cols-2">
+        <div className="sm:col-span-2">
+          <label className={labelClassName}>Title</label>
+          <input className={fieldClassName} value={item.title} onChange={(e) => updateField('title', e.target.value)} required />
+        </div>
+        <div className="sm:col-span-2">
+          <label className={labelClassName}>Subtitle</label>
+          <input className={fieldClassName} value={item.subtitle} onChange={(e) => updateField('subtitle', e.target.value)} />
+        </div>
+        <div>
+          <label className={labelClassName}>Video type</label>
+          <select className={fieldClassName} value={item.type} onChange={(e) => updateField('type', e.target.value)}>
+            <option value="youtube">YouTube</option>
+            <option value="file">Uploaded file</option>
+          </select>
+        </div>
+        <div>
+          <label className={labelClassName}>Poster image</label>
+          <MediaDropzone
+            image={item.poster}
+            video=""
+            onChange={({ image }) => updateField('poster', image)}
+            onClear={() => updateField('poster', '')}
+          />
+        </div>
+        {item.type === 'youtube' ? (
+          <div className="sm:col-span-2">
+            <label className={labelClassName}>YouTube ID or URL</label>
+            <input
+              className={fieldClassName}
+              value={item.youtubeId}
+              onChange={(e) => updateField('youtubeId', e.target.value)}
+              placeholder="EyIvs6DKl-Y or https://youtu.be/..."
+              required
+            />
+          </div>
+        ) : (
+          <div className="sm:col-span-2">
+            <label className={labelClassName}>Video file</label>
+            <MediaDropzone
+              image=""
+              video={item.videoSrc}
+              onChange={({ video }) => updateField('videoSrc', video)}
+              onClear={() => updateField('videoSrc', '')}
+            />
+          </div>
+        )}
+      </div>
+
+      <div className="mt-5 flex flex-wrap gap-3">
+        <button type="submit" className="rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase transition-colors hover:bg-brand-light">
+          Save video
+        </button>
+        <button type="button" onClick={onCancel} className="rounded-lg border border-slate-200 px-5 py-2.5 text-xs font-semibold tracking-wide text-ink-muted uppercase transition-colors hover:border-brand/25 hover:text-brand">
+          Cancel
+        </button>
+      </div>
+    </form>
+  )
+}
+
 export default function GalleryPanel() {
   const { content, setContent, loading, loadError } = useDashboardSection(
     getDefaultGalleryContent,
     loadGalleryContentRemote,
   )
   const [editingId, setEditingId] = useState(null)
+  const [editingVideoId, setEditingVideoId] = useState(null)
   const [savedMessage, setSavedMessage] = useState('')
   const [saveError, setSaveError] = useState('')
 
@@ -146,12 +303,31 @@ export default function GalleryPanel() {
     }))
   }
 
+  const updateWatchSection = (field, value) => {
+    setContent((current) => ({
+      ...current,
+      watchSection: { ...current.watchSection, [field]: value },
+    }))
+  }
+
+  const updateVideoLibraryMeta = (field, value) => {
+    setContent((current) => ({
+      ...current,
+      videoLibrary: { ...current.videoLibrary, [field]: value },
+    }))
+  }
+
   const saveHeader = () => persist(content, 'Gallery header saved.')
+  const saveWatchSection = () => persist(content, 'Watch section saved.')
+  const saveVideoLibraryHeader = () => persist(content, 'Video library header saved.')
 
   const saveItem = (item) => {
     const items = content.mediaGallery.items
     const exists = items.some((entry) => entry.id === item.id)
-    const nextItems = exists ? items.map((entry) => (entry.id === item.id ? item : entry)) : [item, ...items]
+    const nextItem = exists ? item : { ...item, createdAt: item.createdAt || new Date().toISOString() }
+    const nextItems = exists
+      ? items.map((entry) => (entry.id === item.id ? nextItem : entry))
+      : [nextItem, ...items]
 
     persist(
       {
@@ -177,26 +353,47 @@ export default function GalleryPanel() {
     if (editingId === id) setEditingId(null)
   }
 
-  const handleReset = () => {
-    if (!window.confirm('Reset gallery content back to defaults?')) return
-    resetGalleryContent()
-    setContent(getDefaultGalleryContent())
-    setEditingId(null)
-    setSavedMessage('Reset to default content.')
-    window.setTimeout(() => setSavedMessage(''), 2500)
+  const saveVideoItem = (item) => {
+    const items = content.videoLibrary.items
+    const exists = items.some((entry) => entry.id === item.id)
+    const nextItems = exists ? items.map((entry) => (entry.id === item.id ? item : entry)) : [item, ...items]
+
+    persist(
+      {
+        ...content,
+        videoLibrary: { ...content.videoLibrary, items: nextItems },
+      },
+      exists ? 'Library video updated.' : 'Library video added.',
+    )
+    setEditingVideoId(null)
+  }
+
+  const deleteVideoItem = (id) => {
+    persist(
+      {
+        ...content,
+        videoLibrary: {
+          ...content.videoLibrary,
+          items: content.videoLibrary.items.filter((entry) => entry.id !== id),
+        },
+      },
+      'Library video deleted.',
+    )
+    if (editingVideoId === id) setEditingVideoId(null)
   }
 
   const items = content.mediaGallery.items
+  const videoItems = content.videoLibrary.items
 
   return (
     <PanelShell
       eyebrow="Gallery"
-      title="Photo & video gallery"
-      description="Add, edit, and remove images and videos in the gallery grid on the Video & Gallery page."
+      title="Video & gallery page"
+      description="Edit the Watch section, video library, and photo grid on the Video & Gallery page."
     >
       <DashboardSectionLoader loading={loading} loadError={loadError} />
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <a href="/video-gallery#gallery" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-brand transition-colors hover:text-brand-light">
+        <a href="/video-gallery" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-brand transition-colors hover:text-brand-light">
           Preview live page →
         </a>
         <div className="flex flex-wrap items-center gap-2">
@@ -206,6 +403,100 @@ export default function GalleryPanel() {
       </div>
 
       <section className="rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
+        <h2 className="font-serif text-xl text-ink">Watch section</h2>
+        <p className="mt-1 text-sm text-ink-muted">The featured YouTube block below the page hero.</p>
+        <div className="mt-4 grid gap-4">
+          <div>
+            <label className={labelClassName}>YouTube ID or URL</label>
+            <input
+              className={fieldClassName}
+              value={content.watchSection.youtubeId || content.watchSection.youtubeUrl || ''}
+              onChange={(e) => {
+                const value = e.target.value
+                setContent((current) => ({
+                  ...current,
+                  watchSection: {
+                    ...current.watchSection,
+                    youtubeId: parseYoutubeId(value),
+                    youtubeUrl: value.includes('http') ? value : current.watchSection.youtubeUrl,
+                  },
+                }))
+              }}
+            />
+          </div>
+          <div>
+            <label className={labelClassName}>Title</label>
+            <input className={fieldClassName} value={content.watchSection.title} onChange={(e) => updateWatchSection('title', e.target.value)} />
+          </div>
+          <div>
+            <label className={labelClassName}>Poster image</label>
+            <MediaDropzone
+              image={content.watchSection.poster}
+              video=""
+              onChange={({ image }) => updateWatchSection('poster', image)}
+              onClear={() => updateWatchSection('poster', '')}
+            />
+          </div>
+          <StringListEditor
+            label="Paragraphs"
+            items={content.watchSection.paragraphs ?? []}
+            onChange={(paragraphs) => updateWatchSection('paragraphs', paragraphs)}
+          />
+        </div>
+        <button type="button" onClick={saveWatchSection} className="mt-4 rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase transition-colors hover:bg-brand-light">
+          Save watch section
+        </button>
+      </section>
+
+      <section className="mt-6 rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
+        <h2 className="font-serif text-xl text-ink">Video library</h2>
+        <p className="mt-1 text-sm text-ink-muted">Curated collection shown below the Watch section.</p>
+        <div className="mt-4 grid gap-4 md:grid-cols-2">
+          <div>
+            <label className={labelClassName}>Label</label>
+            <input className={fieldClassName} value={content.videoLibrary.label} onChange={(e) => updateVideoLibraryMeta('label', e.target.value)} />
+          </div>
+          <div>
+            <label className={labelClassName}>Title</label>
+            <input className={fieldClassName} value={content.videoLibrary.title} onChange={(e) => updateVideoLibraryMeta('title', e.target.value)} />
+          </div>
+          <div className="md:col-span-2">
+            <label className={labelClassName}>Description</label>
+            <textarea
+              className={`${fieldClassName} min-h-24 resize-y`}
+              value={content.videoLibrary.description}
+              onChange={(e) => updateVideoLibraryMeta('description', e.target.value)}
+            />
+          </div>
+        </div>
+        <button type="button" onClick={saveVideoLibraryHeader} className="mt-4 rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase transition-colors hover:bg-brand-light">
+          Save library header
+        </button>
+
+        <div className="mt-6">
+          <DashboardItemList
+            title="Library videos"
+            countLabel={`${videoItems.length} video${videoItems.length === 1 ? '' : 's'}`}
+            items={videoItems}
+            editingId={editingVideoId}
+            onAdd={() => setEditingVideoId('new')}
+            onEdit={setEditingVideoId}
+            onDelete={deleteVideoItem}
+            getItemId={(item) => item.id}
+            addLabel="Add video"
+            renderPreview={(item) => <VideoLibraryItemPreview item={item} />}
+            renderEditor={(item) =>
+              item === 'new' ? (
+                <VideoLibraryItemEditor initialItem={emptyVideoLibraryItem} onSave={saveVideoItem} onCancel={() => setEditingVideoId(null)} />
+              ) : (
+                <VideoLibraryItemEditor key={item.id} initialItem={item} onSave={saveVideoItem} onCancel={() => setEditingVideoId(null)} />
+              )
+            }
+          />
+        </div>
+      </section>
+
+      <section className="mt-6 rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
         <h2 className="font-serif text-xl text-ink">Gallery header</h2>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           <div>
@@ -242,12 +533,6 @@ export default function GalleryPanel() {
             )
           }
         />
-      </div>
-
-      <div className="mt-6">
-        <button type="button" onClick={handleReset} className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold tracking-wide text-ink-muted uppercase transition-colors hover:border-accent/30 hover:text-accent-hover">
-          Reset to defaults
-        </button>
       </div>
     </PanelShell>
   )

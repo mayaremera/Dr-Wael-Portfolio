@@ -30,6 +30,33 @@ export function getDefaultServicesContent() {
   }
 }
 
+function migrateImagePath(url, legacyPath, nextPath) {
+  if (!url) return url
+
+  const [base, query] = url.split('?')
+  if (base !== legacyPath) return url
+
+  return query ? `${nextPath}?${query}` : nextPath
+}
+
+function mergeTherapyConcepts(saved, defaults) {
+  if (!Array.isArray(saved) || saved.length === 0) return defaults
+
+  const savedById = new Map(saved.map((concept) => [concept.id, concept]))
+  return defaults.map((concept) => {
+    const merged = savedById.get(concept.id) ?? concept
+
+    if (concept.id === 'family-training') {
+      return {
+        ...merged,
+        image: migrateImagePath(merged.image, '/images/family.jpg', '/images/familytraining.jpg'),
+      }
+    }
+
+    return merged
+  })
+}
+
 function mergeWithDefaults(saved) {
   const defaults = getDefaultServicesContent()
 
@@ -48,7 +75,7 @@ function mergeWithDefaults(saved) {
       ...defaults.testimonialsSection,
       ...saved.testimonialsSection,
     },
-    therapyConcepts: saved.therapyConcepts ?? defaults.therapyConcepts,
+    therapyConcepts: mergeTherapyConcepts(saved.therapyConcepts, defaults.therapyConcepts),
     clinicalSpecializations: saved.clinicalSpecializations ?? defaults.clinicalSpecializations,
     testimonials: saved.testimonials ?? defaults.testimonials,
   }

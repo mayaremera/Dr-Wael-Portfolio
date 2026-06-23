@@ -3,6 +3,7 @@ import ContactButton from './ContactButton'
 
 export default function Expertise() {
   const { whyChooseUs } = useHomeContent()
+  const imageSrc = whyChooseUs.image
 
   return (
     <section id="expertise" className="border-t border-slate-200 bg-surface-alt py-20 lg:py-28">
@@ -37,16 +38,13 @@ export default function Expertise() {
 
           <div className="relative order-1 min-h-[260px] sm:min-h-[320px] lg:order-2 lg:min-h-[520px]">
             <img
-              src={whyChooseUs.image}
+              key={imageSrc}
+              src={imageSrc}
               alt="Family receiving speech-language support"
               className="absolute inset-0 h-full w-full object-cover"
             />
             <div
-              className="pointer-events-none absolute inset-0 bg-gradient-to-r from-surface-alt/85 via-surface-alt/25 to-transparent"
-              aria-hidden="true"
-            />
-            <div
-              className="pointer-events-none absolute inset-y-0 left-0 hidden w-24 bg-gradient-to-r from-surface-alt via-surface-alt/40 to-transparent lg:block"
+              className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.82)_0%,rgba(255,255,255,0.28)_18%,transparent_32%)]"
               aria-hidden="true"
             />
           </div>

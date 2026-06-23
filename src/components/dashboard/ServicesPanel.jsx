@@ -10,7 +10,6 @@ import {
   emptyTherapyConcept,
   getDefaultServicesContent,
   loadServicesContentRemote,
-  resetServicesContent,
   saveServicesContent,
 } from '../../data/servicesContentStore'
 import { useDashboardSection } from '../../hooks/useDashboardSection'
@@ -506,19 +505,6 @@ export default function ServicesPanel() {
     if (editingTestimonialId === id) setEditingTestimonialId(null)
   }
 
-  const handleReset = () => {
-    if (!window.confirm('Reset all services, cases, and testimonials back to the original defaults?')) return
-
-    resetServicesContent()
-    setContent(getDefaultServicesContent())
-    setEditingServiceId(null)
-    setEditingCaseId(null)
-    setEditingTestimonialId(null)
-    setSaveError('')
-    setSavedMessage('Reset to default content.')
-    window.setTimeout(() => setSavedMessage(''), 2500)
-  }
-
   return (
     <PanelShell
       eyebrow="Service"
@@ -676,12 +662,6 @@ export default function ServicesPanel() {
             )
           }
         />
-      </div>
-
-      <div className="mt-6">
-        <button type="button" onClick={handleReset} className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold tracking-wide text-ink-muted uppercase transition-colors hover:border-accent/30 hover:text-accent-hover">
-          Reset to defaults
-        </button>
       </div>
     </PanelShell>
   )

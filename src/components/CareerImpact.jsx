@@ -1,4 +1,4 @@
-import { careerImpact } from '../data/content'
+import { useAboutContent } from '../hooks/useAboutContent'
 
 const statAccents = [
   'border-brand/20 bg-brand-muted/40',
@@ -8,6 +8,8 @@ const statAccents = [
 ]
 
 export default function CareerImpact() {
+  const { careerImpact } = useAboutContent()
+
   return (
     <section id="career-impact" className="border-t border-slate-200 bg-surface-alt py-14 lg:py-16">
       <div className="mx-auto max-w-6xl px-6 lg:px-8">

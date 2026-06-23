@@ -3,7 +3,6 @@ import { DashboardPagination, useDashboardPagination } from './DashboardItemList
 import {
   getDefaultContactContent,
   loadContactContentRemote,
-  resetContactContent,
   saveContactContent,
 } from '../../data/contactContentStore'
 import { useDashboardSection } from '../../hooks/useDashboardSection'
@@ -79,14 +78,6 @@ export default function ContactPanel() {
   }
 
   const saveAll = () => persist(content)
-
-  const handleReset = () => {
-    if (!window.confirm('Reset contact content back to defaults?')) return
-    resetContactContent()
-    setContent(getDefaultContactContent())
-    setSavedMessage('Reset to default content.')
-    window.setTimeout(() => setSavedMessage(''), 2500)
-  }
 
   return (
     <PanelShell
@@ -166,19 +157,12 @@ export default function ContactPanel() {
             <label className={labelClassName}>Phone</label>
             <input className={fieldClassName} value={content.directContact.phone} onChange={(e) => updateDirectContact('phone', e.target.value)} />
           </div>
-          <div className="md:col-span-2">
-            <label className={labelClassName}>Website</label>
-            <input className={fieldClassName} value={content.directContact.domain} onChange={(e) => updateDirectContact('domain', e.target.value)} />
-          </div>
         </div>
       </section>
 
       <div className="mt-6 flex flex-wrap gap-3">
         <button type="button" onClick={saveAll} className="rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase transition-colors hover:bg-brand-light">
           Save all changes
-        </button>
-        <button type="button" onClick={handleReset} className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold tracking-wide text-ink-muted uppercase transition-colors hover:border-accent/30 hover:text-accent-hover">
-          Reset to defaults
         </button>
       </div>
     </PanelShell>

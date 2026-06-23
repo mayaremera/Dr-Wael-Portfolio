@@ -262,7 +262,7 @@ export default function TherapyConcepts({ showCasesPreview = false, fullDetail =
             </div>
           ) : (
             <div className="grid items-stretch gap-4 md:grid-cols-2">
-              {therapyConcepts.slice(0, 4).map((concept) => (
+              {displayConcepts.map((concept) => (
                 <article
                   key={concept.id}
                   className="group flex h-full flex-col overflow-hidden rounded-sm border border-slate-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-brand/20 hover:shadow-md sm:flex-row"

@@ -8,12 +8,12 @@ import {
   emptyCredentialWheelItem,
   getDefaultHomeContent,
   loadHomeContentRemote,
-  resetHomeContent,
   saveHomeContent,
 } from '../../data/homeContentStore'
 import { useDashboardSection } from '../../hooks/useDashboardSection'
 import DashboardSectionLoader from './DashboardSectionLoader'
 import { persistDashboardSection } from './persistDashboardSection'
+import { withCacheBust } from '../../lib/mediaUrl'
 
 const fieldClassName =
   'w-full rounded-lg border border-slate-200/90 bg-white px-3 py-2.5 text-sm text-ink outline-none transition-all placeholder:text-ink-muted/50 focus:border-brand/40 focus:ring-2 focus:ring-brand/15'
@@ -79,15 +79,9 @@ function CtaFields({ label, cta, onChange }) {
   return (
     <div>
       <p className="mb-2 text-xs font-semibold text-ink">{label}</p>
-      <div className="grid gap-3 sm:grid-cols-2">
-        <div>
-          <label className={labelClassName}>Button label</label>
-          <input className={fieldClassName} value={cta.label} onChange={(e) => onChange({ ...cta, label: e.target.value })} />
-        </div>
-        <div>
-          <label className={labelClassName}>Link</label>
-          <input className={fieldClassName} value={cta.href} onChange={(e) => onChange({ ...cta, href: e.target.value })} />
-        </div>
+      <div>
+        <label className={labelClassName}>Button label</label>
+        <input className={fieldClassName} value={cta.label} onChange={(e) => onChange({ ...cta, label: e.target.value })} />
       </div>
     </div>
   )
@@ -295,6 +289,34 @@ export default function HomePagePanel() {
     }))
   }
 
+  const saveWhyTrust = (nextContent = content, message = 'Why Trust section saved.') => {
+    persist(nextContent, message)
+  }
+
+  const updateWhyTrustImage = (image, { autoSave = false } = {}) => {
+    const nextImage = image ? withCacheBust(image) : ''
+
+    setContent((current) => {
+      const nextContent = {
+        ...current,
+        whyChooseUs: { ...current.whyChooseUs, image: nextImage },
+      }
+
+      if (autoSave) {
+        persistDashboardSection({
+          saveFn: saveHomeContent,
+          nextContent,
+          setContent,
+          setSaveError,
+          setSavedMessage,
+          message: 'Why Trust image saved.',
+        })
+      }
+
+      return nextContent
+    })
+  }
+
   const updatePromoVideo = (field, value) => {
     setContent((current) => ({
       ...current,
@@ -373,21 +395,11 @@ export default function HomePagePanel() {
 
   const saveAll = () => persist(content)
 
-  const handleReset = () => {
-    if (!window.confirm('Reset home page content back to defaults?')) return
-    resetHomeContent()
-    setContent(getDefaultHomeContent())
-    setEditingAffiliationId(null)
-    setEditingCredentialWheelItemId(null)
-    setSavedMessage('Reset to default content.')
-    window.setTimeout(() => setSavedMessage(''), 2500)
-  }
-
   return (
     <PanelShell
       eyebrow="Home Page"
       title="Home page content"
-      description="Edit the hero banner, affiliations, why choose section, and video sections shown on the live home page."
+      description="Edit the hero banner, affiliations, Why Trust section, and video sections shown on the live home page."
     >
       <DashboardSectionLoader loading={loading} loadError={loadError} />
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
@@ -500,10 +512,6 @@ export default function HomePagePanel() {
             <label className={labelClassName}>Subtitle</label>
             <textarea className={`${fieldClassName} min-h-20 resize-y`} value={content.affiliations.subtitle} onChange={(e) => updateAffiliations('subtitle', e.target.value)} />
           </div>
-          <div>
-            <label className={labelClassName}>View all link URL</label>
-            <input className={fieldClassName} value={content.affiliations.viewAllHref} onChange={(e) => updateAffiliations('viewAllHref', e.target.value)} />
-          </div>
         </div>
         <div className="mt-6">
           <DashboardItemList
@@ -539,8 +547,8 @@ export default function HomePagePanel() {
       </section>
 
       <section className="mt-6 rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
-        <h2 className="font-serif text-xl text-ink">Why choose Dr. Wael</h2>
-        <p className="mt-1 text-sm text-ink-muted">The expertise section with image and supporting paragraphs.</p>
+        <h2 className="font-serif text-xl text-ink">Why Trust</h2>
+        <p className="mt-1 text-sm text-ink-muted">The Why Trust section with image and supporting paragraphs.</p>
         <div className="mt-4 grid gap-4">
           <div className="grid gap-4 md:grid-cols-2">
             <div>
@@ -557,8 +565,16 @@ export default function HomePagePanel() {
             <MediaDropzone
               image={content.whyChooseUs.image}
               video=""
-              onChange={({ image }) => updateWhyChoose('image', image)}
-              onClear={() => updateWhyChoose('image', '')}
+              onChange={({ image }) => updateWhyTrustImage(image)}
+              onUploaded={({ image }) => updateWhyTrustImage(image, { autoSave: true })}
+              onClear={() => {
+                const nextContent = {
+                  ...content,
+                  whyChooseUs: { ...content.whyChooseUs, image: '' },
+                }
+                setContent(nextContent)
+                saveWhyTrust(nextContent, 'Why Trust image removed.')
+              }}
             />
           </div>
           <StringListEditor
@@ -566,6 +582,15 @@ export default function HomePagePanel() {
             items={content.whyChooseUs.paragraphs}
             onChange={(paragraphs) => updateWhyChoose('paragraphs', paragraphs)}
           />
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={() => saveWhyTrust()}
+              className="rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase transition-colors hover:bg-brand-light"
+            >
+              Save changes
+            </button>
+          </div>
         </div>
       </section>
 
@@ -612,9 +637,6 @@ export default function HomePagePanel() {
       <div className="mt-6 flex flex-wrap gap-3">
         <button type="button" onClick={saveAll} className="rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase transition-colors hover:bg-brand-light">
           Save all changes
-        </button>
-        <button type="button" onClick={handleReset} className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold tracking-wide text-ink-muted uppercase transition-colors hover:border-accent/30 hover:text-accent-hover">
-          Reset to defaults
         </button>
       </div>
     </PanelShell>

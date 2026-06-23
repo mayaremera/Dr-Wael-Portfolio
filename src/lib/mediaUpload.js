@@ -16,6 +16,10 @@ function buildObjectPath(file) {
 
 export async function isMediaStorageAvailable() {
   if (!isSupabaseConfigured || !supabase) return false
+
+  const { data, error } = await supabase.auth.getUser()
+  if (error || !data.user) return false
+
   const session = await getSupabaseSession()
   return Boolean(session)
 }
@@ -25,8 +29,8 @@ export async function uploadMediaToStorage(file) {
     throw new Error('Supabase is not configured.')
   }
 
-  const session = await getSupabaseSession()
-  if (!session) {
+  const { data: userData, error: userError } = await supabase.auth.getUser()
+  if (userError || !userData.user) {
     throw new Error('Sign in to Supabase before uploading media.')
   }
 

@@ -15,6 +15,7 @@ import TherapyConcepts from './components/TherapyConcepts'
 import Expertise from './components/Expertise'
 import Testimonials from './components/Testimonials'
 import VideoSection from './components/VideoSection'
+import VideoLibrarySection from './components/VideoLibrarySection'
 import GalleryPageHeading from './components/GalleryPageHeading'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
@@ -25,6 +26,7 @@ import { images } from './data/content'
 import { useServicesContent } from './hooks/useServicesContent'
 
 const HOME_PATH = '/'
+const PAGE_LOADER_MS = 1000
 
 function PageHeading({ eyebrow, title, backgroundImage, imagePosition = 'center' }) {
   const positionClass =
@@ -168,17 +170,16 @@ function VibeBand({
 
 function App() {
   const { speechLanguageServices } = useServicesContent()
-  const [showInitialLoader, setShowInitialLoader] = useState(true)
+  const [isPageReady, setIsPageReady] = useState(false)
   const rawPath = window.location.pathname.replace(/\/+$/, '') || HOME_PATH
   const pathname = rawPath === '/cases' ? '/services' : rawPath
   const isDashboard = pathname === '/dashboard' || pathname.startsWith('/dashboard/')
 
   useEffect(() => {
-    const frame = requestAnimationFrame(() => {
-      requestAnimationFrame(() => setShowInitialLoader(false))
-    })
-    return () => cancelAnimationFrame(frame)
-  }, [])
+    setIsPageReady(false)
+    const timer = window.setTimeout(() => setIsPageReady(true), PAGE_LOADER_MS)
+    return () => window.clearTimeout(timer)
+  }, [pathname])
 
   useEffect(() => {
     if (rawPath === '/cases') {
@@ -187,12 +188,7 @@ function App() {
   }, [rawPath])
 
   if (isDashboard) {
-    return (
-      <>
-        {showInitialLoader ? <PageLoader /> : null}
-        <Dashboard />
-      </>
-    )
+    return <Dashboard isPageLoading={!isPageReady} />
   }
 
   const pages = {
@@ -247,6 +243,7 @@ function App() {
         }}
       >
         <VideoSection variant="light" />
+        <VideoLibrarySection />
         <PromoVideoSection ctaHref="/contact" secondaryHref="/services" />
         <GalleryGrid />
       </PageLayout>
@@ -293,24 +290,25 @@ function App() {
   }
 
   const pageContent = pages[pathname]
-  const isHome = pathname === HOME_PATH
 
   return (
     <div className="min-h-screen bg-surface pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0">
-      {showInitialLoader ? <PageLoader /> : null}
       <Header />
-      <main>
-        {pageContent ?? (
-          <section className="mx-auto max-w-3xl px-6 py-24 text-center">
-            <p className="text-xs font-semibold tracking-[0.22em] text-brand uppercase">Page not found</p>
-            <h1 className="mt-4 font-serif text-4xl text-ink">This page does not exist.</h1>
-            <ContactButton href="/" className="mt-8">
-              Back to Home
-            </ContactButton>
-          </section>
-        )}
-      </main>
-      <Footer />
+      <div className={!isPageReady ? 'pointer-events-none select-none' : undefined} aria-hidden={!isPageReady}>
+        <main>
+          {pageContent ?? (
+            <section className="mx-auto max-w-3xl px-6 py-24 text-center">
+              <p className="text-xs font-semibold tracking-[0.22em] text-brand uppercase">Page not found</p>
+              <h1 className="mt-4 font-serif text-4xl text-ink">This page does not exist.</h1>
+              <ContactButton href="/" className="mt-8">
+                Back to Home
+              </ContactButton>
+            </section>
+          )}
+        </main>
+        {isPageReady ? <Footer /> : null}
+      </div>
+      {!isPageReady ? <PageLoader variant="below-header" /> : null}
     </div>
   )
 }
