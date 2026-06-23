@@ -7,6 +7,7 @@ import {
   leadershipRoles as defaultLeadershipRoles,
   profileDetails as defaultProfileDetails,
 } from './content'
+import { academicServices as defaultAcademicServices } from './academicServices'
 import {
   CONTENT_SECTIONS,
   loadSectionPrimary,
@@ -28,11 +29,36 @@ function getDefaultCertificates() {
   }))
 }
 
+function normalizeAcademicServices(data) {
+  const source = data ?? defaultAcademicServices
+
+  return {
+    label: source.label ?? defaultAcademicServices.label,
+    title: source.title ?? defaultAcademicServices.title,
+    intro: source.intro ?? defaultAcademicServices.intro,
+    categories: (source.categories ?? defaultAcademicServices.categories).map((category, categoryIndex) => ({
+      id: category.id || createContentId(category.label || `academic-category-${categoryIndex}`),
+      label: category.label || '',
+      items: (category.items ?? []).map((item, itemIndex) => ({
+        id: item.id || createContentId(item.title || `academic-item-${categoryIndex}-${itemIndex}`),
+        title: item.title || '',
+        org: item.org || '',
+        period: item.period ?? null,
+        description: item.description ?? null,
+        ...(item.link?.href ? { link: { href: item.link.href, label: item.link.label || 'Learn more' } } : {}),
+        ...(item.journals?.length ? { journals: [...item.journals] } : {}),
+        ...(item.workshops?.length ? { workshops: item.workshops.map((workshop) => ({ ...workshop })) } : {}),
+      })),
+    })),
+  }
+}
+
 export function getDefaultAboutContent() {
   return {
     profileDetails: cloneContent(defaultProfileDetails),
     profileImage: images.drWael,
     careerImpact: cloneContent(defaultCareerImpact),
+    academicServices: normalizeAcademicServices(defaultAcademicServices),
     certificates: cloneContent(getDefaultCertificates()),
     careerTimeline: cloneContent(defaultCareerTimeline),
     leadershipRoles: cloneContent(defaultLeadershipRoles).map((role, index) => ({
@@ -65,6 +91,7 @@ function mergeWithDefaults(saved) {
       ...saved.careerImpact,
       stats: saved.careerImpact?.stats?.length ? saved.careerImpact.stats : defaults.careerImpact.stats,
     },
+    academicServices: normalizeAcademicServices(saved.academicServices ?? defaults.academicServices),
     certificates: saved.certificates ?? defaults.certificates,
     careerTimeline: saved.careerTimeline ?? defaults.careerTimeline,
     leadershipRoles: (saved.leadershipRoles ?? defaults.leadershipRoles).map((role, index) => ({
@@ -130,4 +157,29 @@ export const emptyLeadershipRole = {
   title: '',
   org: '',
   note: '',
+}
+
+export const emptyAcademicCategory = {
+  id: '',
+  label: '',
+  items: [],
+}
+
+export const emptyAcademicServiceItem = {
+  id: '',
+  title: '',
+  org: '',
+  period: '',
+  description: '',
+  link: { href: '', label: '' },
+  journals: [],
+  workshops: [],
+}
+
+export function createAcademicCategoryId(label = 'category') {
+  return createContentId(label)
+}
+
+export function createAcademicServiceItemId(title = 'item') {
+  return createContentId(title)
 }

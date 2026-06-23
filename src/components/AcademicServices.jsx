@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { academicServices } from '../data/academicServices'
+import { useEffect, useState } from 'react'
+import { useAboutContent } from '../hooks/useAboutContent'
 
 function ServiceItem({ item }) {
   return (
@@ -59,10 +59,19 @@ function ServiceItem({ item }) {
 }
 
 export default function AcademicServices() {
+  const { academicServices } = useAboutContent()
   const { label, title, intro, categories } = academicServices
   const [activeId, setActiveId] = useState(categories[0]?.id ?? '')
 
-  const activeCategory = categories.find((c) => c.id === activeId) ?? categories[0]
+  useEffect(() => {
+    if (!categories.some((category) => category.id === activeId)) {
+      setActiveId(categories[0]?.id ?? '')
+    }
+  }, [categories, activeId])
+
+  if (!categories.length) return null
+
+  const activeCategory = categories.find((category) => category.id === activeId) ?? categories[0]
 
   return (
     <section id="academic-services" className="border-t border-slate-200 bg-surface py-16 lg:py-20">
@@ -106,7 +115,7 @@ export default function AcademicServices() {
             className="mt-6 animate-fade-up space-y-3"
           >
             {activeCategory.items.map((item) => (
-              <ServiceItem key={`${activeCategory.id}-${item.title}`} item={item} />
+              <ServiceItem key={item.id} item={item} />
             ))}
           </div>
         </div>
