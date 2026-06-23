@@ -34,12 +34,12 @@ export default function Logo({ scrolled = false, className = '', markOnly = fals
       {!markOnly ? (
       <div className="hidden min-w-0 flex-col leading-none lg:flex">
         <span
-          className={`font-logo text-[1.02rem] font-medium tracking-[0.01em] transition-colors duration-500 xl:text-[1.08rem] ${textTone}`}
+          className={`font-serif text-[1.02rem] font-medium tracking-[0.01em] transition-colors duration-500 xl:text-[1.08rem] ${textTone}`}
         >
           Wael Al-Dakroury
         </span>
         <span
-          className={`mt-1 font-logo text-[0.56rem] font-medium tracking-[0.2em] uppercase transition-colors duration-500 xl:text-[0.58rem] ${credentialTone}`}
+          className={`mt-1 font-sans text-[0.56rem] font-semibold tracking-[0.2em] uppercase transition-colors duration-500 xl:text-[0.58rem] ${credentialTone}`}
         >
           PhD, CCC-SLP, F-ASHA
         </span>
