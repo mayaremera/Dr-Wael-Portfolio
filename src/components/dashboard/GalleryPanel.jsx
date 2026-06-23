@@ -165,6 +165,8 @@ function GalleryItemEditor({ initialItem, onSave, onCancel }) {
 }
 
 function VideoLibraryItemPreview({ item }) {
+  const description = item.description?.trim() || item.subtitle?.trim() || ''
+
   return (
     <div className="flex gap-3">
       <div className="h-16 w-28 shrink-0 overflow-hidden rounded-lg bg-slate-100 ring-1 ring-slate-200/80">
@@ -176,7 +178,8 @@ function VideoLibraryItemPreview({ item }) {
       </div>
       <div className="min-w-0 flex-1">
         <p className="font-medium text-ink">{item.title || 'Untitled video'}</p>
-        <p className="mt-1 line-clamp-2 text-sm text-ink-muted">{item.subtitle || item.youtubeId || item.videoSrc || 'No source'}</p>
+        {item.subtitle ? <p className="mt-0.5 text-xs font-semibold tracking-wide text-brand uppercase">{item.subtitle}</p> : null}
+        <p className="mt-1 line-clamp-2 text-sm text-ink-muted">{description || item.youtubeId || item.videoSrc || 'No description'}</p>
       </div>
     </div>
   )
@@ -219,14 +222,28 @@ function VideoLibraryItemEditor({ initialItem, onSave, onCancel }) {
           <input className={fieldClassName} value={item.title} onChange={(e) => updateField('title', e.target.value)} required />
         </div>
         <div className="sm:col-span-2">
-          <label className={labelClassName}>Subtitle</label>
-          <input className={fieldClassName} value={item.subtitle} onChange={(e) => updateField('subtitle', e.target.value)} />
+          <label className={labelClassName}>Tag (optional)</label>
+          <input
+            className={fieldClassName}
+            value={item.subtitle}
+            onChange={(e) => updateField('subtitle', e.target.value)}
+            placeholder="e.g. Lecture · 2024"
+          />
+        </div>
+        <div className="sm:col-span-2">
+          <label className={labelClassName}>Description</label>
+          <textarea
+            className={`${fieldClassName} min-h-24 resize-y`}
+            value={item.description ?? ''}
+            onChange={(e) => updateField('description', e.target.value)}
+            placeholder="What happens in this moment and why it matters..."
+          />
         </div>
         <div>
-          <label className={labelClassName}>Video type</label>
+          <label className={labelClassName}>Video source</label>
           <select className={fieldClassName} value={item.type} onChange={(e) => updateField('type', e.target.value)}>
-            <option value="youtube">YouTube</option>
-            <option value="file">Uploaded file</option>
+            <option value="youtube">YouTube link (embedded player)</option>
+            <option value="file">Upload video file</option>
           </select>
         </div>
         <div>
@@ -240,24 +257,26 @@ function VideoLibraryItemEditor({ initialItem, onSave, onCancel }) {
         </div>
         {item.type === 'youtube' ? (
           <div className="sm:col-span-2">
-            <label className={labelClassName}>YouTube ID or URL</label>
+            <label className={labelClassName}>YouTube link or video ID</label>
             <input
               className={fieldClassName}
               value={item.youtubeId}
               onChange={(e) => updateField('youtubeId', e.target.value)}
-              placeholder="EyIvs6DKl-Y or https://youtu.be/..."
+              placeholder="https://youtu.be/... or https://www.youtube.com/watch?v=..."
               required
             />
+            <p className="mt-1.5 text-xs text-ink-muted">Plays inside the site in an embedded frame — the video is not stored on your server.</p>
           </div>
         ) : (
           <div className="sm:col-span-2">
-            <label className={labelClassName}>Video file</label>
+            <label className={labelClassName}>Upload video</label>
             <MediaDropzone
               image=""
               video={item.videoSrc}
               onChange={({ video }) => updateField('videoSrc', video)}
               onClear={() => updateField('videoSrc', '')}
             />
+            <p className="mt-1.5 text-xs text-ink-muted">Upload an MP4 or other supported video file to host on your site.</p>
           </div>
         )}
       </div>
@@ -449,8 +468,8 @@ export default function GalleryPanel() {
       </section>
 
       <section className="mt-6 rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
-        <h2 className="font-serif text-xl text-ink">Video library</h2>
-        <p className="mt-1 text-sm text-ink-muted">Curated collection shown below the Watch section.</p>
+        <h2 className="font-serif text-xl text-ink">Key moments</h2>
+        <p className="mt-1 text-sm text-ink-muted">Important video moments shown as cards below the Watch section. Add as many as you need.</p>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           <div>
             <label className={labelClassName}>Label</label>
@@ -470,12 +489,12 @@ export default function GalleryPanel() {
           </div>
         </div>
         <button type="button" onClick={saveVideoLibraryHeader} className="mt-4 rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase transition-colors hover:bg-brand-light">
-          Save library header
+          Save section header
         </button>
 
         <div className="mt-6">
           <DashboardItemList
-            title="Library videos"
+            title="Moment videos"
             countLabel={`${videoItems.length} video${videoItems.length === 1 ? '' : 's'}`}
             items={videoItems}
             editingId={editingVideoId}

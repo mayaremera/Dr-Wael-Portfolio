@@ -8,6 +8,7 @@ import Profile from './components/Profile'
 import PromoVideoSection from './components/PromoVideoSection'
 import Leadership from './components/Leadership'
 import SpeakingTraining from './components/SpeakingTraining'
+import AcademicServices from './components/AcademicServices'
 import ProfessionalServices from './components/ProfessionalServices'
 import CertificationGallery from './components/CertificationGallery'
 import CareerTimeline from './components/CareerTimeline'
@@ -208,6 +209,7 @@ function App() {
         <CertificationGallery />
         <CareerTimeline />
         <Leadership />
+        <AcademicServices />
         <VibeBand
           label="Professional Leadership"
           title="Global Recognition with Real-World Impact"

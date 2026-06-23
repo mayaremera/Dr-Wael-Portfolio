@@ -64,10 +64,10 @@ export function getDefaultGalleryContent() {
   return {
     watchSection: cloneContent(defaultWatchVideo),
     videoLibrary: {
-      label: 'Video Library',
-      title: 'Moments That Matter',
+      label: 'Key Moments',
+      title: 'Important Moments from Practice',
       description:
-        'Lectures, ceremonies, and clinical highlights — a curated collection of Dr. Wael’s work in communication sciences.',
+        'Highlights from lectures, ceremonies, and clinical work — each clip captures a meaningful moment in Dr. Wael’s journey.',
       items: [],
     },
     mediaGallery: {
@@ -168,6 +168,7 @@ export const emptyVideoLibraryItem = {
   id: '',
   title: '',
   subtitle: '',
+  description: '',
   type: 'youtube',
   youtubeId: '',
   videoSrc: '',
