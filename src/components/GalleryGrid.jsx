@@ -223,14 +223,14 @@ export default function GalleryGrid() {
 
             return (
               <div key={item.id} className="mb-3 break-inside-avoid sm:mb-4">
-                <GalleryTile item={item} aspectClass={aspectClass} onImageClick={setActiveImage} />
+                <GalleryTile item={item} aspectClass={aspectClass} onItemClick={setActiveItem} />
               </div>
             )
           })}
         </div>
       </div>
 
-      {activeImage ? <GalleryModal item={activeImage} onClose={closeModal} /> : null}
+      {activeItem ? <GalleryModal item={activeItem} onClose={closeModal} /> : null}
     </section>
   )
 }
