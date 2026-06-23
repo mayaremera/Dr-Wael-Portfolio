@@ -7,16 +7,15 @@ export const site = {
   suffix: 'SLP',
   domain: 'drwaelslp.com',
   email: 'info@drwaelslp.com',
-  phone: '+91 3309 62885',
-  languages: ['English', 'Arabic'],
+  phone: '+1 913 309 6288',
+  languages: ['English', 'Arabic', 'Spanish'],
   tagline: 'Every child has something to say. We help them find the words.',
   footerTagline: 'Helping children communicate, connect, and thrive.',
   social: {
-    facebook: 'https://facebook.com/',
-    instagram: 'https://instagram.com/',
-    youtube: 'https://youtube.com/',
-    linkedin: 'https://linkedin.com/',
-    twitter: 'https://twitter.com/',
+    facebook: 'https://www.facebook.com/share/18yWpgqVwW/?mibextid=wwXIfr',
+    threads: 'https://www.threads.com/@dr.waelaldakroury?invite=0',
+    linkedin: 'https://www.linkedin.com/in/waelslp?utm_source=share_via&utm_content=profile&utm_medium=member_ios',
+    twitter: 'https://x.com/waelslp?s=11&t=dyMPABoxYnqU0IAoWfilIQ',
   },
 }
 

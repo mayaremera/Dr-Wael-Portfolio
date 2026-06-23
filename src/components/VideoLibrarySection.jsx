@@ -96,15 +96,15 @@ function VideoCard({ item, index, onPlay }) {
   const displayIndex = String(index + 1).padStart(2, '0')
 
   return (
-    <article className="group">
+    <article className="group h-full">
       <button
         type="button"
         onClick={onPlay}
-        className="w-full text-left"
+        className="flex h-full w-full flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white text-left shadow-sm ring-1 ring-slate-200/70 transition-all duration-300 hover:border-brand/25 hover:shadow-md hover:ring-brand/20"
         aria-label={`Play ${item.title}`}
         onContextMenu={blockMediaContext}
       >
-        <div className="relative aspect-[16/10] overflow-hidden rounded-2xl bg-slate-100">
+        <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
           {item.poster ? (
             <img
               src={item.poster}
@@ -132,7 +132,7 @@ function VideoCard({ item, index, onPlay }) {
           </span>
         </div>
 
-        <div className="mt-4 px-0.5">
+        <div className="flex flex-1 flex-col p-4 sm:p-5">
           {item.subtitle ? (
             <p className="text-[0.65rem] font-semibold tracking-[0.16em] text-brand uppercase">{item.subtitle}</p>
           ) : null}

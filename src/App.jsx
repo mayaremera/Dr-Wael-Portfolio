@@ -25,6 +25,7 @@ import PageLoader from './components/PageLoader'
 import Dashboard from './components/dashboard/Dashboard'
 import { images } from './data/content'
 import { useServicesContent } from './hooks/useServicesContent'
+import { useSeo } from './hooks/useSeo'
 
 const HOME_PATH = '/'
 const PAGE_LOADER_MS = 1000
@@ -176,6 +177,8 @@ function App() {
   const pathname = rawPath === '/cases' ? '/services' : rawPath
   const isDashboard = pathname === '/dashboard' || pathname.startsWith('/dashboard/')
 
+  useSeo(pathname)
+
   useEffect(() => {
     setIsPageReady(false)
     const timer = window.setTimeout(() => setIsPageReady(true), PAGE_LOADER_MS)
@@ -295,7 +298,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-surface pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0">
-      <Header />
+      {isPageReady ? <Header /> : null}
       <div className={!isPageReady ? 'pointer-events-none select-none' : undefined} aria-hidden={!isPageReady}>
         <main>
           {pageContent ?? (
@@ -310,7 +313,7 @@ function App() {
         </main>
         {isPageReady ? <Footer /> : null}
       </div>
-      {!isPageReady ? <PageLoader variant="below-header" /> : null}
+      {!isPageReady ? <PageLoader /> : null}
     </div>
   )
 }

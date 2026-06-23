@@ -68,16 +68,14 @@ export default function Footer() {
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                 </svg>
               </FooterSocialIcon>
-              <FooterSocialIcon href={site.social.instagram} label="Instagram">
-                <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current" strokeWidth="2" aria-hidden="true">
-                  <rect x="3" y="3" width="18" height="18" rx="5" />
-                  <circle cx="12" cy="12" r="4" />
-                  <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+              <FooterSocialIcon href={site.social.threads} label="Threads">
+                <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden="true">
+                  <path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.011v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.11.636c-.52-1.635-1.368-2.918-2.534-3.812C17.705 1.75 15.413 1.17 12.2 1.15h-.01c-3.01.022-5.312.911-6.838 2.647-1.433 1.635-2.17 3.985-2.196 6.973v.015c.026 2.988.763 5.338 2.196 6.973 1.526 1.736 3.828 2.625 6.838 2.647h.01c2.39-.017 4.223-.643 5.67-1.947 1.558-1.402 2.377-3.573 2.432-6.458v-.844H12.01v-2.11h5.84v1.086c-.053 3.31-1.148 6.168-3.278 8.078-1.874 1.692-4.467 2.542-7.786 2.564z" />
                 </svg>
               </FooterSocialIcon>
-              <FooterSocialIcon href={site.social.youtube} label="YouTube">
+              <FooterSocialIcon href={site.social.twitter} label="X / Twitter">
                 <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden="true">
-                  <path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                 </svg>
               </FooterSocialIcon>
               <FooterSocialIcon href={site.social.linkedin} label="LinkedIn">

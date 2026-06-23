@@ -40,7 +40,7 @@ export default function PageLoader({ variant = 'fullscreen' }) {
 
   return (
     <div
-      className={`page-loader fixed z-40 flex items-center justify-center ${positionClass}`}
+      className={`page-loader fixed z-[60] flex items-center justify-center ${positionClass}`}
       role="status"
       aria-live="polite"
       aria-busy="true"
