@@ -52,7 +52,7 @@ export default function CareerTimeline() {
           <p className="text-xs font-semibold tracking-[0.22em] text-brand uppercase">Career Journey</p>
           <h2 className="mt-3 font-serif text-3xl text-ink md:text-4xl">A timeline of milestones</h2>
           <p className="mt-4 text-sm leading-relaxed text-ink-muted md:text-base">
-            From doctoral training to global leadership — key moments that shaped Dr. Wael&apos;s clinical and academic path.
+            Education, clinical leadership, and academic appointments — the foundation of Dr. Wael&apos;s career in speech-language pathology.
           </p>
         </header>
 

@@ -58,7 +58,7 @@ function ServiceItem({ item }) {
   )
 }
 
-export default function AcademicServices() {
+export default function AcademicServices({ embedded = false }) {
   const { academicServices } = useAboutContent()
   const { label, title, intro, categories } = academicServices
   const [activeId, setActiveId] = useState(categories[0]?.id ?? '')
@@ -73,53 +73,59 @@ export default function AcademicServices() {
 
   const activeCategory = categories.find((category) => category.id === activeId) ?? categories[0]
 
-  return (
-    <section id="academic-services" className="border-t border-slate-200 bg-surface py-16 lg:py-20">
-      <div className="mx-auto max-w-6xl px-6 lg:px-8">
+  const content = (
+    <>
+      {!embedded ? (
         <header className="mx-auto max-w-3xl text-center">
           <p className="text-xs font-semibold tracking-[0.22em] text-brand uppercase">{label}</p>
-          <h2 className="mt-3 font-serif text-3xl leading-tight text-ink md:text-4xl">{title}</h2>
-          <p className="mt-5 text-sm leading-relaxed text-ink-muted md:text-base">{intro}</p>
+          <h3 className="mt-3 font-serif text-3xl leading-tight text-ink md:text-4xl">{title}</h3>
+          <p className="mt-4 text-sm leading-relaxed text-ink-muted md:text-base">{intro}</p>
         </header>
+      ) : null}
 
-        <div className="mt-10 lg:mt-12">
-          <div
-            className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-            role="tablist"
-            aria-label="Academic service categories"
-          >
-            {categories.map((category) => {
-              const isActive = category.id === activeId
-              return (
-                <button
-                  key={category.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={isActive}
-                  onClick={() => setActiveId(category.id)}
-                  className={`shrink-0 rounded-full border px-4 py-2 text-xs font-semibold tracking-[0.08em] uppercase transition-all duration-200 ${
-                    isActive
-                      ? 'border-brand bg-brand text-white shadow-sm'
-                      : 'border-slate-200 bg-white text-ink-muted hover:border-brand/30 hover:text-brand'
-                  }`}
-                >
-                  {category.label}
-                </button>
-              )
-            })}
-          </div>
+      <div className={embedded ? '' : 'mt-8 lg:mt-10'}>
+        <div
+          className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          role="tablist"
+          aria-label="Academic service categories"
+        >
+          {categories.map((category) => {
+            const isActive = category.id === activeId
+            return (
+              <button
+                key={category.id}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => setActiveId(category.id)}
+                className={`shrink-0 rounded-full border px-4 py-2 text-xs font-semibold tracking-[0.08em] uppercase transition-all duration-200 ${
+                  isActive
+                    ? 'border-brand bg-brand text-white shadow-sm'
+                    : 'border-slate-200 bg-white text-ink-muted hover:border-brand/30 hover:text-brand'
+                }`}
+              >
+                {category.label}
+              </button>
+            )
+          })}
+        </div>
 
-          <div
-            key={activeCategory.id}
-            role="tabpanel"
-            className="mt-6 animate-fade-up space-y-3"
-          >
-            {activeCategory.items.map((item) => (
-              <ServiceItem key={item.id} item={item} />
-            ))}
-          </div>
+        <div key={activeCategory.id} role="tabpanel" className="mt-6 animate-fade-up space-y-3">
+          {activeCategory.items.map((item) => (
+            <ServiceItem key={item.id} item={item} />
+          ))}
         </div>
       </div>
+    </>
+  )
+
+  if (embedded) {
+    return <div id="academic-services">{content}</div>
+  }
+
+  return (
+    <section id="academic-services" className="border-t border-slate-200 bg-surface py-16 lg:py-20">
+      <div className="mx-auto max-w-6xl px-6 lg:px-8">{content}</div>
     </section>
   )
 }

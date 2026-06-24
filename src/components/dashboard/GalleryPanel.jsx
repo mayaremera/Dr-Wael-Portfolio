@@ -5,9 +5,11 @@ import { useConfirmDelete } from './DeleteConfirmDialog'
 import {
   createGalleryItemId,
   createVideoLibraryItemId,
+  applyGalleryPresentationOrder,
   emptyGalleryItem,
   emptyVideoLibraryItem,
   getDefaultGalleryContent,
+  getNextGallerySortOrder,
   loadGalleryContentRemote,
   parseYoutubeId,
   saveGalleryContent,
@@ -94,7 +96,10 @@ function GalleryItemPreview({ item }) {
         <span className="rounded-full bg-brand-muted px-2 py-0.5 text-[0.6rem] font-semibold tracking-wide text-brand uppercase">
           {item.type}
         </span>
-        <p className="mt-1 line-clamp-2 text-sm text-ink-muted">{item.alt || 'No alt text'}</p>
+        <p className="font-medium text-ink">{item.title || item.alt || 'Untitled'}</p>
+        <p className="mt-1 line-clamp-2 text-sm text-ink-muted">
+          {item.description?.trim() || item.alt || 'No description'}
+        </p>
       </div>
     </div>
   )
@@ -147,7 +152,25 @@ function GalleryItemEditor({ initialItem, onSave, onCancel }) {
           />
         </div>
         <div>
-          <label className={labelClassName}>Alt text</label>
+          <label className={labelClassName}>Title</label>
+          <input
+            className={fieldClassName}
+            value={item.title}
+            onChange={(e) => updateField('title', e.target.value)}
+            placeholder="Short headline for this moment"
+          />
+        </div>
+        <div>
+          <label className={labelClassName}>Description</label>
+          <textarea
+            className={`${fieldClassName} min-h-24 resize-y`}
+            value={item.description}
+            onChange={(e) => updateField('description', e.target.value)}
+            placeholder="What is happening in this photo or video?"
+          />
+        </div>
+        <div>
+          <label className={labelClassName}>Alt text (accessibility)</label>
           <input className={fieldClassName} value={item.alt} onChange={(e) => updateField('alt', e.target.value)} required />
         </div>
       </div>
@@ -343,15 +366,28 @@ export default function GalleryPanel() {
   const saveItem = (item) => {
     const items = content.mediaGallery.items
     const exists = items.some((entry) => entry.id === item.id)
-    const nextItem = exists ? item : { ...item, createdAt: item.createdAt || new Date().toISOString() }
+    const existing = items.find((entry) => entry.id === item.id)
+    const nextSortOrder = exists
+      ? (typeof item.sortOrder === 'number' ? item.sortOrder : existing?.sortOrder ?? 0)
+      : getNextGallerySortOrder(items)
+
+    const nextItem = {
+      ...item,
+      sortOrder: nextSortOrder,
+      createdAt: item.createdAt || existing?.createdAt || new Date().toISOString(),
+    }
+
     const nextItems = exists
       ? items.map((entry) => (entry.id === item.id ? nextItem : entry))
-      : [nextItem, ...items]
+      : [...items, nextItem]
 
     persist(
       {
         ...content,
-        mediaGallery: { ...content.mediaGallery, items: nextItems },
+        mediaGallery: {
+          ...content.mediaGallery,
+          items: applyGalleryPresentationOrder(nextItems),
+        },
       },
       exists ? 'Gallery item updated.' : 'Gallery item added.',
     )
@@ -408,7 +444,7 @@ export default function GalleryPanel() {
     <PanelShell
       eyebrow="Gallery"
       title="Video & gallery page"
-      description="Edit the Watch section, video library, and photo grid on the Video & Gallery page."
+      description="Edit the Watch section, key moment videos, and the paginated photo & video gallery. Each gallery item supports a title, description, and alt text."
     >
       <DashboardSectionLoader loading={loading} loadError={loadError} />
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
@@ -516,7 +552,8 @@ export default function GalleryPanel() {
       </section>
 
       <section className="mt-6 rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
-        <h2 className="font-serif text-xl text-ink">Gallery header</h2>
+        <h2 className="font-serif text-xl text-ink">Gallery section</h2>
+        <p className="mt-1 text-sm text-ink-muted">Header and paginated photo & video cards at the bottom of the page.</p>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           <div>
             <label className={labelClassName}>Label</label>
@@ -525,6 +562,14 @@ export default function GalleryPanel() {
           <div>
             <label className={labelClassName}>Title</label>
             <input className={fieldClassName} value={content.mediaGallery.title} onChange={(e) => updateGalleryMeta('title', e.target.value)} />
+          </div>
+          <div className="md:col-span-2">
+            <label className={labelClassName}>Description</label>
+            <textarea
+              className={`${fieldClassName} min-h-20 resize-y`}
+              value={content.mediaGallery.description || ''}
+              onChange={(e) => updateGalleryMeta('description', e.target.value)}
+            />
           </div>
         </div>
         <button type="button" onClick={saveHeader} className="mt-4 rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase transition-colors hover:bg-brand-light">

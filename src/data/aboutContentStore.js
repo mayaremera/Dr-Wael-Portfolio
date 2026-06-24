@@ -8,6 +8,7 @@ import {
   profileDetails as defaultProfileDetails,
 } from './content'
 import { academicServices as defaultAcademicServices } from './academicServices'
+import { refereedPublications as defaultRefereedPublications } from './refereedPublications'
 import {
   CONTENT_SECTIONS,
   loadSectionPrimary,
@@ -27,6 +28,27 @@ function getDefaultCertificates() {
     ...certificate,
     image: certificatePlaceholders[index % certificatePlaceholders.length],
   }))
+}
+
+const TIMELINE_DUPLICATE_IDS = new Set(['asha-ambassador', 'sig17-editor', 'ialp', 'eacsl', 'jslhr'])
+
+function mergeAcademicServices(saved, defaults) {
+  const normalized = normalizeAcademicServices(saved ?? defaults)
+  const hasInternational = normalized.categories.some((category) => category.id === 'international')
+
+  if (hasInternational) return normalized
+
+  const internationalCategory = (defaults.categories ?? []).find((category) => category.id === 'international')
+  if (!internationalCategory) return normalized
+
+  return {
+    ...normalized,
+    categories: [internationalCategory, ...normalized.categories],
+  }
+}
+
+function normalizeCareerTimeline(items = []) {
+  return items.filter((item) => !TIMELINE_DUPLICATE_IDS.has(item.id))
 }
 
 function normalizeAcademicServices(data) {
@@ -53,14 +75,35 @@ function normalizeAcademicServices(data) {
   }
 }
 
+function normalizeRefereedPublications(data) {
+  const source = data ?? defaultRefereedPublications
+
+  return {
+    label: source.label ?? defaultRefereedPublications.label,
+    title: source.title ?? defaultRefereedPublications.title,
+    intro: source.intro ?? defaultRefereedPublications.intro,
+    papers: (source.papers ?? defaultRefereedPublications.papers).map((paper, index) => ({
+      id: paper.id || createContentId(paper.title || `paper-${index}`),
+      year: paper.year ?? '',
+      authors: paper.authors || '',
+      title: paper.title || '',
+      venue: paper.venue || '',
+      details: paper.details ?? '',
+      doi: paper.doi ?? null,
+      type: paper.type || 'Journal',
+    })),
+  }
+}
+
 export function getDefaultAboutContent() {
   return {
     profileDetails: cloneContent(defaultProfileDetails),
     profileImage: images.drWael,
     careerImpact: cloneContent(defaultCareerImpact),
     academicServices: normalizeAcademicServices(defaultAcademicServices),
+    refereedPublications: normalizeRefereedPublications(defaultRefereedPublications),
     certificates: cloneContent(getDefaultCertificates()),
-    careerTimeline: cloneContent(defaultCareerTimeline),
+    careerTimeline: normalizeCareerTimeline(cloneContent(defaultCareerTimeline)),
     leadershipRoles: cloneContent(defaultLeadershipRoles).map((role, index) => ({
       id: `leadership-${index}`,
       ...role,
@@ -91,9 +134,16 @@ function mergeWithDefaults(saved) {
       ...saved.careerImpact,
       stats: saved.careerImpact?.stats?.length ? saved.careerImpact.stats : defaults.careerImpact.stats,
     },
-    academicServices: normalizeAcademicServices(saved.academicServices ?? defaults.academicServices),
+    academicServices: mergeAcademicServices(
+      saved.academicServices ?? defaults.academicServices,
+      normalizeAcademicServices(defaultAcademicServices),
+    ),
+    refereedPublications: normalizeRefereedPublications(saved.refereedPublications ?? defaults.refereedPublications),
     certificates: saved.certificates ?? defaults.certificates,
-    careerTimeline: saved.careerTimeline ?? defaults.careerTimeline,
+    careerTimeline: normalizeCareerTimeline(saved.careerTimeline ?? defaults.careerTimeline).map((item, index) => ({
+      id: item.id || `timeline-${index}`,
+      ...item,
+    })),
     leadershipRoles: (saved.leadershipRoles ?? defaults.leadershipRoles).map((role, index) => ({
       id: role.id || `leadership-${index}`,
       ...role,
@@ -174,6 +224,17 @@ export const emptyAcademicServiceItem = {
   link: { href: '', label: '' },
   journals: [],
   workshops: [],
+}
+
+export const emptyPublication = {
+  id: '',
+  year: '',
+  authors: '',
+  title: '',
+  venue: '',
+  details: '',
+  doi: '',
+  type: 'Journal',
 }
 
 export function createAcademicCategoryId(label = 'category') {

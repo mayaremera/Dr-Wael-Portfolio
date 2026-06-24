@@ -1,9 +1,45 @@
 export const academicServices = {
   label: 'Academic Services',
-  title: 'Institutional leadership & professional contribution',
+  title: 'National programs, training leadership & professional service',
   intro:
-    'Beyond clinical practice, Dr. Wael contributes to national programs, international training initiatives, accreditation standards, and peer-reviewed scholarship — shaping speech-language pathology across Saudi Arabia and the wider region.',
+    'Institutional roles across national initiatives, WHO programs, ASHA-accredited training, accreditation standards, editorial boards, and scientific committees throughout Saudi Arabia and the wider region.',
   categories: [
+    {
+      id: 'international',
+      label: 'International Roles',
+      items: [
+        {
+          title: 'ASHA International SLP Ambassador',
+          org: 'American Speech-Language-Hearing Association',
+          period: '2024 – 2026',
+          description: 'Global advocacy and professional collaboration across the speech-language pathology profession.',
+        },
+        {
+          title: 'Chief Editor, SIG 17 Perspectives',
+          org: 'American Speech-Language-Hearing Association',
+          period: '2026 – 2028',
+          description: 'Editorial leadership in communication sciences and global issues in communication sciences and disorders.',
+        },
+        {
+          title: 'Member, Child Language Committee',
+          org: 'International Association of Communication Sciences and Disorders (IALP)',
+          period: '2025 – 2031',
+          description: 'International leadership in child language research and clinical practice.',
+        },
+        {
+          title: 'Honorary President',
+          org: 'Egyptian Association for Communication Sciences (EACSL)',
+          period: 'Present',
+          description: 'Honoring contributions to communication sciences across the region.',
+        },
+        {
+          title: 'Editorial Board Member, Language Section',
+          org: 'Journal of Speech, Language, and Hearing Research (JSLHR)',
+          period: '2023 – 2025',
+          description: 'Peer-reviewed research leadership in language sciences.',
+        },
+      ],
+    },
     {
       id: 'national',
       label: 'National Programs',
@@ -160,7 +196,7 @@ export const academicServices = {
           org: 'Saudi Society of Speech-Language Pathology and Audiology (SSSPA)',
           period: 'Since 2011',
           description:
-            'Continuous active role in SSSPA conferences and activities, contributing expertise across the profession.',
+            'Continuous active role in SSSPA conferences and activities. As described by the president of SSSPA, “Dr. Wael’s contributions to all SSSPA conferences and activities have enriched the members and propelled the field forward. Dr. Wael is in a continuously active role in cooperation with SSSPA.”',
         },
         {
           title: 'Associate Coordinator, Professional Workshops',

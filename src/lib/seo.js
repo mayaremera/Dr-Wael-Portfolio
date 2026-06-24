@@ -22,6 +22,12 @@ export const NAME_VARIANTS = [
   'Wael Al-Dakroury',
   'Wael Aldakroury',
   'Dr. Wael Aldakroury',
+  'Dr. Wael A. El-Dakroury',
+  'Dr. Wael El-Dakroury',
+  'Dr Wael El Dakroury',
+  'Wael El-Dakroury',
+  'Wael Eldakroury',
+  'Dr. Wael Eldakroury',
   'وائل الدكروري',
   'د. وائل الدكروري',
   'دكتور وائل الدكروري',
@@ -229,7 +235,12 @@ export function getPageSeo(pathname) {
 }
 
 function buildSameAs() {
-  return Object.values(site.social).filter((url) => url && !url.endsWith('/'))
+  return [
+    ...Object.values(site.social),
+    site.academic.googleScholar,
+    site.academic.researchGate,
+    site.academic.orcid,
+  ].filter((url) => url && !url.endsWith('/'))
 }
 
 function buildMedicalConditions() {

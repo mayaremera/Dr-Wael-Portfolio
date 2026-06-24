@@ -7,6 +7,12 @@ import {
 } from './contentSync'
 
 export const GALLERY_STORAGE_KEY = 'drwael-gallery-content'
+export const GALLERY_PAGE_SIZE = 6
+
+/** First index on page 5 when using GALLERY_PAGE_SIZE (0-based). */
+export const GALLERY_BACKSEAT_POSITION = (5 - 1) * GALLERY_PAGE_SIZE
+
+const GALLERY_BACKSEAT_VIDEO_PATTERN = /62\.49\.01\s*PM\.mp4/i
 
 function cloneContent(data) {
   return JSON.parse(JSON.stringify(data))
@@ -34,14 +40,63 @@ export function getGalleryItemSortTime(item, fallbackIndex = 0) {
 }
 
 export function sortGalleryItems(items = []) {
-  return [...items]
-    .map((item, index) => ({ item, index }))
-    .sort((a, b) => {
-      const timeDiff = getGalleryItemSortTime(b.item, b.index) - getGalleryItemSortTime(a.item, a.index)
-      if (timeDiff !== 0) return timeDiff
-      return a.index - b.index
-    })
-    .map(({ item }) => item)
+  return [...items].sort((a, b) => {
+    const orderA = typeof a.sortOrder === 'number' ? a.sortOrder : 0
+    const orderB = typeof b.sortOrder === 'number' ? b.sortOrder : 0
+    if (orderB !== orderA) return orderB - orderA
+
+    return String(a.id ?? '').localeCompare(String(b.id ?? ''))
+  })
+}
+
+function ensureGallerySortOrders(items = []) {
+  if (items.length === 0) return items
+
+  return items.map((item, index) => {
+    if (typeof item.sortOrder === 'number' && !Number.isNaN(item.sortOrder)) {
+      return item
+    }
+
+    return {
+      ...item,
+      sortOrder: items.length - index,
+    }
+  })
+}
+
+function moveItemToPosition(items, fromIndex, toIndex) {
+  if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0 || fromIndex >= items.length) {
+    return items
+  }
+
+  const reordered = [...items]
+  const [moved] = reordered.splice(fromIndex, 1)
+  reordered.splice(toIndex, 0, moved)
+
+  const total = reordered.length
+  return reordered.map((item, index) => ({
+    ...item,
+    sortOrder: total - index,
+  }))
+}
+
+/** Stable display order: explicit sortOrder, with one legacy clip kept off page 1. */
+export function applyGalleryPresentationOrder(items = []) {
+  const withOrders = ensureGallerySortOrders(items)
+  const sorted = sortGalleryItems(withOrders)
+  const total = sorted.length
+
+  if (total <= GALLERY_BACKSEAT_POSITION) return sorted
+
+  const backseatIndex = sorted.findIndex(
+    (item) => item.type === 'video' && GALLERY_BACKSEAT_VIDEO_PATTERN.test(item.src || ''),
+  )
+
+  if (backseatIndex === -1 || backseatIndex === GALLERY_BACKSEAT_POSITION) {
+    return sorted
+  }
+
+  return moveItemToPosition(sorted, backseatIndex, GALLERY_BACKSEAT_POSITION)
 }
 
 function withGalleryItemDefaults(item, index) {
@@ -54,6 +109,10 @@ function withGalleryItemDefaults(item, index) {
     ...item,
     ...(createdAt ? { createdAt } : {}),
   }
+}
+
+export function getNextGallerySortOrder(items = []) {
+  return Math.max(0, ...items.map((item) => item.sortOrder ?? 0)) + 1
 }
 
 export function getDefaultGalleryContent() {
@@ -72,7 +131,7 @@ export function getDefaultGalleryContent() {
     },
     mediaGallery: {
       ...cloneContent(defaultMediaGallery),
-      items: sortGalleryItems(defaultItems),
+      items: applyGalleryPresentationOrder(defaultItems),
     },
   }
 }
@@ -107,7 +166,7 @@ function mergeWithDefaults(saved) {
     mediaGallery: {
       ...defaults.mediaGallery,
       ...saved.mediaGallery,
-      items: sortGalleryItems(mergedItems),
+      items: applyGalleryPresentationOrder(mergedItems),
     },
   }
 }
@@ -126,10 +185,18 @@ export async function loadGalleryContentRemote() {
 }
 
 export async function saveGalleryContent(data) {
+  const payload = {
+    ...data,
+    mediaGallery: {
+      ...data.mediaGallery,
+      items: applyGalleryPresentationOrder(data.mediaGallery?.items ?? []),
+    },
+  }
+
   return saveSectionPrimary({
     section: CONTENT_SECTIONS.GALLERY,
     storageKey: GALLERY_STORAGE_KEY,
-    data,
+    data: payload,
   })
 }
 
@@ -160,7 +227,10 @@ export const emptyGalleryItem = {
   id: '',
   type: 'image',
   src: '',
+  title: '',
   alt: '',
+  description: '',
+  sortOrder: null,
   createdAt: '',
 }
 

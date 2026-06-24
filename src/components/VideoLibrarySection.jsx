@@ -170,7 +170,7 @@ export default function VideoLibrarySection() {
   return (
     <section
       id="video-library"
-      className="border-t border-slate-200 bg-white py-20 lg:py-28 select-none"
+      className="border-t border-slate-200 bg-surface-alt py-20 lg:py-28 select-none"
       onContextMenu={blockMediaContext}
       onCopy={(event) => event.preventDefault()}
     >

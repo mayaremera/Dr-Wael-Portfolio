@@ -17,6 +17,12 @@ export const site = {
     linkedin: 'https://www.linkedin.com/in/waelslp?utm_source=share_via&utm_content=profile&utm_medium=member_ios',
     twitter: 'https://x.com/waelslp?s=11&t=dyMPABoxYnqU0IAoWfilIQ',
   },
+  academic: {
+    googleScholar: 'https://scholar.google.com/citations?user=EEoUMHMAAAAJ&hl=en',
+    researchGate: 'https://www.researchgate.net/profile/Wael-Aldakroury?ev=hdr_xprf',
+    orcid: 'https://orcid.org/my-orcid?orcid=0000-0003-3158-6414',
+    orcidId: '0000-0003-3158-6414',
+  },
 }
 
 export const images = {
@@ -129,6 +135,8 @@ const gridMedia = (filename, type) => ({
 export const mediaGallery = {
   label: 'Gallery',
   title: 'Snapshots from Sessions & Events',
+  description:
+    'Photos and clips from clinical work, training sessions, and professional events — open any moment to view it full size.',
   items: [
     gridMedia('WhatsApp Video 2026-05-27 at 62.49.01 PM.mp4', 'video'),
     gridMedia('WhatsApp Video 2026-05-27 at 6.49.00 PM.mp4', 'video'),
@@ -313,9 +321,9 @@ export const academicLeadership = {
 
 export const internationalLeadership = {
   label: 'International Leadership & Professional Service',
-  title: 'Advancing the profession on a global stage',
+  title: 'Advancing the profession on a global and national stage',
   intro:
-    'My professional service extends beyond clinical practice and academia to include leadership roles within international organizations dedicated to advancing the Speech-Language Pathology profession.',
+    'International appointments, national program leadership, ASHA-accredited training, accreditation standards, editorial service, and scientific committee work — spanning organizations from ASHA and WHO to Saudi national initiatives.',
   summary:
     'Current and recent leadership roles include ASHA Fellow (F-ASHA), Editor of Perspectives SIG 17, ASHA International Ambassador, Member of the IALP Child Language Committee, and recipient of the ASHA Certificate of Recognition for International Achievement.',
 }
@@ -336,6 +344,45 @@ export const speakingTraining = {
     'Evidence-Based Practice',
     'Artificial Intelligence in Speech-Language Pathology',
     'Program Development',
+  ],
+}
+
+export const professionalMembership = {
+  label: 'Professional Membership',
+  title: 'Affiliated with leading speech-language & autism organizations',
+  intro:
+    'Active membership across international, national, and regional professional bodies — reflecting a sustained commitment to the highest standards in communication sciences and clinical practice.',
+  organizations: [
+    {
+      id: 'asha',
+      abbr: 'ASHA',
+      name: 'American Speech-Language-Hearing Association',
+      scope: 'International',
+    },
+    {
+      id: 'ialp',
+      abbr: 'IALP',
+      name: 'International Association of Logopedics and Phoniatrics',
+      scope: 'International',
+    },
+    {
+      id: 'asa',
+      abbr: 'ASA',
+      name: 'Autism Society of America',
+      scope: 'International',
+    },
+    {
+      id: 'ssspa',
+      abbr: 'SSSPA',
+      name: 'Saudi Society of Speech-Language Pathology and Audiology',
+      scope: 'National',
+    },
+    {
+      id: 'espl',
+      abbr: 'ESPL',
+      name: 'Egyptian Society of Phoniatrics and Logopedics',
+      scope: 'Regional',
+    },
   ],
 }
 
@@ -412,46 +459,11 @@ export const careerTimeline = [
     type: 'academic',
   },
   {
-    id: 'asha-ambassador',
-    year: '2024–2026',
-    title: 'ASHA International SLP Ambassador',
-    org: 'American Speech-Language-Hearing Association',
-    type: 'leadership',
-  },
-  {
     id: 'asha-fellow',
     year: '2025',
     title: 'ASHA Fellow',
     org: 'American Speech-Language-Hearing Association',
     type: 'honor',
-  },
-  {
-    id: 'sig17-editor',
-    year: '2026–2028',
-    title: 'Chief Editor, SIG17 Perspectives',
-    org: 'American Speech-Language-Hearing Association',
-    type: 'leadership',
-  },
-  {
-    id: 'ialp',
-    year: '2025–2031',
-    title: 'Member, Child Language Committee',
-    org: 'International Association of Communication Sciences and Disorders',
-    type: 'leadership',
-  },
-  {
-    id: 'eacsl',
-    year: 'Present',
-    title: 'Honorary President',
-    org: 'Egyptian Association for Communication Sciences',
-    type: 'leadership',
-  },
-  {
-    id: 'jslhr',
-    year: '2023–2025',
-    title: 'Editorial Board Member, Language Section',
-    org: 'Journal of Speech, Language, and Hearing Research',
-    type: 'research',
   },
 ]
 

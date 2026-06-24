@@ -1,0 +1,71 @@
+export const refereedPublications = {
+  label: 'Scholarly Work',
+  title: 'Refereed Papers in Print',
+  intro:
+    'Peer-reviewed publications spanning autism services, ADHD and language, pediatric communication disorders, and national program evaluation.',
+  papers: [
+    {
+      id: 'faseeh-2025',
+      year: 2025,
+      authors:
+        'Alnemary, F., Alroqi, H., Dashash, N., Al-Dakroury, W., Aljahlan, Y., Almohammadi, A., Faquih, N., Alsulaiman, R., Alaslani, K., Madani, D., Al Sabi, Y., Albeeshi, A., and Murad, A.',
+      title:
+        'Faseeh Initiative: Redefining Early Language Development, Technology, and Sustainability for Lasting Change in Saudi Arabia.',
+      venue: 'Proceedings of the 1st International Conference on Creativity, Technology, and Sustainability',
+      details: 'Proceedings in Technology Transfer, pp. 293–308',
+      doi: 'https://doi.org/10.1007/978-981-97-8588-9_28',
+      type: 'Proceedings',
+    },
+    {
+      id: 'autism-ksa-2022',
+      year: 2022,
+      authors: 'Al-Dakroury, W., Alnemary, F. M., & Alnemary, F.',
+      title: 'Autism in the Kingdom of Saudi Arabia: Current Situation and Future Perspectives for Services and Research.',
+      venue: 'Perspectives of the ASHA Special Interest Groups',
+      details: '7(6)',
+      doi: 'https://doi.org/10.1044/2022_PERSP-22-00087',
+      type: 'Journal',
+    },
+    {
+      id: 'adhd-pragmatic-2022',
+      year: 2022,
+      authors: 'Al-Dakroury, W.',
+      title: 'Pragmatic Disorder in Children with ADHD.',
+      venue: 'Journal of Abnormal and Behavioral Psychology',
+      details: '8: 162',
+      doi: 'https://doi.org/10.37421/2472-0496.22.8.162',
+      type: 'Journal',
+    },
+    {
+      id: 'pediatric-neurology-2020',
+      year: 2020,
+      authors: 'Al-Dakroury, W.',
+      title: 'Communication Disorders in Pediatrics.',
+      venue: 'Clinical Child Neurology Book, Springer',
+      details: 'ISBN 978-3-319-43152-9',
+      doi: null,
+      type: 'Book Chapter',
+    },
+    {
+      id: 'adhd-sld-2018',
+      year: 2018,
+      authors: 'Al-Dakroury, W.',
+      title: 'Speech and Language Disorders in ADHD.',
+      venue: 'Abnormal and Behavioral Psychology',
+      details: '4: 134',
+      doi: 'https://doi.org/10.4172/2472-0496.1000134',
+      type: 'Journal',
+    },
+    {
+      id: 'adhd-verbal-2017',
+      year: 2017,
+      authors: 'Al-Dakroury, W. & Gardner, H.',
+      title:
+        'Verbal Output Profile in Children with Attention Deficit Hyperactivity Disorder.',
+      venue: 'Communication Disorders, Deaf Studies and Hearing Aids',
+      details: '5: 168',
+      doi: 'https://doi.org/10.4172/2375-4427.1000168',
+      type: 'Journal',
+    },
+  ],
+}

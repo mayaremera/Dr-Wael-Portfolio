@@ -5,10 +5,11 @@ import GalleryGrid from './components/GalleryGrid'
 import DrWaelActivity from './components/DrWaelActivity'
 import GlobalEventsMap from './components/GlobalEventsMap'
 import Profile from './components/Profile'
+import ProfessionalMembership from './components/ProfessionalMembership'
 import PromoVideoSection from './components/PromoVideoSection'
 import Leadership from './components/Leadership'
 import SpeakingTraining from './components/SpeakingTraining'
-import AcademicServices from './components/AcademicServices'
+import RefereedPublications from './components/RefereedPublications'
 import ProfessionalServices from './components/ProfessionalServices'
 import CertificationGallery from './components/CertificationGallery'
 import CareerTimeline from './components/CareerTimeline'
@@ -212,7 +213,7 @@ function App() {
         <CertificationGallery />
         <CareerTimeline />
         <Leadership />
-        <AcademicServices />
+        <RefereedPublications />
         <VibeBand
           label="Professional Leadership"
           title="Global Recognition with Real-World Impact"
@@ -249,7 +250,7 @@ function App() {
       >
         <VideoSection variant="light" />
         <VideoLibrarySection />
-        <PromoVideoSection ctaHref="/contact" secondaryHref="/services" />
+        <PromoVideoSection variant="light" ctaHref="/contact" secondaryHref="/services" />
         <GalleryGrid />
       </PageLayout>
     ),
@@ -258,6 +259,7 @@ function App() {
         <GlobalEventsMap />
         <SpeakingTraining />
         <DrWaelActivity variant="full" />
+        <ProfessionalMembership />
         <VibeBand
           label="Academic & Clinical Presence"
           title="Active Contributions Across Conferences and Institutions"

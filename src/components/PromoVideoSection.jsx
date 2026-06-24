@@ -3,10 +3,11 @@ import { useHomeContent } from '../hooks/useHomeContent'
 
 const PROMO_PLAYBACK_RATE = 0.65
 
-export default function PromoVideoSection({ ctaHref, secondaryHref }) {
+export default function PromoVideoSection({ ctaHref, secondaryHref, variant = 'alt' }) {
   const { promoVideo } = useHomeContent()
   const { src, label, titleHighlight, description, cta, secondary } = promoVideo
   const videoRef = useRef(null)
+  const isLight = variant === 'light'
 
   useEffect(() => {
     const video = videoRef.current
@@ -25,7 +26,7 @@ export default function PromoVideoSection({ ctaHref, secondaryHref }) {
   return (
     <section
       id="promo"
-      className="border-t border-slate-200 bg-surface-alt py-16 lg:py-20"
+      className={`border-t border-slate-200 py-16 lg:py-20 ${isLight ? 'bg-white' : 'bg-surface-alt'}`}
       aria-labelledby="promo-heading"
     >
       <div className="mx-auto max-w-6xl px-6 lg:px-8">

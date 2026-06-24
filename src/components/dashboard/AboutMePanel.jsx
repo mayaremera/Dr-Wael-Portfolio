@@ -10,7 +10,7 @@ import {
   emptyAcademicCategory,
   emptyAcademicServiceItem,
   emptyCertificate,
-  emptyLeadershipRole,
+  emptyPublication,
   emptyTimelineEntry,
   getDefaultAboutContent,
   loadAboutContentRemote,
@@ -144,27 +144,6 @@ function TimelineEditor({ initialItem, onSave, onCancel }) {
         <div><label className={labelClassName}>Type</label><select className={fieldClassName} value={item.type} onChange={(e) => update('type', e.target.value)}>{TIMELINE_TYPES.map((type) => <option key={type} value={type}>{type}</option>)}</select></div>
         <div className="sm:col-span-2"><label className={labelClassName}>Title</label><input className={fieldClassName} value={item.title} onChange={(e) => update('title', e.target.value)} required /></div>
         <div className="sm:col-span-2"><label className={labelClassName}>Organization</label><input className={fieldClassName} value={item.org} onChange={(e) => update('org', e.target.value)} required /></div>
-      </div>
-      <div className="mt-4 flex gap-3">
-        <button type="submit" className="rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase">Save</button>
-        <button type="button" onClick={onCancel} className="rounded-lg border border-slate-200 px-5 py-2.5 text-xs font-semibold tracking-wide text-ink-muted uppercase">Cancel</button>
-      </div>
-    </form>
-  )
-}
-
-function LeadershipEditor({ initialItem, onSave, onCancel }) {
-  const [item, setItem] = useState({ ...emptyLeadershipRole, ...initialItem })
-  const update = (field, value) => setItem((c) => ({ ...c, [field]: value }))
-
-  return (
-    <form onSubmit={(e) => { e.preventDefault(); onSave({ ...item, id: item.id || createContentId(item.title) }) }} className="rounded-xl border border-brand/20 bg-brand-muted/30 p-5">
-      <h3 className="font-serif text-xl text-ink">{item.id ? 'Edit leadership role' : 'New leadership role'}</h3>
-      <div className="mt-4 grid gap-4 sm:grid-cols-2">
-        <div><label className={labelClassName}>Year / period</label><input className={fieldClassName} value={item.year} onChange={(e) => update('year', e.target.value)} required /></div>
-        <div className="sm:col-span-2"><label className={labelClassName}>Title</label><input className={fieldClassName} value={item.title} onChange={(e) => update('title', e.target.value)} required /></div>
-        <div className="sm:col-span-2"><label className={labelClassName}>Organization</label><input className={fieldClassName} value={item.org} onChange={(e) => update('org', e.target.value)} required /></div>
-        <div className="sm:col-span-2"><label className={labelClassName}>Note</label><textarea className={`${fieldClassName} min-h-20 resize-y`} value={item.note} onChange={(e) => update('note', e.target.value)} required /></div>
       </div>
       <div className="mt-4 flex gap-3">
         <button type="submit" className="rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase">Save</button>
@@ -428,6 +407,70 @@ function AcademicCategoryEditor({ initialCategory, onSave, onCancel }) {
   )
 }
 
+const PUBLICATION_TYPES = ['Journal', 'Proceedings', 'Book Chapter']
+
+function PublicationEditor({ initialItem, onSave, onCancel }) {
+  const [item, setItem] = useState({ ...emptyPublication, ...initialItem })
+  const update = (field, value) => setItem((current) => ({ ...current, [field]: value }))
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault()
+        onSave({
+          ...item,
+          id: item.id || createContentId(item.title),
+          year: Number(item.year) || item.year,
+          doi: item.doi?.trim() || null,
+        })
+      }}
+      className="rounded-xl border border-brand/20 bg-brand-muted/30 p-5"
+    >
+      <h3 className="font-serif text-xl text-ink">{item.id ? 'Edit publication' : 'New publication'}</h3>
+      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        <div>
+          <label className={labelClassName}>Year</label>
+          <input className={fieldClassName} type="number" value={item.year} onChange={(e) => update('year', e.target.value)} required />
+        </div>
+        <div>
+          <label className={labelClassName}>Type</label>
+          <select className={fieldClassName} value={item.type} onChange={(e) => update('type', e.target.value)}>
+            {PUBLICATION_TYPES.map((type) => (
+              <option key={type} value={type}>
+                {type}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="sm:col-span-2">
+          <label className={labelClassName}>Authors</label>
+          <textarea className={`${fieldClassName} min-h-20 resize-y`} value={item.authors} onChange={(e) => update('authors', e.target.value)} required />
+        </div>
+        <div className="sm:col-span-2">
+          <label className={labelClassName}>Title</label>
+          <textarea className={`${fieldClassName} min-h-20 resize-y`} value={item.title} onChange={(e) => update('title', e.target.value)} required />
+        </div>
+        <div className="sm:col-span-2">
+          <label className={labelClassName}>Venue / Journal</label>
+          <input className={fieldClassName} value={item.venue} onChange={(e) => update('venue', e.target.value)} required />
+        </div>
+        <div className="sm:col-span-2">
+          <label className={labelClassName}>Details (volume, pages, ISBN)</label>
+          <input className={fieldClassName} value={item.details} onChange={(e) => update('details', e.target.value)} />
+        </div>
+        <div className="sm:col-span-2">
+          <label className={labelClassName}>DOI link (optional)</label>
+          <input className={fieldClassName} value={item.doi || ''} onChange={(e) => update('doi', e.target.value)} placeholder="https://doi.org/..." />
+        </div>
+      </div>
+      <div className="mt-5 flex gap-3">
+        <button type="submit" className="rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase">Save publication</button>
+        <button type="button" onClick={onCancel} className="rounded-lg border border-slate-200 px-5 py-2.5 text-xs font-semibold tracking-wide text-ink-muted uppercase">Cancel</button>
+      </div>
+    </form>
+  )
+}
+
 export default function AboutMePanel() {
   const { content, setContent, loading, loadError } = useDashboardSection(
     getDefaultAboutContent,
@@ -435,8 +478,8 @@ export default function AboutMePanel() {
   )
   const [editingCertId, setEditingCertId] = useState(null)
   const [editingTimelineId, setEditingTimelineId] = useState(null)
-  const [editingLeadershipId, setEditingLeadershipId] = useState(null)
   const [editingAcademicCategoryId, setEditingAcademicCategoryId] = useState(null)
+  const [editingPublicationId, setEditingPublicationId] = useState(null)
   const [savedMessage, setSavedMessage] = useState('')
   const [saveError, setSaveError] = useState('')
 
@@ -462,9 +505,18 @@ export default function AboutMePanel() {
         [field]: value,
       },
     }))
+  const updateRefereedPublications = (field, value) =>
+    setContent((current) => ({
+      ...current,
+      refereedPublications: {
+        ...(current.refereedPublications ?? getDefaultAboutContent().refereedPublications),
+        [field]: value,
+      },
+    }))
   const saveProfile = () => persist(content, 'Profile saved.')
   const saveCareerImpact = () => persist(content, 'Career impact cards saved.')
   const saveAcademicHeader = () => persist(content, 'Academic Services header saved.')
+  const savePublicationsHeader = () => persist(content, 'Publications header saved.')
 
   const saveListItem = (listKey, item, setEditing) => {
     const list = content[listKey]
@@ -511,10 +563,41 @@ export default function AboutMePanel() {
     if (editingAcademicCategoryId === id) setEditingAcademicCategoryId(null)
   }
 
+  const savePublication = (paper) => {
+    const refereedPublications = content.refereedPublications ?? getDefaultAboutContent().refereedPublications
+    const papers = refereedPublications.papers ?? []
+    const exists = papers.some((entry) => entry.id === paper.id)
+    const nextPapers = exists ? papers.map((entry) => (entry.id === paper.id ? paper : entry)) : [paper, ...papers]
+
+    persist(
+      {
+        ...content,
+        refereedPublications: { ...refereedPublications, papers: nextPapers },
+      },
+      exists ? 'Publication updated.' : 'Publication added.',
+    )
+    setEditingPublicationId(null)
+  }
+
+  const deletePublication = (id) => {
+    const refereedPublications = content.refereedPublications ?? getDefaultAboutContent().refereedPublications
+    persist(
+      {
+        ...content,
+        refereedPublications: {
+          ...refereedPublications,
+          papers: (refereedPublications.papers ?? []).filter((entry) => entry.id !== id),
+        },
+      },
+      'Publication deleted.',
+    )
+    if (editingPublicationId === id) setEditingPublicationId(null)
+  }
+
   const academicCategories = content.academicServices?.categories ?? []
 
   return (
-    <PanelShell eyebrow="About Me" title="Profile, certificates & career" description="Manage Dr. Wael's biography, academic services, certificates, career timeline, and leadership roles on the About Me page.">
+    <PanelShell eyebrow="About Me" title="Profile, certificates & career" description="Manage Dr. Wael's biography, international leadership, academic services, refereed publications, certificates, career timeline, and leadership roles on the About Me page.">
       <DashboardSectionLoader loading={loading} loadError={loadError} />
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <a href="/about-me" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-brand">Preview live page →</a>
@@ -577,8 +660,10 @@ export default function AboutMePanel() {
       </section>
 
       <section className="mt-6 rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm">
-        <h2 className="font-serif text-xl text-ink">Academic Services</h2>
-        <p className="mt-1 text-sm text-ink-muted">Section header and tabbed categories shown on the About Me page.</p>
+        <h2 className="font-serif text-xl text-ink">International Leadership & Professional Service</h2>
+        <p className="mt-1 text-sm text-ink-muted">
+          One section on the About Me page — use the categories below (International Roles, National Programs, etc.). No separate leadership cards.
+        </p>
         <div className="mt-4 grid gap-4">
           <div className="grid gap-4 md:grid-cols-2">
             <div>
@@ -628,6 +713,57 @@ export default function AboutMePanel() {
         />
       </div>
 
+      <section className="mt-6 rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm">
+        <h2 className="font-serif text-xl text-ink">Refereed Publications</h2>
+        <p className="mt-1 text-sm text-ink-muted">Scholarly papers section shown below International Leadership on the About Me page.</p>
+        <div className="mt-4 grid gap-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div>
+              <label className={labelClassName}>Section label</label>
+              <input className={fieldClassName} value={content.refereedPublications?.label ?? ''} onChange={(e) => updateRefereedPublications('label', e.target.value)} />
+            </div>
+            <div>
+              <label className={labelClassName}>Section title</label>
+              <input className={fieldClassName} value={content.refereedPublications?.title ?? ''} onChange={(e) => updateRefereedPublications('title', e.target.value)} />
+            </div>
+          </div>
+          <div>
+            <label className={labelClassName}>Introduction</label>
+            <textarea className={`${fieldClassName} min-h-24 resize-y`} value={content.refereedPublications?.intro ?? ''} onChange={(e) => updateRefereedPublications('intro', e.target.value)} />
+          </div>
+        </div>
+        <button type="button" onClick={savePublicationsHeader} className="mt-4 rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase">Save publications header</button>
+      </section>
+
+      <div className="mt-6">
+        <DashboardItemList
+          title="Refereed papers"
+          countLabel={`${content.refereedPublications?.papers?.length ?? 0} paper${content.refereedPublications?.papers?.length === 1 ? '' : 's'}`}
+          items={content.refereedPublications?.papers ?? []}
+          editingId={editingPublicationId}
+          onAdd={() => setEditingPublicationId('new')}
+          onEdit={setEditingPublicationId}
+          onDelete={deletePublication}
+          getItemId={(item) => item.id}
+          addLabel="Add paper"
+          emptyMessage="No publications yet."
+          renderPreview={(item) => (
+            <div>
+              <p className="text-xs font-semibold text-brand uppercase">{item.year} · {item.type}</p>
+              <p className="font-medium text-ink">{item.title}</p>
+              <p className="line-clamp-2 text-sm text-ink-muted">{item.venue}</p>
+            </div>
+          )}
+          renderEditor={(item) =>
+            item === 'new' ? (
+              <PublicationEditor initialItem={emptyPublication} onSave={savePublication} onCancel={() => setEditingPublicationId(null)} />
+            ) : (
+              <PublicationEditor key={item.id} initialItem={item} onSave={savePublication} onCancel={() => setEditingPublicationId(null)} />
+            )
+          }
+        />
+      </div>
+
       <div className="mt-6">
         <DashboardItemList title="Certificates" countLabel={`${content.certificates.length} certificate${content.certificates.length === 1 ? '' : 's'}`} items={content.certificates} editingId={editingCertId} onAdd={() => setEditingCertId('new')} onEdit={setEditingCertId} onDelete={(id) => deleteListItem('certificates', id, setEditingCertId, editingCertId)} getItemId={(i) => i.id}
           renderPreview={(item) => (<div className="flex gap-3"><div className="h-14 w-20 overflow-hidden rounded bg-slate-100">{item.image ? <img src={item.image} alt="" className="h-full w-full object-cover" /> : null}</div><div><p className="font-medium text-ink">{item.title}</p><p className="text-xs text-ink-muted">{item.issuer} · {item.year}</p></div></div>)}
@@ -639,13 +775,6 @@ export default function AboutMePanel() {
         <DashboardItemList title="Career timeline" countLabel={`${content.careerTimeline.length} entries`} items={content.careerTimeline} editingId={editingTimelineId} onAdd={() => setEditingTimelineId('new')} onEdit={setEditingTimelineId} onDelete={(id) => deleteListItem('careerTimeline', id, setEditingTimelineId, editingTimelineId)} getItemId={(i) => i.id}
           renderPreview={(item) => (<div><p className="text-xs font-semibold text-brand uppercase">{item.year} · {item.type}</p><p className="font-medium text-ink">{item.title}</p><p className="text-sm text-ink-muted">{item.org}</p></div>)}
           renderEditor={(item) => item === 'new' ? <TimelineEditor initialItem={emptyTimelineEntry} onSave={(entry) => saveListItem('careerTimeline', entry, setEditingTimelineId)} onCancel={() => setEditingTimelineId(null)} /> : <TimelineEditor key={item.id} initialItem={item} onSave={(entry) => saveListItem('careerTimeline', entry, setEditingTimelineId)} onCancel={() => setEditingTimelineId(null)} />}
-        />
-      </div>
-
-      <div className="mt-6">
-        <DashboardItemList title="Leadership & research" countLabel={`${content.leadershipRoles.length} roles`} items={content.leadershipRoles} editingId={editingLeadershipId} onAdd={() => setEditingLeadershipId('new')} onEdit={setEditingLeadershipId} onDelete={(id) => deleteListItem('leadershipRoles', id, setEditingLeadershipId, editingLeadershipId)} getItemId={(i) => i.id}
-          renderPreview={(item) => (<div><p className="text-xs font-semibold text-brand uppercase">{item.year}</p><p className="font-medium text-ink">{item.title}</p><p className="text-sm text-ink-muted">{item.org}</p></div>)}
-          renderEditor={(item) => item === 'new' ? <LeadershipEditor initialItem={emptyLeadershipRole} onSave={(entry) => saveListItem('leadershipRoles', entry, setEditingLeadershipId)} onCancel={() => setEditingLeadershipId(null)} /> : <LeadershipEditor key={item.id} initialItem={item} onSave={(entry) => saveListItem('leadershipRoles', entry, setEditingLeadershipId)} onCancel={() => setEditingLeadershipId(null)} />}
         />
       </div>
     </PanelShell>
