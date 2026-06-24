@@ -1,0 +1,1013 @@
+{
+  "countries": [
+    {
+      "id": "saudi-arabia",
+      "lat": 23.8859,
+      "lng": 45.0792,
+      "role": "Conferences, workshops & keynote engagements across the Kingdom",
+      "country": "Saudi Arabia",
+      "flag": "🇸🇦",
+      "regions": [
+        {
+          "id": "sa-riyadh",
+          "name": "Riyadh",
+          "role": "Conferences, workshops & keynote engagements",
+          "events": [
+            {
+              "period": "2025",
+              "date": "Sep 2025",
+              "type": "Seminar",
+              "title": "Translating Research into Care: Language Disorders in Autism Spectrum Disorder",
+              "location": "Fourth Saudi Autism Research Conference (SARC4), Riyadh",
+              "note": "2-hour seminar."
+            },
+            {
+              "period": "2025",
+              "date": "Apr 2025",
+              "type": "Lecture",
+              "title": "Every day is the day: why early intervention is key for success",
+              "location": "YANMO Campaign for Autism Month, Riyadh & online",
+              "note": "1-hour lecture."
+            },
+            {
+              "period": "2024",
+              "date": "May 2024",
+              "type": "Presentation",
+              "title": "Neurodiversity Co-occurrence: A critical lens for Speech-Language Pathologists",
+              "location": "4th Conference of the Saudi Society of Speech-Language Pathology and Audiology, Riyadh",
+              "note": "30-minute oral presentation."
+            },
+            {
+              "period": "2023",
+              "date": "May 2023",
+              "type": "Conference",
+              "title": "Management of Childhood Apraxia of Speech",
+              "location": "22nd Annual Scientific Conference on Communication Disorders, Riyadh",
+              "note": ""
+            },
+            {
+              "period": "2022",
+              "date": "Dec 2022",
+              "type": "Conference",
+              "title": "Management of Childhood Apraxia of Speech",
+              "location": "6th International Conference on Disability and Rehabilitation, Riyadh",
+              "note": ""
+            },
+            {
+              "period": "2022",
+              "date": "2022",
+              "type": "Conference",
+              "title": "Management of Childhood Apraxia of Speech",
+              "location": "6th International Conference on Disability and Rehabilitation, Riyadh",
+              "note": "Al-Dakroury, W. (2022)."
+            },
+            {
+              "period": "2022",
+              "date": "2022",
+              "type": "Conference",
+              "title": "Clinical Decision Making in Bilingualism: From Evidence to Practice",
+              "location": "3rd Conference of the Saudi Society of Speech-Language Pathology and Audiology, Riyadh",
+              "note": "Al-Dakroury, W. (2022)."
+            },
+            {
+              "period": "2021",
+              "date": "Mar 2021",
+              "type": "Conference",
+              "title": "Language and Autism Spectrum disorder: care roadmap",
+              "location": "Fifth International Psychiatry Conference, Riyadh",
+              "note": "6–10 March 2021."
+            },
+            {
+              "period": "2021",
+              "date": "Jan 2021",
+              "type": "Training",
+              "title": "Teacher Talk® for Early Childhood Educators/Teachers",
+              "location": "King Salman Center for Disability Research, Riyadh",
+              "note": "24-hour program, 12–14 January 2021."
+            },
+            {
+              "period": "2020",
+              "date": "Apr 2020",
+              "type": "Keynote",
+              "title": "Autism Spectrum Disorder in Speech-Language Pathology Context",
+              "location": "Excellence Center for Autism, Online Conference, KSA",
+              "note": "1-hour keynote."
+            },
+            {
+              "period": "2019",
+              "date": "Oct 2019",
+              "type": "Keynote",
+              "title": "Autism Spectrum Disorder in Speech-Language Pathology Context: A view via the lens of personalizing intervention",
+              "location": "First Saudi Autism Research Conference, Prince Nourah bint Abdulrahman University, Riyadh",
+              "note": "45-minute keynote."
+            },
+            {
+              "period": "2019",
+              "date": "2019",
+              "type": "Seminar",
+              "title": "Language Disorders in children with ASD: Empowering family role",
+              "location": "Pediatric Language Disorders Seminar, King Faisal Specialist Hospital and Research Center, Riyadh",
+              "note": "Al-Dakroury, W. (2019)."
+            },
+            {
+              "period": "2019",
+              "date": "2019",
+              "type": "Seminar",
+              "title": "Developmental Language Disorders: ABC's and more",
+              "location": "Pediatric Language Disorders Seminar, King Faisal Specialist Hospital and Research Center, Riyadh",
+              "note": "Al-Dakroury, W. (2019)."
+            },
+            {
+              "period": "2019",
+              "date": "Apr 2019",
+              "type": "Scientific Day",
+              "title": "Autism language and Research update",
+              "location": "Neuroscience Department Scientific Day, King Faisal Specialist Hospital and Research Center, Riyadh",
+              "note": "1-hour presentation."
+            },
+            {
+              "period": "2019",
+              "date": "Apr 2019",
+              "type": "Workshop",
+              "title": "Speech-Language Pathology Intervention Program for children with ASD",
+              "location": "Prince Sultan Center for Special Education Support, Riyadh",
+              "note": "5-hour workshop."
+            },
+            {
+              "period": "2019",
+              "date": "Apr 2019",
+              "type": "Seminar",
+              "title": "Pediatric Communication Disorders",
+              "location": "Pediatric Neurology Residency Program, King Faisal Specialist Hospital and Research Center, Riyadh",
+              "note": "2-hour seminar for 35 doctors."
+            },
+            {
+              "period": "2018",
+              "date": "Apr 2018",
+              "type": "Presentation",
+              "title": "Autism Spectrum Disorders (ASD): Family perspective for their children communication difficulties",
+              "location": "National Committee for Mental Health, Riyadh",
+              "note": ""
+            },
+            {
+              "period": "2016",
+              "date": "Dec 2016",
+              "type": "Seminar",
+              "title": "Executive function disorders in children",
+              "location": "King Salman Center for Disability Research, Riyadh",
+              "note": "Three-hour seminar."
+            },
+            {
+              "period": "2016",
+              "date": "2016",
+              "type": "Conference",
+              "title": "Early signs and symptoms of autism spectrum disorders",
+              "location": "International Conference of Family Medicine & Public Health, Riyadh",
+              "note": "Al-Dakroury, W. (2016)."
+            },
+            {
+              "period": "2016",
+              "date": "2016",
+              "type": "Forum",
+              "title": "A well-balanced approach to provide speech-language pathology intervention for children with autism",
+              "location": "4th Annual Autism Spectrum Disorder Forum, Military Hospital, Riyadh",
+              "note": "In collaboration with New England Children Center, Boston, USA."
+            },
+            {
+              "period": "2016",
+              "date": "Apr 2016",
+              "type": "Workshop",
+              "title": "Language and Autism",
+              "location": "Autism Day at Prince Sultan City for Special Education, Riyadh",
+              "note": "Two-hour workshop."
+            },
+            {
+              "period": "2016",
+              "date": "Apr 2016",
+              "type": "Workshop",
+              "title": "Evidence-Based intervention programs for Autism Spectrum disorders",
+              "location": "Building Skills Center, Riyadh",
+              "note": "Four-hour workshop."
+            },
+            {
+              "period": "2016",
+              "date": "Feb 2016",
+              "type": "Workshop",
+              "title": "The effect of the communication disorders on the children in school setting",
+              "location": "Building Skills Center, Riyadh",
+              "note": "Four-hour workshop."
+            },
+            {
+              "period": "2015",
+              "date": "Nov 2015",
+              "type": "Conference",
+              "title": "Developmental and behavioral disabilities: Assessment considerations",
+              "location": "Saudi International Conference for Hearing and Speech, Riyadh",
+              "note": ""
+            },
+            {
+              "period": "2015",
+              "date": "Nov 2015",
+              "type": "Workshop",
+              "title": "Language impairment comorbidity and ADHD: Evidence of coexistence",
+              "location": "Saudi Association for ADHD (AFTA), Riyadh",
+              "note": "Two-hour workshop."
+            },
+            {
+              "period": "2013",
+              "date": "Mar 2013",
+              "type": "Workshop",
+              "title": "Communication Disorders in ADHD Children: What we can do",
+              "location": "Scientific activities of the Saudi ADHD Society, Riyadh",
+              "note": "Two-hour workshop."
+            },
+            {
+              "period": "2012",
+              "date": "Apr 2012",
+              "type": "Workshop",
+              "title": "The Dilemma of Non-Verbal Children evaluation",
+              "location": "Scientific training program, King Abdul Aziz University Hospital, Riyadh",
+              "note": "Three-hour workshop."
+            },
+            {
+              "period": "2012",
+              "date": "Feb 2012",
+              "type": "Workshop",
+              "title": "Pragmatic Disorders in Pediatrics with TBI",
+              "location": "Aphasia workshop, King Fahad Medical City, Riyadh",
+              "note": ""
+            },
+            {
+              "period": "2011",
+              "date": "May 2011",
+              "type": "Workshop",
+              "title": "Communication Disorders in ASD children: Nature, understanding, and Developing Mechanism",
+              "location": "Autism National Symposium, King Fahad Medical City, Riyadh",
+              "note": "Three-hour workshop."
+            },
+            {
+              "period": "2011",
+              "date": "May 2011",
+              "type": "Presentation",
+              "title": "Communication Disorders in ADHD children",
+              "location": "ADHD National Symposium, King Fahad Medical City, Riyadh",
+              "note": "One-hour presentation."
+            },
+            {
+              "period": "2011",
+              "date": "May 2011",
+              "type": "Workshop",
+              "title": "Communication Disorders in ASD children: the family role and Developing Mechanism",
+              "location": "Autism Family Society, Prince Salman Center for Disability Research, Riyadh",
+              "note": "Three-hour workshop for parents."
+            },
+            {
+              "period": "2011",
+              "date": "Apr 2011",
+              "type": "Workshop",
+              "title": "How to develop your child communication skills",
+              "location": "Autism Day, King Fahad Medical City, Riyadh",
+              "note": "Two-hour workshop for parents."
+            },
+            {
+              "period": "2010",
+              "date": "Apr 2010",
+              "type": "Workshop",
+              "title": "Pragmatic Disorders in ASD children: Nature, understanding, and Developing Mechanism",
+              "location": "International Autism Symposium, Riyadh",
+              "note": "Four-hour workshop, 10–11 April 2010."
+            },
+            {
+              "period": "2005",
+              "date": "Dec 2005",
+              "type": "Training",
+              "title": "Class teachers and their role in enhancing autistic children communication",
+              "location": "Riyadh Autism Center, Riyadh",
+              "note": "12-hour training program."
+            }
+          ]
+        },
+        {
+          "id": "sa-jeddah",
+          "name": "Jeddah",
+          "role": "JISH symposiums & regional training",
+          "events": [
+            {
+              "period": "2020",
+              "date": "Jun 2020",
+              "type": "Presentation",
+              "title": "Children with ASD during COVID-19: What families can do?",
+              "location": "Saudi Exhibitions and Conferences Organization Authority, Jeddah",
+              "note": ""
+            },
+            {
+              "period": "2017",
+              "date": "Apr 2017",
+              "type": "Seminar",
+              "title": "Picture exchange communication system (PECS)",
+              "location": "Autism Support Group, Jeddah",
+              "note": "Three-hour seminar."
+            },
+            {
+              "period": "2009",
+              "date": "Mar 2009",
+              "type": "Training",
+              "title": "Language testing training program",
+              "location": "Jeddah Autism Center, Jeddah",
+              "note": ""
+            },
+            {
+              "period": "2008",
+              "date": "Nov 2008",
+              "type": "Workshop",
+              "title": "Autism Spectrum Disorders: Strategic planning for the communication intervention programs",
+              "location": "First scientific meeting for autism centers in the Arab world, Jeddah",
+              "note": "6-hour workshop."
+            },
+            {
+              "period": "2008",
+              "date": "May 2008",
+              "type": "Symposium",
+              "title": "Strategies and practical approaches to promote communication skills in ASD children",
+              "location": "Jeddah Institute for Speech and Hearing annual symposium, Jeddah",
+              "note": "Three-hour session."
+            },
+            {
+              "period": "2007",
+              "date": "May 2007",
+              "type": "Symposium",
+              "title": "Pragmatic disorders in children: Assessment and intervention",
+              "location": "Jeddah Institute for Speech and Hearing annual symposium, Jeddah",
+              "note": "Three-hour session."
+            },
+            {
+              "period": "2006",
+              "date": "May 2006",
+              "type": "Workshop",
+              "title": "ADHD as a communication disorder: Practical techniques, strategies, and interventions",
+              "location": "Jeddah Institute for Speech and Hearing annual symposium, Jeddah",
+              "note": "Three-hour workshop."
+            },
+            {
+              "period": "2005",
+              "date": "May 2005",
+              "type": "Symposium",
+              "title": "Balanced approach for intervention in delayed speech and language children",
+              "location": "Jeddah Institute for Speech and Hearing annual symposium, Jeddah",
+              "note": "Two-hour session."
+            },
+            {
+              "period": "2004",
+              "date": "May 2004",
+              "type": "Symposium",
+              "title": "Language use difficulties in developmentally disabled children: Intervention and more",
+              "location": "Jeddah Institute for Speech and Hearing annual symposium, Jeddah",
+              "note": "Three-hour session."
+            },
+            {
+              "period": "2003",
+              "date": "May 2003",
+              "type": "Workshop",
+              "title": "Sharpen your language sampling skills: Advanced workshop for Speech Language Pathologist",
+              "location": "Jeddah Institute for Speech and Hearing annual symposium, Jeddah",
+              "note": "Three-hour workshop."
+            },
+            {
+              "period": "2002",
+              "date": "Jun 2002",
+              "type": "Presentation",
+              "title": "Early intervention in communication disorders",
+              "location": "Saudi Association for Family and Community Medicine, Jeddah",
+              "note": "One-hour presentation."
+            },
+            {
+              "period": "2002",
+              "date": "May 2002",
+              "type": "Symposium",
+              "title": "Practical applications in language intervention",
+              "location": "Jeddah Institute for Speech and Hearing annual symposium, Jeddah",
+              "note": "Two-hour session."
+            },
+            {
+              "period": "2001",
+              "date": "May 2001",
+              "type": "Symposium",
+              "title": "New technology in the augmentative alternative communication",
+              "location": "Jeddah Institute for Speech and Hearing annual symposium, Jeddah",
+              "note": "Two-hour session."
+            },
+            {
+              "period": "2000",
+              "date": "Apr 2000",
+              "type": "Symposium",
+              "title": "Auditory verbal therapy",
+              "location": "Jeddah Institute for Speech and Hearing annual symposium, Jeddah",
+              "note": "Two-hour session."
+            },
+            {
+              "period": "2000",
+              "date": "Jan 2000",
+              "type": "Presentation",
+              "title": "Neurological-based communication disorders",
+              "location": "Neurologist Club, Hyatt Regency Hotel, Jeddah",
+              "note": "Two-hour presentation."
+            }
+          ]
+        },
+        {
+          "id": "sa-madina",
+          "name": "Madina",
+          "role": "Regional clinical training",
+          "events": [
+            {
+              "period": "2010s",
+              "date": "2010s",
+              "type": "Presentation",
+              "title": "Developmental language Delay: Considerations and Practices",
+              "location": "Tiba Center for Rehabilitation, Madina",
+              "note": "One-hour session."
+            }
+          ]
+        },
+        {
+          "id": "sa-eastern",
+          "name": "Khobar & Dammam",
+          "role": "Eastern Province conferences",
+          "events": [
+            {
+              "period": "2018",
+              "date": "Nov 2018",
+              "type": "Conference",
+              "title": "Language and Autism: what we need to know",
+              "location": "2nd International Conference of Saudi Psychiatric Association, Dammam",
+              "note": ""
+            },
+            {
+              "period": "2015",
+              "date": "May 2015",
+              "type": "Workshop",
+              "title": "Autism Spectrum Disorders: Family perspective for their children communication difficulties",
+              "location": "Shine a Light on Autism, John Hopkins Aramco Healthcare, Khobar",
+              "note": "3-hour workshop."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "egypt",
+      "lat": 26.8206,
+      "lng": 30.8025,
+      "role": "International SLP programs & congresses",
+      "country": "Egypt",
+      "flag": "🇪🇬",
+      "regions": [
+        {
+          "id": "eg-alexandria",
+          "name": "Alexandria",
+          "role": "International SLP programs",
+          "events": [
+            {
+              "period": "2021",
+              "date": "2021",
+              "type": "Program",
+              "title": "The principles of effective management for childhood apraxia of speech",
+              "location": "Topics in Motor Speech Disorders, Online ASHA Program",
+              "note": "Al-Dakroury, W. (2021)."
+            },
+            {
+              "period": "2017",
+              "date": "2017",
+              "type": "Program",
+              "title": "A well-balanced approach to provide speech-language pathology intervention for children with autism",
+              "location": "Speech and Language Pathology International Program, Alexandria",
+              "note": "Al-Dakroury, W. (2017)."
+            },
+            {
+              "period": "2017",
+              "date": "2017",
+              "type": "Program",
+              "title": "The ABC's of Executive Function Disorders in Children: Assessment and intervention",
+              "location": "Speech and Language Pathology International Program, Alexandria",
+              "note": "Al-Dakroury, W. (2017)."
+            },
+            {
+              "period": "2013",
+              "date": "Mar 2013",
+              "type": "Congress",
+              "title": "The Dilemma of Non-Verbal Children Assessment and Intervention",
+              "location": "3rd National Congress of the Egyptian Society of Phoniatrics and Logopedics, Alexandria",
+              "note": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "uae",
+      "lat": 23.4241,
+      "lng": 53.8478,
+      "role": "Gulf region conferences",
+      "country": "United Arab Emirates",
+      "flag": "🇦🇪",
+      "regions": [
+        {
+          "id": "ae-dubai",
+          "name": "Dubai",
+          "role": "Gulf region conferences",
+          "events": [
+            {
+              "period": "2016",
+              "date": "2016",
+              "type": "Mini-Seminar",
+              "title": "Comorbidity of autism spectrum disorder and hearing impairment in children: Challenges of intervention",
+              "location": "13th Annual Middle East Otolaryngology Conference and Exhibition, Dubai",
+              "note": "Al-Dakroury, W. (2016)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bahrain",
+      "lat": 26.0667,
+      "lng": 50.5577,
+      "role": "Gulf clinical forums",
+      "country": "Bahrain",
+      "flag": "🇧🇭",
+      "regions": [
+        {
+          "id": "bh-manama",
+          "name": "Manama",
+          "role": "Gulf clinical forums",
+          "events": [
+            {
+              "period": "2013",
+              "date": "Apr 2013",
+              "type": "Conference",
+              "title": "ADHD and Autism the underlying link: The speech-language pathology perspective",
+              "location": "Untangle Autism Conference, Manama",
+              "note": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qatar",
+      "lat": 25.3548,
+      "lng": 51.1839,
+      "role": "Regional professional forums",
+      "country": "Qatar",
+      "flag": "🇶🇦",
+      "regions": [
+        {
+          "id": "qa-doha",
+          "name": "Doha",
+          "role": "Regional professional forums",
+          "events": [
+            {
+              "period": "2004",
+              "date": "Dec 2004",
+              "type": "Presentation",
+              "title": "Technology use to encourage communication with nonverbal children",
+              "location": "Office of the UN Special Rapporteur on Disability, Doha",
+              "note": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "oman",
+      "lat": 21.4735,
+      "lng": 55.9754,
+      "role": "Regional training programs",
+      "country": "Oman",
+      "flag": "🇴🇲",
+      "regions": [
+        {
+          "id": "om-muscat",
+          "name": "Muscat",
+          "role": "Regional training programs",
+          "events": [
+            {
+              "period": "2014",
+              "date": "Nov 2014",
+              "type": "Training",
+              "title": "Communication Disorders in Down Syndrome: Advanced workshop for Speech-Language Pathologist",
+              "location": "Ministry of Education, Special Needs Department, Muscat",
+              "note": "20-hour training program."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "kuwait",
+      "lat": 29.3759,
+      "lng": 47.9774,
+      "role": "World autism conferences",
+      "country": "Kuwait",
+      "flag": "🇰🇼",
+      "regions": [
+        {
+          "id": "kw-kuwait",
+          "name": "Kuwait City",
+          "role": "World autism conferences",
+          "events": [
+            {
+              "period": "2014",
+              "date": "Nov 2014",
+              "type": "Conference",
+              "title": "Pragmatic language profile in children with autism: Assessment and intervention strategies",
+              "location": "4th World Autism Conference, Kuwait",
+              "note": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "jordan",
+      "lat": 30.5852,
+      "lng": 36.2384,
+      "role": "Arab hearing health conferences",
+      "country": "Jordan",
+      "flag": "🇯🇴",
+      "regions": [
+        {
+          "id": "jo-amman",
+          "name": "Amman",
+          "role": "Arab hearing health conferences",
+          "events": [
+            {
+              "period": "2024",
+              "date": "May 2024",
+              "type": "Presentation",
+              "title": "Clinical Perspective and Issues about Bilingualism",
+              "location": "Arab Hearing Health International Conference 2024, Amman",
+              "note": "30-minute oral presentation."
+            },
+            {
+              "period": "2024",
+              "date": "May 2024",
+              "type": "Presentation",
+              "title": "Pragmatic Disorders in Pediatrics",
+              "location": "Arab Hearing Health International Conference 2024, Amman",
+              "note": "30-minute oral presentation."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "turkey",
+      "lat": 38.9637,
+      "lng": 35.2433,
+      "role": "European phoniatrics congress",
+      "country": "Turkey",
+      "flag": "🇹🇷",
+      "regions": [
+        {
+          "id": "tr-antalya",
+          "name": "Antalya",
+          "role": "European phoniatrics congress",
+          "events": [
+            {
+              "period": "2023",
+              "date": "Apr 2023",
+              "type": "Congress",
+              "title": "Bilingualism in developmental disabilities: Clinical Perspectives and issues",
+              "location": "30th Congress of Union of the European Phoniatricians, Antalya",
+              "note": "Al-Dakroury, W., Martinez, S., and Martine, E. (2023)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "germany",
+      "lat": 51.1657,
+      "lng": 10.4515,
+      "role": "European ADHD research",
+      "country": "Germany",
+      "flag": "🇩🇪",
+      "regions": [
+        {
+          "id": "de-berlin",
+          "name": "Berlin",
+          "role": "European ADHD research",
+          "events": [
+            {
+              "period": "2011",
+              "date": "2011",
+              "type": "Congress",
+              "title": "Verbal turns difficulties in 4–5 years old Saudi males with ADHD",
+              "location": "3rd International Congress on ADHD, Berlin",
+              "note": "Al-Dakroury, W., Hewlett, N., Watson, J., & Gardner, H. (2011)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "finland",
+      "lat": 61.9241,
+      "lng": 25.7482,
+      "role": "European phoniatrics congress",
+      "country": "Finland",
+      "flag": "🇫🇮",
+      "regions": [
+        {
+          "id": "fi-helsinki",
+          "name": "Helsinki",
+          "role": "European phoniatrics congress",
+          "events": [
+            {
+              "period": "2018",
+              "date": "2018",
+              "type": "Congress",
+              "title": "Language disorders in children with ADHD",
+              "location": "29th Congress of Union of the European Phoniatricians, Helsinki",
+              "note": "Al-Dakroury, W. (2018)."
+            },
+            {
+              "period": "2018",
+              "date": "2018",
+              "type": "Congress",
+              "title": "Developmental disabilities: Perspectives and considerations",
+              "location": "29th Congress of Union of the European Phoniatricians, Helsinki",
+              "note": "Chairperson. Al-Dakroury, W., Martinez, S., Martine, E., and AlGhamdi, S. (2018)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "united-states",
+      "lat": 39.8283,
+      "lng": -98.5795,
+      "role": "ASHA Convention & professional forums",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "regions": [
+        {
+          "id": "us-washington-dc",
+          "name": "Washington, D.C.",
+          "role": "ASHA Convention",
+          "events": [
+            {
+              "period": "2025",
+              "date": "Nov 2025",
+              "type": "Short Course",
+              "title": "Global Practice and Ethics in Turbulent Times (SC31)",
+              "location": "ASHA Convention, Washington, D.C.",
+              "note": "2-hour in-person short course, SIG Culture and Linguistic Diversity."
+            }
+          ]
+        },
+        {
+          "id": "us-orlando",
+          "name": "Orlando, Florida",
+          "role": "ASHA Convention",
+          "events": [
+            {
+              "period": "2019",
+              "date": "2019",
+              "type": "Convention",
+              "title": "Topic initiation to topic maintenance ratio in Children with ADHD",
+              "location": "ASHA Convention, Orlando, FL",
+              "note": "Al-Dakroury, W. (2019)."
+            },
+            {
+              "period": "2019",
+              "date": "2019",
+              "type": "Convention",
+              "title": "The impact of Center for Autism Research (CFAR) in optimizing Autism Services in Saudi Arabia",
+              "location": "ASHA Convention, Orlando, FL",
+              "note": "Al-Dakroury, W. (2019)."
+            }
+          ]
+        },
+        {
+          "id": "us-boston",
+          "name": "Boston, Massachusetts",
+          "role": "ASHA Convention",
+          "events": [
+            {
+              "period": "2023",
+              "date": "2023",
+              "type": "Convention",
+              "title": "Verbal Responsiveness in Interactions of Mothers and Children with ADHD",
+              "location": "ASHA Convention, Boston, Massachusetts",
+              "note": "Al-Dakroury, W. (2023)."
+            },
+            {
+              "period": "2023",
+              "date": "2023",
+              "type": "Convention",
+              "title": "Autism in Saudi Arabia: Current Situation and Future Perspectives for Services and Research",
+              "location": "ASHA Convention, Boston, Massachusetts",
+              "note": "Al-Dakroury, W., Alnemary, F., and Alnemary, F. (2023)."
+            },
+            {
+              "period": "2023",
+              "date": "2023",
+              "type": "Convention",
+              "title": "Faseeh Initiative: Digital App to Screen and Treat Language Disorders in Saudi Arabia",
+              "location": "ASHA Convention, Boston, Massachusetts",
+              "note": "Albeeshi, A., et al. (2023)."
+            }
+          ]
+        },
+        {
+          "id": "us-denver",
+          "name": "Denver, Colorado",
+          "role": "ASHA Convention",
+          "events": [
+            {
+              "period": "2015",
+              "date": "2015",
+              "type": "Poster",
+              "title": "Maternal Contributions & Repair During Interactions with Typically Developing Children & Those with ADHD",
+              "location": "ASHA Convention, Denver, USA",
+              "note": "Al-Dakroury, W. & Gardner, H. (2015)."
+            }
+          ]
+        },
+        {
+          "id": "us-seattle",
+          "name": "Seattle, Washington",
+          "role": "ASHA Convention",
+          "events": [
+            {
+              "period": "2024",
+              "date": "Dec 2024",
+              "type": "Master Course",
+              "title": "Beyond One Language: Unraveling Developmental Language Disorder in Multilingual Children",
+              "location": "ASHA Convention, Seattle, Washington",
+              "note": "1-hour in-person master course, SIG 14."
+            }
+          ]
+        },
+        {
+          "id": "us-philadelphia",
+          "name": "Philadelphia",
+          "role": "ASHA Convention",
+          "events": [
+            {
+              "period": "2010",
+              "date": "2010",
+              "type": "Convention",
+              "title": "Verbal characteristics of 4–5 years old Saudi males with ADHD",
+              "location": "ASHA Convention, Philadelphia, USA",
+              "note": "Al-Dakroury, W., Hewlett, N., Watson, J., & Gardner, H. (2010)."
+            },
+            {
+              "period": "2010",
+              "date": "2010",
+              "type": "Convention",
+              "title": "Bridging western standards with speech-language pathology services in Saudi Arabia",
+              "location": "ASHA Convention, Philadelphia, USA",
+              "note": "Al-Dakroury, W. (2010)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "canada",
+      "lat": 56.1304,
+      "lng": -106.3468,
+      "role": "International ADHD congress",
+      "country": "Canada",
+      "flag": "🇨🇦",
+      "regions": [
+        {
+          "id": "ca-vancouver",
+          "name": "Vancouver",
+          "role": "International ADHD congress",
+          "events": [
+            {
+              "period": "2017",
+              "date": "2017",
+              "type": "Congress",
+              "title": "The impact of the interlocutor familiarity on verbal interaction in children with ADHD",
+              "location": "6th International Congress on ADHD, Vancouver",
+              "note": "Al-Dakroury, W. (2017)."
+            },
+            {
+              "period": "2017",
+              "date": "2017",
+              "type": "Congress",
+              "title": "Ratio of topic initiation to topic maintenance in children with ADHD",
+              "location": "6th International Congress on ADHD, Vancouver",
+              "note": "Al-Dakroury, W. (2017)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "united-kingdom",
+      "lat": 55.3781,
+      "lng": -3.436,
+      "role": "Autism-Europe congress",
+      "country": "United Kingdom",
+      "flag": "🇬🇧",
+      "regions": [
+        {
+          "id": "gb-edinburgh",
+          "name": "Edinburgh",
+          "role": "Autism-Europe congress",
+          "events": [
+            {
+              "period": "2016",
+              "date": "2016",
+              "type": "Congress",
+              "title": "Managing the challenges of language use difficulties in children with autism spectrum disorder",
+              "location": "XI Autism-Europe International Congress, Edinburgh, UK",
+              "note": "Al-Dakroury, W. (2016)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ireland",
+      "lat": 53.4129,
+      "lng": -8.2439,
+      "role": "IALP world congress",
+      "country": "Ireland",
+      "flag": "🇮🇪",
+      "regions": [
+        {
+          "id": "ie-dublin",
+          "name": "Dublin",
+          "role": "IALP world congress",
+          "events": [
+            {
+              "period": "2016",
+              "date": "2016",
+              "type": "Congress",
+              "title": "The possible impact of interlocutor familiarity on verbal interaction in children with ADHD",
+              "location": "30th World Congress of the IALP, Dublin, Ireland",
+              "note": "Al-Dakroury, W. (2016)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "portugal",
+      "lat": 39.3999,
+      "lng": -8.2245,
+      "role": "European speech therapy congress",
+      "country": "Portugal",
+      "flag": "🇵🇹",
+      "regions": [
+        {
+          "id": "pt-estoril",
+          "name": "Estoril",
+          "role": "European speech therapy congress",
+          "events": [
+            {
+              "period": "2018",
+              "date": "2018",
+              "type": "Congress",
+              "title": "Addressing continued education in Egypt through the speech and language pathology international program",
+              "location": "10th European Congress of Speech and Language Therapy, Estoril, Portugal",
+              "note": "Martinez, S., Al-Dakroury, W., Elie, M., & Natour, Y. (2018)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "austria",
+      "lat": 47.5162,
+      "lng": 14.5501,
+      "role": "European child psychiatry congress",
+      "country": "Austria",
+      "flag": "🇦🇹",
+      "regions": [
+        {
+          "id": "at-vienna",
+          "name": "Vienna",
+          "role": "European child psychiatry congress",
+          "events": [
+            {
+              "period": "2019",
+              "date": "2019",
+              "type": "Congress",
+              "title": "Managing the challenges of language use difficulties in children with autism spectrum disorder",
+              "location": "18th International Congress of European Society for Child and Adolescent Psychiatry, Vienna",
+              "note": "Al-Dakroury, W. (2019)."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -49,8 +49,20 @@ export function project(lat, lng, phi, theta, size, scale = 1.05) {
   }
 }
 
+function clampDisplayToSurface(point, maxOffset) {
+  const dx = point.displayX - point.x
+  const dy = point.displayY - point.y
+  const distance = Math.hypot(dx, dy)
+
+  if (distance <= maxOffset) return
+
+  const scale = maxOffset / distance
+  point.displayX = point.x + dx * scale
+  point.displayY = point.y + dy * scale
+}
+
 /** Push overlapping markers apart so clusters stay clickable. */
-export function separateMarkerPositions(positions, minDistance = 24, iterations = 10) {
+export function separateMarkerPositions(positions, minDistance = 24, iterations = 6, maxOffset = 14) {
   const separated = positions.map((point) => ({
     ...point,
     displayX: point.x,
@@ -77,6 +89,10 @@ export function separateMarkerPositions(positions, minDistance = 24, iterations 
         b.displayY += ny * push
       }
     }
+  }
+
+  for (const point of separated) {
+    clampDisplayToSurface(point, maxOffset)
   }
 
   return separated

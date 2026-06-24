@@ -88,7 +88,7 @@ function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value))
 }
 
-function EventsPanel({ location, isPinned, onClose, anchor }) {
+function EventsPanel({ location, activeRegion, isPinned, onClose, anchor, onRegionChange }) {
   const panelRef = useRef(null)
   const [desktopPosition, setDesktopPosition] = useState(null)
 
@@ -121,9 +121,11 @@ function EventsPanel({ location, isPinned, onClose, anchor }) {
     const top = clamp(anchor.y, panelHeight / 2 + 12, parentHeight - panelHeight / 2 - 12)
 
     setDesktopPosition({ left, top })
-  }, [location, anchor, location?.id])
+  }, [location, anchor, location?.id, activeRegion?.id])
 
-  if (!location) return null
+  if (!location || !activeRegion) return null
+
+  const hasMultipleRegions = (location.regions?.length ?? 0) > 1
 
   const anchoredDesktopStyle = desktopPosition
     ? {
@@ -165,7 +167,7 @@ function EventsPanel({ location, isPinned, onClose, anchor }) {
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
               <p className="text-[0.62rem] font-semibold tracking-[0.22em] text-accent uppercase">
-                {isPinned ? 'Selected region' : 'Previewing region'}
+                {isPinned ? 'Selected country' : 'Previewing country'}
               </p>
               {!isPinned ? (
                 <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-[0.58rem] font-medium tracking-wide text-white/45 uppercase">
@@ -176,23 +178,47 @@ function EventsPanel({ location, isPinned, onClose, anchor }) {
             </div>
 
             <h3 className="mt-2 font-serif text-[1.65rem] leading-tight text-white">{location.country}</h3>
-            <p className="mt-1 text-sm font-medium text-brand-light/95">{location.city}</p>
-            <p className="mt-1.5 text-xs leading-relaxed text-white/42">{location.role}</p>
+            <p className="mt-1 text-sm font-medium text-brand-light/95">{activeRegion.name}</p>
+            <p className="mt-1.5 text-xs leading-relaxed text-white/42">{activeRegion.role || location.role}</p>
           </div>
         </div>
+
+        {hasMultipleRegions ? (
+          <div className="relative mt-4 flex flex-wrap gap-2">
+            {location.regions.map((region) => {
+              const isActive = region.id === activeRegion.id
+              return (
+                <button
+                  key={region.id}
+                  type="button"
+                  onClick={() => onRegionChange(region.id)}
+                  className={`rounded-full border px-3 py-1.5 text-[0.62rem] font-semibold tracking-wide uppercase transition-colors ${
+                    isActive
+                      ? 'border-accent/50 bg-accent/15 text-white'
+                      : 'border-white/10 bg-white/[0.04] text-white/55 hover:border-white/20 hover:text-white/80'
+                  }`}
+                  aria-pressed={isActive}
+                >
+                  {region.name}
+                  <span className="ml-1.5 tabular-nums text-white/45">({region.eventCount})</span>
+                </button>
+              )
+            })}
+          </div>
+        ) : null}
 
         <div className="relative mt-5 flex items-center justify-between gap-3">
           <div className="h-px flex-1 bg-linear-to-r from-accent/50 via-white/10 to-transparent" aria-hidden="true" />
           <span className="globe-events-panel__count">
-            {location.eventCount} event{location.eventCount !== 1 ? 's' : ''}
+            {activeRegion.eventCount} event{activeRegion.eventCount !== 1 ? 's' : ''}
           </span>
         </div>
       </div>
 
       <div className="globe-panel-scroll globe-events-panel__scroll">
-        <div className="space-y-3" key={location.id}>
-          {location.events.map((event, index) => (
-            <EventTimelineCard key={event.id} event={event} index={index} total={location.events.length} />
+        <div className="space-y-3" key={`${location.id}-${activeRegion.id}`}>
+          {activeRegion.events.map((event, index) => (
+            <EventTimelineCard key={event.id} event={event} index={index} total={activeRegion.events.length} />
           ))}
         </div>
       </div>
@@ -212,6 +238,7 @@ export default function GlobalEventsMap() {
   const [selectedId, setSelectedId] = useState(null)
   const [hoveredId, setHoveredId] = useState(null)
   const [anchor, setAnchor] = useState(null)
+  const [activeRegionByCountry, setActiveRegionByCountry] = useState({})
 
   const globeMeta = activity.globe ?? globalPresenceMap
   const locations = useMemo(() => buildMapLocationsWithEvents(activity), [activity])
@@ -219,12 +246,22 @@ export default function GlobalEventsMap() {
   const selectedLocation = locations.find((loc) => loc.id === selectedId) ?? null
   const hoveredLocation = locations.find((loc) => loc.id === hoveredId) ?? null
   const activeLocation = selectedLocation ?? hoveredLocation
+
+  const activeRegion =
+    activeLocation?.regions?.find((region) => region.id === activeRegionByCountry[activeLocation.id]) ??
+    activeLocation?.regions?.[0] ??
+    null
+
   const totalEvents = locations.reduce((sum, loc) => sum + loc.eventCount, 0)
   const countryCount = locations.length
 
   const handleSelect = useCallback((id) => {
     setSelectedId((current) => (current === id ? null : id))
     setHoveredId(null)
+  }, [])
+
+  const handleRegionChange = useCallback((countryId, regionId) => {
+    setActiveRegionByCountry((current) => ({ ...current, [countryId]: regionId }))
   }, [])
 
   const handleActiveAnchorChange = useCallback((clientPoint) => {
@@ -303,12 +340,16 @@ export default function GlobalEventsMap() {
 
           <EventsPanel
             location={activeLocation}
+            activeRegion={activeRegion}
             isPinned={Boolean(selectedLocation)}
             onClose={() => {
               setSelectedId(null)
               setHoveredId(null)
             }}
             anchor={anchor}
+            onRegionChange={(regionId) => {
+              if (activeLocation) handleRegionChange(activeLocation.id, regionId)
+            }}
           />
         </div>
       </div>

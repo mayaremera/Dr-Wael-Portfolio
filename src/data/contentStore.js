@@ -1,5 +1,5 @@
 import { drWaelActivity as defaultDrWaelActivity } from './content'
-import { globalPresenceMap, mapLocations as defaultMapLocations } from './globalEventMap'
+import { globalPresenceMap, mapLocations as defaultMapLocations, normalizeGlobeCountries, normalizeGlobeCountry } from './globalEventMap'
 import {
   CONTENT_SECTIONS,
   loadSectionPrimary,
@@ -29,6 +29,75 @@ export function getDefaultDrWaelActivity() {
   }
 }
 
+function mergeGlobeRegions(defaultRegions = [], savedRegions = []) {
+  const defaultById = new Map(defaultRegions.map((region) => [region.id, region]))
+
+  if (!savedRegions.length) return defaultRegions
+
+  return savedRegions.map((region) => {
+    const fallback = defaultById.get(region.id) ?? {}
+    return {
+      ...fallback,
+      ...region,
+      milestones: region.milestones?.length
+        ? region.milestones.map((milestone, milestoneIndex) => ({
+            ...fallback.milestones?.[milestoneIndex],
+            ...milestone,
+            isMilestone: true,
+          }))
+        : (fallback.milestones ?? []),
+    }
+  })
+}
+
+function usesLegacyCityMarkerSchema(locations = []) {
+  if (!locations.length) return false
+  if (locations.some((loc) => Array.isArray(loc.regions) && loc.regions.length > 0)) return false
+  return locations.some((loc) => loc.city)
+}
+
+function shouldResetToDefaultGlobe(savedLocations, defaultById) {
+  if (!usesLegacyCityMarkerSchema(savedLocations)) return false
+  const unknownCount = savedLocations.filter((loc) => !defaultById.has(loc.id)).length
+  return unknownCount >= Math.ceil(savedLocations.length * 0.5)
+}
+
+function mergeGlobeCountry(defaultCountry, savedCountry) {
+  const fallback = defaultCountry ?? {}
+  return normalizeGlobeCountry({
+    ...fallback,
+    ...savedCountry,
+    lat: Number.isFinite(Number(savedCountry.lat)) ? Number(savedCountry.lat) : fallback.lat,
+    lng: Number.isFinite(Number(savedCountry.lng)) ? Number(savedCountry.lng) : fallback.lng,
+    regions: mergeGlobeRegions(fallback.regions, savedCountry.regions),
+  })
+}
+
+function mergeGlobeLocations(defaultLocations, savedLocations = []) {
+  const normalizedDefaults = normalizeGlobeCountries(defaultLocations)
+  if (!savedLocations.length) return normalizedDefaults
+
+  const defaultById = new Map(normalizedDefaults.map((location) => [location.id, location]))
+
+  if (shouldResetToDefaultGlobe(savedLocations, defaultById)) {
+    return normalizedDefaults
+  }
+
+  const normalizedSaved = normalizeGlobeCountries(savedLocations)
+  const savedById = new Map(normalizedSaved.map((location) => [location.id, location]))
+  const merged = normalizedSaved.map((location) =>
+    mergeGlobeCountry(defaultById.get(location.id), location),
+  )
+
+  for (const defaultLocation of normalizedDefaults) {
+    if (!savedById.has(defaultLocation.id)) {
+      merged.push(defaultLocation)
+    }
+  }
+
+  return merged
+}
+
 function mergeWithDefaults(saved) {
   const defaults = getDefaultDrWaelActivity()
 
@@ -40,19 +109,7 @@ function mergeWithDefaults(saved) {
     globe: {
       ...defaults.globe,
       ...saved.globe,
-      locations: saved.globe?.locations?.length
-        ? saved.globe.locations.map((location, index) => ({
-            ...defaults.globe.locations[index],
-            ...location,
-            milestones: location.milestones?.length
-              ? location.milestones.map((milestone, milestoneIndex) => ({
-                  ...defaults.globe.locations[index]?.milestones?.[milestoneIndex],
-                  ...milestone,
-                  isMilestone: true,
-                }))
-              : (defaults.globe.locations[index]?.milestones ?? []),
-          }))
-        : defaults.globe.locations,
+      locations: mergeGlobeLocations(defaults.globe.locations, saved.globe?.locations),
     },
   }
 }
@@ -119,13 +176,19 @@ export const emptyGlobeMilestone = {
   isMilestone: true,
 }
 
+export const emptyGlobeRegion = {
+  id: '',
+  name: '',
+  role: '',
+  milestones: [],
+}
+
 export const emptyGlobeLocation = {
   id: '',
   country: '',
-  city: '',
   lat: 0,
   lng: 0,
   flag: '',
   role: '',
-  milestones: [],
+  regions: [{ ...emptyGlobeRegion, id: 'region-1', name: 'Main region' }],
 }

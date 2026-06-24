@@ -8,6 +8,7 @@ import {
   emptyActivityEvent,
   emptyGlobeLocation,
   emptyGlobeMilestone,
+  emptyGlobeRegion,
   getDefaultDrWaelActivity,
   loadDrWaelActivityRemote,
   saveDrWaelActivity,
@@ -240,16 +241,23 @@ function EventEditor({ initialEvent, initialStatus = 'upcoming', onSave, onCance
 }
 
 function GlobeLocationPreview({ location }) {
+  const regionCount = location.regions?.length ?? 0
+  const eventCount = (location.regions ?? []).reduce(
+    (sum, region) => sum + (region.milestones?.length ?? 0),
+    0,
+  )
+
   return (
     <div className="flex gap-3">
       <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-2xl ring-1 ring-slate-200/80">
         {location.flag || '🌍'}
       </div>
       <div className="min-w-0 flex-1">
-        <p className="font-medium text-ink">{location.country || 'Untitled location'}</p>
-        <p className="text-xs text-ink-muted">{location.city}</p>
+        <p className="font-medium text-ink">{location.country || 'Untitled country'}</p>
+        <p className="text-xs text-ink-muted">
+          {regionCount} region{regionCount === 1 ? '' : 's'} · {eventCount} event{eventCount === 1 ? '' : 's'}
+        </p>
         <p className="mt-1 text-xs text-ink-muted">
-          {location.milestones?.length ?? 0} milestone{(location.milestones?.length ?? 0) === 1 ? '' : 's'} ·{' '}
           {Number(location.lat).toFixed(2)}, {Number(location.lng).toFixed(2)}
         </p>
       </div>
@@ -257,73 +265,19 @@ function GlobeLocationPreview({ location }) {
   )
 }
 
-function GlobeMilestoneEditor({ initialMilestone, onSave, onCancel }) {
-  const [milestone, setMilestone] = useState({ ...emptyGlobeMilestone, ...initialMilestone })
-  const update = (field, value) => setMilestone((current) => ({ ...current, [field]: value }))
-
-  return (
-    <form
-      onSubmit={(event) => {
-        event.preventDefault()
-        onSave({
-          ...milestone,
-          id: milestone.id || createActivityId(milestone.title),
-          isMilestone: true,
-        })
-      }}
-      className="rounded-lg border border-slate-200/80 bg-white p-4"
-    >
-      <div className="grid gap-3 sm:grid-cols-2">
-        <div>
-          <label className={labelClassName}>Period</label>
-          <input className={fieldClassName} value={milestone.period} onChange={(e) => update('period', e.target.value)} required />
-        </div>
-        <div>
-          <label className={labelClassName}>Date</label>
-          <input className={fieldClassName} value={milestone.date} onChange={(e) => update('date', e.target.value)} required />
-        </div>
-        <div>
-          <label className={labelClassName}>Type</label>
-          <input className={fieldClassName} value={milestone.type} onChange={(e) => update('type', e.target.value)} required />
-        </div>
-        <div>
-          <label className={labelClassName}>Location</label>
-          <input className={fieldClassName} value={milestone.location} onChange={(e) => update('location', e.target.value)} required />
-        </div>
-        <div className="sm:col-span-2">
-          <label className={labelClassName}>Title</label>
-          <input className={fieldClassName} value={milestone.title} onChange={(e) => update('title', e.target.value)} required />
-        </div>
-        <div className="sm:col-span-2">
-          <label className={labelClassName}>Note</label>
-          <textarea className={`${fieldClassName} min-h-20 resize-y`} value={milestone.note} onChange={(e) => update('note', e.target.value)} required />
-        </div>
-      </div>
-      <div className="mt-3 flex gap-2">
-        <button type="submit" className="rounded-lg bg-brand px-4 py-2 text-xs font-semibold tracking-wide text-white uppercase">
-          Save milestone
-        </button>
-        <button type="button" onClick={onCancel} className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold tracking-wide text-ink-muted uppercase">
-          Cancel
-        </button>
-      </div>
-    </form>
-  )
-}
-
-function GlobeLocationEditor({ initialLocation, onSave, onCancel }) {
+function GlobeRegionEditor({ initialRegion, onSave, onCancel }) {
   const confirmDelete = useConfirmDelete()
-  const [location, setLocation] = useState({
-    ...emptyGlobeLocation,
-    ...initialLocation,
-    milestones: initialLocation.milestones ?? [],
+  const [region, setRegion] = useState({
+    ...emptyGlobeRegion,
+    ...initialRegion,
+    milestones: initialRegion.milestones ?? [],
   })
   const [editingMilestoneId, setEditingMilestoneId] = useState(null)
 
-  const update = (field, value) => setLocation((current) => ({ ...current, [field]: value }))
+  const update = (field, value) => setRegion((current) => ({ ...current, [field]: value }))
 
   const saveMilestone = (milestone) => {
-    setLocation((current) => {
+    setRegion((current) => {
       const exists = current.milestones.some((entry) => entry.id === milestone.id)
       const milestones = exists
         ? current.milestones.map((entry) => (entry.id === milestone.id ? milestone : entry))
@@ -335,73 +289,59 @@ function GlobeLocationEditor({ initialLocation, onSave, onCancel }) {
   }
 
   const deleteMilestone = (id) => {
-    setLocation((current) => ({
+    setRegion((current) => ({
       ...current,
       milestones: current.milestones.filter((entry) => entry.id !== id),
     }))
     if (editingMilestoneId === id) setEditingMilestoneId(null)
   }
 
-  const handleSubmit = (event) => {
-    event.preventDefault()
-    onSave({
-      ...location,
-      id: location.id || createActivityId(location.country),
-      lat: Number(location.lat),
-      lng: Number(location.lng),
+  const handleSubmit = () => {
+    if (!region.name?.trim()) return
+
+    setRegion((current) => {
+      onSave({
+        ...current,
+        id: current.id || createActivityId(current.name),
+      })
+      return current
     })
   }
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-xl border border-brand/20 bg-brand-muted/30 p-5 shadow-sm">
+    <div className="rounded-lg border border-slate-200/80 bg-white p-4">
       <div className="flex items-center justify-between gap-3">
-        <h3 className="font-serif text-xl text-ink">{location.id ? 'Edit globe location' : 'New globe location'}</h3>
+        <h4 className="text-sm font-semibold text-ink">{region.id ? 'Edit region' : 'New region'}</h4>
         <button type="button" onClick={onCancel} className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold tracking-wide text-ink-muted uppercase">
           Cancel
         </button>
       </div>
 
-      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+      <div className="mt-4 grid gap-3 sm:grid-cols-2">
         <div>
-          <label className={labelClassName}>Country</label>
-          <input className={fieldClassName} value={location.country} onChange={(e) => update('country', e.target.value)} required />
+          <label className={labelClassName}>Region / city name</label>
+          <input className={fieldClassName} value={region.name} onChange={(e) => update('name', e.target.value)} required />
         </div>
         <div>
-          <label className={labelClassName}>City</label>
-          <input className={fieldClassName} value={location.city} onChange={(e) => update('city', e.target.value)} required />
-        </div>
-        <div>
-          <label className={labelClassName}>Latitude</label>
-          <input className={fieldClassName} type="number" step="any" value={location.lat} onChange={(e) => update('lat', e.target.value)} required />
-        </div>
-        <div>
-          <label className={labelClassName}>Longitude</label>
-          <input className={fieldClassName} type="number" step="any" value={location.lng} onChange={(e) => update('lng', e.target.value)} required />
-        </div>
-        <div>
-          <label className={labelClassName}>Flag emoji</label>
-          <input className={fieldClassName} value={location.flag} onChange={(e) => update('flag', e.target.value)} placeholder="🇸🇦" />
-        </div>
-        <div>
-          <label className={labelClassName}>Role label</label>
-          <input className={fieldClassName} value={location.role} onChange={(e) => update('role', e.target.value)} required />
+          <label className={labelClassName}>Region label</label>
+          <input className={fieldClassName} value={region.role} onChange={(e) => update('role', e.target.value)} placeholder="Optional short description" />
         </div>
       </div>
 
-      <div className="mt-6 rounded-lg border border-slate-200/80 bg-white/70 p-4">
+      <div className="mt-4 rounded-lg border border-slate-200/80 bg-surface-alt/40 p-3">
         <div className="flex items-center justify-between gap-3">
-          <h4 className="text-sm font-semibold text-ink">Milestones at this location</h4>
+          <p className="text-xs font-semibold tracking-wide text-ink-muted uppercase">Events in this region</p>
           <button
             type="button"
             onClick={() => setEditingMilestoneId('new')}
-            className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold tracking-wide text-brand uppercase"
+            className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold tracking-wide text-brand uppercase"
           >
-            Add milestone
+            Add event
           </button>
         </div>
 
         {editingMilestoneId === 'new' ? (
-          <div className="mt-4">
+          <div className="mt-3">
             <GlobeMilestoneEditor
               initialMilestone={emptyGlobeMilestone}
               onSave={saveMilestone}
@@ -410,12 +350,12 @@ function GlobeLocationEditor({ initialLocation, onSave, onCancel }) {
           </div>
         ) : null}
 
-        <div className="mt-4 space-y-3">
-          {location.milestones.length === 0 ? (
-            <p className="rounded-lg bg-surface-alt px-4 py-5 text-center text-sm text-ink-muted">No milestones yet.</p>
+        <div className="mt-3 space-y-3">
+          {region.milestones.length === 0 ? (
+            <p className="rounded-lg bg-white px-4 py-4 text-center text-sm text-ink-muted">No events in this region yet.</p>
           ) : (
-            location.milestones.map((milestone) => (
-              <div key={milestone.id} className="rounded-lg border border-slate-200/80 bg-surface-alt/60 p-3">
+            region.milestones.map((milestone) => (
+              <div key={milestone.id} className="rounded-lg border border-slate-200/80 bg-white p-3">
                 {editingMilestoneId === milestone.id ? (
                   <GlobeMilestoneEditor
                     initialMilestone={milestone}
@@ -439,8 +379,8 @@ function GlobeLocationEditor({ initialLocation, onSave, onCancel }) {
                         type="button"
                         onClick={() =>
                           confirmDelete({
-                            title: 'Delete this milestone?',
-                            message: 'This milestone will be removed from this globe location.',
+                            title: 'Delete this event?',
+                            message: 'This event will be removed from this region.',
                             onConfirm: () => deleteMilestone(milestone.id),
                           })
                         }
@@ -457,12 +397,229 @@ function GlobeLocationEditor({ initialLocation, onSave, onCancel }) {
         </div>
       </div>
 
-      <div className="mt-4 flex gap-3">
-        <button type="submit" className="rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase">
-          Save location
+      <div className="mt-4 flex gap-2">
+        <button type="button" onClick={handleSubmit} className="rounded-lg bg-brand px-4 py-2 text-xs font-semibold tracking-wide text-white uppercase">
+          Save region
         </button>
       </div>
-    </form>
+      <p className="mt-2 text-xs text-ink-muted">After adding events, save the region, then save the country below.</p>
+    </div>
+  )
+}
+
+function GlobeLocationEditor({ initialLocation, onSave, onCancel }) {
+  const confirmDelete = useConfirmDelete()
+  const [location, setLocation] = useState({
+    ...emptyGlobeLocation,
+    ...initialLocation,
+    regions: initialLocation.regions?.length ? initialLocation.regions : emptyGlobeLocation.regions,
+  })
+  const [editingRegionId, setEditingRegionId] = useState(null)
+
+  const update = (field, value) => setLocation((current) => ({ ...current, [field]: value }))
+
+  const saveRegion = (region) => {
+    setLocation((current) => {
+      const exists = current.regions.some((entry) => entry.id === region.id)
+      const regions = exists
+        ? current.regions.map((entry) => (entry.id === region.id ? region : entry))
+        : [region, ...current.regions]
+
+      return { ...current, regions }
+    })
+    setEditingRegionId(null)
+  }
+
+  const deleteRegion = (id) => {
+    setLocation((current) => ({
+      ...current,
+      regions: current.regions.filter((entry) => entry.id !== id),
+    }))
+    if (editingRegionId === id) setEditingRegionId(null)
+  }
+
+  const handleSubmit = () => {
+    onSave({
+      ...location,
+      id: location.id || createActivityId(location.country),
+      lat: Number(location.lat),
+      lng: Number(location.lng),
+      regions: location.regions.filter((region) => region.name?.trim()),
+    })
+  }
+
+  return (
+    <div className="rounded-xl border border-brand/20 bg-brand-muted/30 p-5 shadow-sm">
+      <div className="flex items-center justify-between gap-3">
+        <h3 className="font-serif text-xl text-ink">{location.id ? 'Edit globe country' : 'New globe country'}</h3>
+        <button type="button" onClick={onCancel} className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold tracking-wide text-ink-muted uppercase">
+          Cancel
+        </button>
+      </div>
+
+      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        <div>
+          <label className={labelClassName}>Country</label>
+          <input className={fieldClassName} value={location.country} onChange={(e) => update('country', e.target.value)} required />
+        </div>
+        <div>
+          <label className={labelClassName}>Flag emoji</label>
+          <input className={fieldClassName} value={location.flag} onChange={(e) => update('flag', e.target.value)} placeholder="🇸🇦" />
+        </div>
+        <div>
+          <label className={labelClassName}>Latitude</label>
+          <input className={fieldClassName} type="number" step="any" value={location.lat} onChange={(e) => update('lat', e.target.value)} required />
+        </div>
+        <div>
+          <label className={labelClassName}>Longitude</label>
+          <input className={fieldClassName} type="number" step="any" value={location.lng} onChange={(e) => update('lng', e.target.value)} required />
+        </div>
+        <div className="sm:col-span-2">
+          <label className={labelClassName}>Country summary</label>
+          <input className={fieldClassName} value={location.role} onChange={(e) => update('role', e.target.value)} placeholder="Short description shown in the globe panel" />
+        </div>
+      </div>
+
+      <div className="mt-6 rounded-lg border border-slate-200/80 bg-white/70 p-4">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <h4 className="text-sm font-semibold text-ink">Regions / states / cities</h4>
+            <p className="mt-1 text-xs text-ink-muted">Add one region per city or state. Visitors switch between them inside the country panel.</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setEditingRegionId('new')}
+            className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold tracking-wide text-brand uppercase"
+          >
+            Add region
+          </button>
+        </div>
+
+        {editingRegionId === 'new' ? (
+          <div className="mt-4">
+            <GlobeRegionEditor
+              initialRegion={emptyGlobeRegion}
+              onSave={saveRegion}
+              onCancel={() => setEditingRegionId(null)}
+            />
+          </div>
+        ) : null}
+
+        <div className="mt-4 space-y-3">
+          {location.regions.length === 0 ? (
+            <p className="rounded-lg bg-surface-alt px-4 py-5 text-center text-sm text-ink-muted">Add at least one region for this country.</p>
+          ) : (
+            location.regions.map((region) => (
+              <div key={region.id} className="rounded-lg border border-slate-200/80 bg-surface-alt/60 p-3">
+                {editingRegionId === region.id ? (
+                  <GlobeRegionEditor
+                    initialRegion={region}
+                    onSave={saveRegion}
+                    onCancel={() => setEditingRegionId(null)}
+                  />
+                ) : (
+                  <>
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div>
+                        <p className="font-medium text-ink">{region.name || 'Untitled region'}</p>
+                        {region.role ? <p className="mt-1 text-xs text-ink-muted">{region.role}</p> : null}
+                        <p className="mt-1 text-xs text-ink-muted">
+                          {region.milestones?.length ?? 0} event{(region.milestones?.length ?? 0) === 1 ? '' : 's'}
+                        </p>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setEditingRegionId(region.id)}
+                          className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold tracking-wide text-brand uppercase"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            confirmDelete({
+                              title: 'Delete this region?',
+                              message: 'This region and all of its events will be removed from the globe country.',
+                              onConfirm: () => deleteRegion(region.id),
+                            })
+                          }
+                          className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold tracking-wide text-accent-hover uppercase"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
+      <div className="mt-4 flex gap-3">
+        <button type="button" onClick={handleSubmit} className="rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase">
+          Save country
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function GlobeMilestoneEditor({ initialMilestone, onSave, onCancel }) {
+  const [milestone, setMilestone] = useState({ ...emptyGlobeMilestone, ...initialMilestone })
+  const update = (field, value) => setMilestone((current) => ({ ...current, [field]: value }))
+
+  const handleSave = () => {
+    if (!milestone.period?.trim() || !milestone.date?.trim() || !milestone.type?.trim() || !milestone.title?.trim() || !milestone.location?.trim()) {
+      return
+    }
+
+    onSave({
+      ...milestone,
+      id: milestone.id || createActivityId(milestone.title),
+      isMilestone: true,
+    })
+  }
+
+  return (
+    <div className="rounded-lg border border-slate-200/80 bg-white p-4">
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div>
+          <label className={labelClassName}>Period</label>
+          <input className={fieldClassName} value={milestone.period} onChange={(e) => update('period', e.target.value)} required />
+        </div>
+        <div>
+          <label className={labelClassName}>Date</label>
+          <input className={fieldClassName} value={milestone.date} onChange={(e) => update('date', e.target.value)} required />
+        </div>
+        <div>
+          <label className={labelClassName}>Type</label>
+          <input className={fieldClassName} value={milestone.type} onChange={(e) => update('type', e.target.value)} required />
+        </div>
+        <div>
+          <label className={labelClassName}>Location</label>
+          <input className={fieldClassName} value={milestone.location} onChange={(e) => update('location', e.target.value)} required />
+        </div>
+        <div className="sm:col-span-2">
+          <label className={labelClassName}>Title</label>
+          <input className={fieldClassName} value={milestone.title} onChange={(e) => update('title', e.target.value)} required />
+        </div>
+        <div className="sm:col-span-2">
+          <label className={labelClassName}>Note</label>
+          <textarea className={`${fieldClassName} min-h-20 resize-y`} value={milestone.note} onChange={(e) => update('note', e.target.value)} placeholder="Optional" />
+        </div>
+      </div>
+      <div className="mt-3 flex gap-2">
+        <button type="button" onClick={handleSave} className="rounded-lg bg-brand px-4 py-2 text-xs font-semibold tracking-wide text-white uppercase">
+          Save event
+        </button>
+        <button type="button" onClick={onCancel} className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold tracking-wide text-ink-muted uppercase">
+          Cancel
+        </button>
+      </div>
+    </div>
   )
 }
 
@@ -530,7 +687,7 @@ export default function InTheFieldPanel() {
         ...activity,
         globe: { ...activity.globe, locations: nextLocations },
       },
-      exists ? 'Globe location updated.' : 'Globe location created.',
+      exists ? 'Globe country updated.' : 'Globe country created.',
     )
     setEditingGlobeLocationId(null)
   }
@@ -544,7 +701,7 @@ export default function InTheFieldPanel() {
           locations: globeLocations.filter((entry) => entry.id !== id),
         },
       },
-      'Globe location deleted.',
+      'Globe country deleted.',
     )
     if (editingGlobeLocationId === id) setEditingGlobeLocationId(null)
   }
@@ -740,16 +897,16 @@ export default function InTheFieldPanel() {
 
       <div className="mt-6">
         <DashboardItemList
-          title="Globe locations"
-          countLabel={`${globeLocations.length} location${globeLocations.length === 1 ? '' : 's'} on the map`}
+          title="Globe countries"
+          countLabel={`${globeLocations.length} countr${globeLocations.length === 1 ? 'y' : 'ies'} on the map`}
           items={globeLocations}
           editingId={editingGlobeLocationId}
           onAdd={() => setEditingGlobeLocationId('new')}
           onEdit={setEditingGlobeLocationId}
           onDelete={deleteGlobeLocation}
           getItemId={(item) => item.id}
-          addLabel="Add location"
-          emptyMessage="No globe locations yet."
+          addLabel="Add country"
+          emptyMessage="No globe countries yet."
           renderPreview={(item) => <GlobeLocationPreview location={item} />}
           renderEditor={(item) =>
             item === 'new' ? (

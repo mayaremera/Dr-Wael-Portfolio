@@ -144,6 +144,8 @@ export default function EarthGlobe({
 
     const resizeCanvas = (size) => {
       sizeRef.current = size
+      container.style.width = `${size}px`
+      container.style.height = `${size}px`
       canvas.width = size * dpr
       canvas.height = size * dpr
       canvas.style.width = `${size}px`
@@ -178,20 +180,24 @@ export default function EarthGlobe({
     }
 
     const updateMarkers = (phi, theta, size) => {
-      const raw = locationsRef.current.map((loc) => {
-        const point = project(loc.lat, loc.lng, phi, theta, size)
-        return {
+      const raw = locationsRef.current.flatMap((loc) => {
+        const lat = Number(loc.lat)
+        const lng = Number(loc.lng)
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return []
+
+        const point = project(lat, lng, phi, theta, size)
+        return [{
           id: loc.id,
           country: loc.country,
           x: point.x,
           y: point.y,
           visible: point.visible,
           depth: point.depth,
-        }
+        }]
       })
 
       const visible = raw.filter((point) => point.visible)
-      const separated = separateMarkerPositions(visible, Math.max(20, size * 0.028))
+      const separated = separateMarkerPositions(visible, Math.max(18, size * 0.022))
       markerPositionsRef.current = separated
 
       for (const point of raw) {
@@ -208,6 +214,7 @@ export default function EarthGlobe({
         el.style.left = `${displayX}px`
         el.style.top = `${displayY}px`
         el.style.opacity = point.visible ? '1' : '0'
+        el.style.visibility = point.visible ? 'visible' : 'hidden'
         el.style.transform = `translate(-50%, -50%) scale(${active ? 1.15 : 1})`
         el.style.zIndex = String(active ? 30 : 10 + Math.round(point.depth * 10))
       }
@@ -374,9 +381,14 @@ export default function EarthGlobe({
       <div
         ref={containerRef}
         className="globe-canvas-wrap relative mx-auto cursor-grab touch-none select-none"
-        style={{ width: GLOBE_PX, height: GLOBE_PX, maxWidth: `min(99vw, ${GLOBE_MAX_PX}px)`, maxHeight: `min(99vw, ${GLOBE_MAX_PX}px)` }}
+        style={{
+          width: GLOBE_PX,
+          height: GLOBE_PX,
+          maxWidth: `min(99vw, ${GLOBE_MAX_PX}px)`,
+          maxHeight: `min(99vw, ${GLOBE_MAX_PX}px)`,
+        }}
       >
-        <canvas ref={canvasRef} className="globe-canvas block h-full w-full" aria-hidden="true" />
+        <canvas ref={canvasRef} className="globe-canvas" aria-hidden="true" />
 
         {locations.map((loc) => (
           <button
@@ -389,7 +401,7 @@ export default function EarthGlobe({
             className="globe-marker-btn"
             style={{ opacity: 0 }}
             tabIndex={-1}
-            aria-label={`${loc.country}, ${loc.city} — ${loc.eventCount} events`}
+            aria-label={`${loc.country} — ${loc.eventCount} events across ${loc.regions?.length ?? 1} region${(loc.regions?.length ?? 1) === 1 ? '' : 's'}`}
             aria-pressed={selectedId === loc.id}
           >
             <span
