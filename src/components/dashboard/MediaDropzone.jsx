@@ -1,5 +1,7 @@
 import { useRef, useState } from 'react'
 import { isMediaStorageAvailable, uploadMediaToStorage } from '../../lib/mediaUpload'
+import { isImageFile, isVideoFile } from '../../lib/mediaFileTypes'
+import { hasMediaSrc } from '../../lib/mediaUrl'
 import { isSupabaseConfigured } from '../../lib/supabase'
 import { useConfirmDelete } from './DeleteConfirmDialog'
 
@@ -13,17 +15,17 @@ export default function MediaDropzone({ image, video, onChange, onUploaded, onCl
   const [uploading, setUploading] = useState(false)
   const [uploadStatus, setUploadStatus] = useState('')
 
-  const mediaSrc = video || image
-  const isVideo = Boolean(video)
+  const mediaSrc = hasMediaSrc(video) ? video.trim() : hasMediaSrc(image) ? image.trim() : ''
+  const isVideo = hasMediaSrc(video)
 
   const handleFile = (file) => {
     if (!file) return
 
-    const isImage = file.type.startsWith('image/')
-    const isVideoFile = file.type.startsWith('video/')
+    const isImage = isImageFile(file)
+    const isVideoFileType = isVideoFile(file)
 
-    if (!isImage && !isVideoFile) {
-      setError('Please drop an image or video file.')
+    if (!isImage && !isVideoFileType) {
+      setError('Please choose a supported image or video file (JPG, PNG, WebP, MP4, etc.).')
       return
     }
 
@@ -41,7 +43,7 @@ export default function MediaDropzone({ image, video, onChange, onUploaded, onCl
       reader.onload = () => {
         const payload = {
           image: isImage ? reader.result : '',
-          video: isVideoFile ? reader.result : '',
+          video: isVideoFileType ? reader.result : '',
         }
         onChange(payload)
         setUploadStatus('Saved locally only.')
@@ -107,16 +109,19 @@ export default function MediaDropzone({ image, video, onChange, onUploaded, onCl
         type="file"
         accept="image/*,video/*"
         className="hidden"
-        onChange={(changeEvent) => handleFile(changeEvent.target.files?.[0])}
+        onChange={(changeEvent) => {
+          handleFile(changeEvent.target.files?.[0])
+          changeEvent.target.value = ''
+        }}
       />
 
       {mediaSrc ? (
         <div className="overflow-hidden rounded-xl border border-slate-200/80 bg-white">
           <div className="relative aspect-video w-full bg-slate-900">
             {isVideo ? (
-              <video src={video} className="h-full w-full object-cover" muted playsInline controls />
+              <video src={mediaSrc} className="h-full w-full object-cover" muted playsInline controls />
             ) : (
-              <img key={image} src={image} alt="" className="h-full w-full object-cover" />
+              <img key={mediaSrc} src={mediaSrc} alt="" className="h-full w-full object-cover" />
             )}
             <span className="absolute left-3 top-3 rounded-full bg-black/50 px-2.5 py-1 text-[0.65rem] font-semibold tracking-wide text-white uppercase">
               {isVideo ? 'Video' : 'Image'}
@@ -126,9 +131,10 @@ export default function MediaDropzone({ image, video, onChange, onUploaded, onCl
             <button
               type="button"
               onClick={() => inputRef.current?.click()}
-              className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold tracking-wide text-brand uppercase transition-colors hover:border-brand/25"
+              disabled={uploading}
+              className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold tracking-wide text-brand uppercase transition-colors hover:border-brand/25 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Replace
+              {uploading ? 'Uploading…' : 'Replace'}
             </button>
             <button
               type="button"

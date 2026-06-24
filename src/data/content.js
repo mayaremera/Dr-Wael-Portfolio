@@ -545,6 +545,12 @@ export const speechLanguageServices = {
   ],
 }
 
+/** Fixed page hero at the top of /services — not editable in the dashboard. */
+export const servicesPageHero = {
+  eyebrow: 'Services',
+  title: 'Speech & Language Services',
+}
+
 export const therapyConcepts = [
   {
     id: 'screening',

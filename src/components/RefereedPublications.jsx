@@ -51,7 +51,7 @@ function highlightAuthor(authors = '') {
   return nodes.length ? nodes : authors
 }
 
-function PublicationEntry({ paper, index }) {
+function PublicationEntry({ paper }) {
   const style = getTypeStyle(paper.type)
 
   return (
@@ -80,7 +80,6 @@ function PublicationEntry({ paper, index }) {
               {paper.type}
             </span>
           ) : null}
-          <span className="font-serif text-xs tabular-nums text-brand/35">{String(index + 1).padStart(2, '0')}</span>
         </div>
 
         <p className="mt-3 text-sm leading-relaxed text-ink-muted">{highlightAuthor(paper.authors)}</p>
@@ -111,12 +110,14 @@ function PublicationEntry({ paper, index }) {
 }
 
 export default function RefereedPublications() {
-  const { refereedPublications } = useAboutContent()
-  const { label, title, intro, papers } = refereedPublications
+  const { isReady, refereedPublications } = useAboutContent()
+  const papers = refereedPublications?.papers
 
   const sortedPapers = useMemo(() => [...(papers ?? [])].sort((a, b) => b.year - a.year), [papers])
 
-  if (sortedPapers.length === 0) return null
+  if (!isReady || !refereedPublications || sortedPapers.length === 0) return null
+
+  const { label, title, intro } = refereedPublications
 
   return (
     <section id="publications" className="relative overflow-hidden border-t border-slate-200 bg-surface py-16 lg:py-20">
@@ -137,8 +138,8 @@ export default function RefereedPublications() {
           />
 
           <div className="relative">
-            {sortedPapers.map((paper, index) => (
-              <PublicationEntry key={paper.id} paper={paper} index={index} />
+            {sortedPapers.map((paper) => (
+              <PublicationEntry key={paper.id} paper={paper} />
             ))}
           </div>
         </div>

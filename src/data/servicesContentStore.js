@@ -39,30 +39,27 @@ function migrateImagePath(url, legacyPath, nextPath) {
   return query ? `${nextPath}?${query}` : nextPath
 }
 
-function mergeTherapyConcepts(saved, defaults) {
-  if (!Array.isArray(saved) || saved.length === 0) return defaults
-
-  const savedById = new Map(saved.map((concept) => [concept.id, concept]))
-  return defaults.map((concept) => {
-    const merged = savedById.get(concept.id) ?? concept
-
-    if (concept.id === 'family-training') {
-      return {
-        ...merged,
-        image: migrateImagePath(merged.image, '/images/family.jpg', '/images/familytraining.jpg'),
-      }
+function migrateTherapyConcept(concept) {
+  if (concept.id === 'family-training') {
+    return {
+      ...concept,
+      image: migrateImagePath(concept.image, '/images/family.jpg', '/images/familytraining.jpg'),
     }
+  }
 
-    return merged
-  })
+  return concept
+}
+
+function migrateTherapyConcepts(saved, defaults) {
+  if (saved == null) return defaults
+  if (!saved.length) return []
+  return saved.map(migrateTherapyConcept)
 }
 
 function mergeWithDefaults(saved) {
   const defaults = getDefaultServicesContent()
 
   return {
-    ...defaults,
-    ...saved,
     speechLanguageServices: {
       ...defaults.speechLanguageServices,
       ...saved.speechLanguageServices,
@@ -75,9 +72,12 @@ function mergeWithDefaults(saved) {
       ...defaults.testimonialsSection,
       ...saved.testimonialsSection,
     },
-    therapyConcepts: mergeTherapyConcepts(saved.therapyConcepts, defaults.therapyConcepts),
-    clinicalSpecializations: saved.clinicalSpecializations ?? defaults.clinicalSpecializations,
-    testimonials: saved.testimonials ?? defaults.testimonials,
+    therapyConcepts: migrateTherapyConcepts(saved.therapyConcepts, defaults.therapyConcepts),
+    clinicalSpecializations:
+      saved.clinicalSpecializations != null
+        ? saved.clinicalSpecializations
+        : defaults.clinicalSpecializations,
+    testimonials: saved.testimonials != null ? saved.testimonials : defaults.testimonials,
   }
 }
 

@@ -43,17 +43,19 @@ const typeLabels = {
 }
 
 export default function CareerTimeline() {
-  const { careerTimeline } = useAboutContent()
+  const { isReady, careerTimeline, careerTimelineSection } = useAboutContent()
+
+  if (!isReady || !careerTimelineSection) return null
+
+  const { label, title, intro } = careerTimelineSection
 
   return (
     <section id="timeline" className="border-t border-slate-200 bg-surface py-16 lg:py-20">
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
         <header className="mx-auto max-w-2xl text-center">
-          <p className="text-xs font-semibold tracking-[0.22em] text-brand uppercase">Career Journey</p>
-          <h2 className="mt-3 font-serif text-3xl text-ink md:text-4xl">A timeline of milestones</h2>
-          <p className="mt-4 text-sm leading-relaxed text-ink-muted md:text-base">
-            Education, clinical leadership, and academic appointments — the foundation of Dr. Wael&apos;s career in speech-language pathology.
-          </p>
+          <p className="text-xs font-semibold tracking-[0.22em] text-brand uppercase">{label}</p>
+          <h2 className="mt-3 font-serif text-3xl text-ink md:text-4xl">{title}</h2>
+          <p className="mt-4 text-sm leading-relaxed text-ink-muted md:text-base">{intro}</p>
         </header>
 
         <div className="relative mt-12 lg:mt-14">

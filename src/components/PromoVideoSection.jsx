@@ -1,11 +1,11 @@
 import { useEffect, useRef } from 'react'
-import { useHomeContent } from '../hooks/useHomeContent'
+import { useGalleryContent } from '../hooks/useGalleryContent'
 
 const PROMO_PLAYBACK_RATE = 0.65
 
 export default function PromoVideoSection({ ctaHref, secondaryHref, variant = 'alt' }) {
-  const { promoVideo } = useHomeContent()
-  const { src, label, titleHighlight, description, cta, secondary } = promoVideo
+  const { isReady, promoVideo } = useGalleryContent()
+  const src = promoVideo?.src ?? ''
   const videoRef = useRef(null)
   const isLight = variant === 'light'
 
@@ -23,6 +23,10 @@ export default function PromoVideoSection({ ctaHref, secondaryHref, variant = 'a
     return () => video.removeEventListener('loadedmetadata', setPlaybackRate)
   }, [src])
 
+  if (!isReady || !promoVideo || !src) return null
+
+  const { label, titleHighlight, description, cta, secondary } = promoVideo
+
   return (
     <section
       id="promo"
@@ -32,6 +36,7 @@ export default function PromoVideoSection({ ctaHref, secondaryHref, variant = 'a
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
         <div className="relative min-h-[min(46vh,360px)] overflow-hidden rounded-sm shadow-xl shadow-brand/15 sm:min-h-[min(50vh,400px)] lg:min-h-[min(72vh,640px)]">
           <video
+            key={src}
             ref={videoRef}
             className="absolute inset-0 h-full w-full object-cover object-center"
             autoPlay
@@ -41,7 +46,7 @@ export default function PromoVideoSection({ ctaHref, secondaryHref, variant = 'a
             preload="metadata"
             aria-hidden="true"
           >
-            <source src={src} type="video/mp4" />
+            <source src={src} />
           </video>
 
           <div

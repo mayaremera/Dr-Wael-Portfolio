@@ -143,8 +143,7 @@ const fieldClassName =
   'w-full rounded-lg border border-slate-200/90 bg-white px-4 py-3 text-sm text-ink outline-none transition-all placeholder:text-ink-muted/50 focus:border-brand/40 focus:ring-2 focus:ring-brand/15'
 
 export default function Contact() {
-  const { contactDetails, directContact } = useContactContent()
-  const { workplace } = contactDetails
+  const { isReady, contactSection, contactDetails, directContact } = useContactContent()
   const [form, setForm] = useState({
     firstName: '',
     lastName: '',
@@ -154,6 +153,10 @@ export default function Contact() {
   })
   const [status, setStatus] = useState('idle')
   const [errorMessage, setErrorMessage] = useState('')
+
+  if (!isReady || !contactDetails || !directContact) return null
+
+  const { workplace } = contactDetails
 
   const updateField = (field) => (event) => {
     setForm((current) => ({ ...current, [field]: event.target.value }))
@@ -227,13 +230,13 @@ export default function Contact() {
       <div className="relative mx-auto max-w-6xl px-6 lg:px-8">
         <header className="mx-auto max-w-2xl text-center">
           <p className="animate-fade-up text-xs font-semibold tracking-[0.24em] text-brand uppercase">
-            Contact & Appointment
+            {contactSection?.label}
           </p>
           <h2 className="animate-fade-up animation-delay-100 mt-4 font-serif text-3xl leading-tight text-ink md:text-4xl lg:text-[2.75rem]">
-            Let&apos;s start the conversation
+            {contactSection?.title}
           </h2>
           <p className="animate-fade-up animation-delay-200 mt-5 text-base leading-relaxed text-ink-muted md:text-lg">
-            Parents, colleagues, and institutions are welcome. Reach out to book a session or ask a question.
+            {contactSection?.intro}
           </p>
         </header>
 
@@ -339,7 +342,7 @@ export default function Contact() {
                   value={form.email}
                   onChange={updateField('email')}
                   className={fieldClassName}
-                  placeholder={directContact.email}
+                  placeholder="you@example.com"
                 />
               </div>
 

@@ -39,16 +39,16 @@ function PlaceholderCard({ title, items }) {
 }
 
 const panels = {
-  settings: SettingsPanel,
   home: HomePagePanel,
   'about-me': AboutMePanel,
   services: ServicesPanel,
   gallery: GalleryPanel,
   'in-the-field': InTheFieldPanel,
   contact: ContactPanel,
+  settings: SettingsPanel,
 }
 
 export function DashboardPanel({ section }) {
-  const Panel = panels[section] ?? InTheFieldPanel
+  const Panel = panels[section] ?? HomePagePanel
   return <Panel />
 }

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useAboutContent } from '../hooks/useAboutContent'
 
-const PAGE_SIZE = 9
+const PAGE_SIZE = 12
 const MAX_VISIBLE_PAGES = 5
 
 function getVisiblePages(currentPage, pageCount) {
@@ -99,8 +99,12 @@ function Pagination({ page, pageCount, onChange }) {
 }
 
 export default function CertificationGallery() {
-  const { certificates } = useAboutContent()
+  const { isReady, certificates, certificatesSection } = useAboutContent()
   const [page, setPage] = useState(0)
+
+  if (!isReady || !certificatesSection) return null
+
+  const { label, title } = certificatesSection
 
   const pageCount = Math.ceil(certificates.length / PAGE_SIZE)
   const safePage = Math.min(page, Math.max(pageCount - 1, 0))
@@ -115,8 +119,8 @@ export default function CertificationGallery() {
     <section id="certifications" className="border-t border-slate-200 bg-surface-alt py-16 lg:py-20">
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
         <div className="text-center">
-          <p className="text-xs font-semibold tracking-[0.22em] text-brand uppercase">Highlighted Collection</p>
-          <h2 className="mt-3 font-serif text-3xl text-ink md:text-4xl">Certificates & Training Archive</h2>
+          <p className="text-xs font-semibold tracking-[0.22em] text-brand uppercase">{label}</p>
+          <h2 className="mt-3 font-serif text-3xl text-ink md:text-4xl">{title}</h2>
           <div className="mx-auto mt-5 inline-flex items-center gap-3 rounded-full border border-slate-200/80 bg-white px-4 py-2 shadow-sm">
             <span className="text-xs font-semibold tracking-[0.16em] text-ink-muted uppercase">Total Certificates</span>
             <span className="rounded-full bg-brand px-3 py-1 text-lg leading-none font-bold text-white sm:text-xl">
@@ -125,19 +129,25 @@ export default function CertificationGallery() {
           </div>
         </div>
 
-        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {pageItems.map((certificate) => (
             <article
               key={certificate.id}
               className="group relative overflow-hidden rounded-sm border border-slate-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-brand/40 hover:shadow-md hover:shadow-brand/15"
             >
-              <div className="relative aspect-4/3 overflow-hidden">
-                <img
-                  src={certificate.image}
-                  alt={certificate.title}
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
-                  loading="lazy"
-                />
+              <div className="relative aspect-4/3 overflow-hidden bg-slate-100">
+                {certificate.image ? (
+                  <img
+                    src={certificate.image}
+                    alt={certificate.title}
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center px-4 text-center text-xs font-medium tracking-wide text-ink-muted uppercase">
+                    Certificate image
+                  </div>
+                )}
                 <div className="absolute inset-x-0 bottom-0 translate-y-full border-t border-white/25 bg-brand p-4 transition-transform duration-300 ease-out group-hover:translate-y-0">
                   <p className="text-xs font-semibold tracking-[0.14em] text-white uppercase">{certificate.title}</p>
                   <p className="mt-1 text-xs leading-relaxed text-white/85">{certificate.description}</p>

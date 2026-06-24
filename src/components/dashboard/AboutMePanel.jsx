@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import DashboardItemList from './DashboardItemList'
+import DashboardSaveNotice from './DashboardSaveNotice'
 import MediaDropzone from './MediaDropzone'
 import { useConfirmDelete } from './DeleteConfirmDialog'
 import {
@@ -16,10 +17,11 @@ import {
   loadAboutContentRemote,
   saveAboutContent,
 } from '../../data/aboutContentStore'
+import { CONTENT_SECTIONS } from '../../data/contentSync'
 import { useDashboardSection } from '../../hooks/useDashboardSection'
 import DashboardSectionLoader from './DashboardSectionLoader'
 import { persistDashboardSection } from './persistDashboardSection'
-
+import { withCacheBust } from '../../lib/mediaUrl'
 const fieldClassName =
   'w-full rounded-lg border border-slate-200/90 bg-white px-3 py-2.5 text-sm text-ink outline-none transition-all placeholder:text-ink-muted/50 focus:border-brand/40 focus:ring-2 focus:ring-brand/15'
 
@@ -475,6 +477,7 @@ export default function AboutMePanel() {
   const { content, setContent, loading, loadError } = useDashboardSection(
     getDefaultAboutContent,
     loadAboutContentRemote,
+    CONTENT_SECTIONS.ABOUT,
   )
   const [editingCertId, setEditingCertId] = useState(null)
   const [editingTimelineId, setEditingTimelineId] = useState(null)
@@ -482,133 +485,236 @@ export default function AboutMePanel() {
   const [editingPublicationId, setEditingPublicationId] = useState(null)
   const [savedMessage, setSavedMessage] = useState('')
   const [saveError, setSaveError] = useState('')
+  const [isSaving, setIsSaving] = useState(false)
+  const contentRef = useRef(content)
+  contentRef.current = content
 
-  const persist = (next, message = 'Changes saved.') => {
-    persistDashboardSection({
+  const persist = (nextContent, message = 'Changes saved.', previousContent = null) => {
+    void persistDashboardSection({
       saveFn: saveAboutContent,
-      nextContent: next,
+      nextContent,
+      previousContent,
       setContent,
       setSaveError,
       setSavedMessage,
+      setIsSaving,
       message,
       storageErrorMessage: 'Could not save — images may be too large. Try a smaller file.',
     })
   }
 
-  const updateProfile = (field, value) => setContent((c) => ({ ...c, profileDetails: { ...c.profileDetails, [field]: value } }))
-  const updateCareerImpact = (field, value) => setContent((c) => ({ ...c, careerImpact: { ...c.careerImpact, [field]: value } }))
-  const updateAcademicServices = (field, value) =>
-    setContent((current) => ({
-      ...current,
-      academicServices: {
-        ...(current.academicServices ?? getDefaultAboutContent().academicServices),
-        [field]: value,
-      },
-    }))
-  const updateRefereedPublications = (field, value) =>
-    setContent((current) => ({
-      ...current,
-      refereedPublications: {
-        ...(current.refereedPublications ?? getDefaultAboutContent().refereedPublications),
-        [field]: value,
-      },
-    }))
-  const saveProfile = () => persist(content, 'Profile saved.')
-  const saveCareerImpact = () => persist(content, 'Career impact cards saved.')
-  const saveAcademicHeader = () => persist(content, 'Academic Services header saved.')
-  const savePublicationsHeader = () => persist(content, 'Publications header saved.')
+  const persistFromCurrent = (buildNextContent, message) => {
+    const current = contentRef.current
+    if (!current) {
+      setSaveError('Content is still loading. Try again in a moment.')
+      return
+    }
+
+    const nextContent = buildNextContent(current)
+    persist(nextContent, message, current)
+  }
+
+  const updateProfile = (field, value) => {
+    setContent((current) => {
+      if (!current) return current
+      return { ...current, profileDetails: { ...current.profileDetails, [field]: value } }
+    })
+  }
+
+  const updateCareerImpact = (field, value) => {
+    setContent((current) => {
+      if (!current) return current
+      return { ...current, careerImpact: { ...current.careerImpact, [field]: value } }
+    })
+  }
+
+  const updateCertificatesSection = (field, value) => {
+    setContent((current) => {
+      if (!current) return current
+      return {
+        ...current,
+        certificatesSection: {
+          ...(current.certificatesSection ?? getDefaultAboutContent().certificatesSection),
+          [field]: value,
+        },
+      }
+    })
+  }
+
+  const updateCareerTimelineSection = (field, value) => {
+    setContent((current) => {
+      if (!current) return current
+      return {
+        ...current,
+        careerTimelineSection: {
+          ...(current.careerTimelineSection ?? getDefaultAboutContent().careerTimelineSection),
+          [field]: value,
+        },
+      }
+    })
+  }
+
+  const updateAcademicServices = (field, value) => {
+    setContent((current) => {
+      if (!current) return current
+      return {
+        ...current,
+        academicServices: {
+          ...(current.academicServices ?? getDefaultAboutContent().academicServices),
+          [field]: value,
+        },
+      }
+    })
+  }
+
+  const updateRefereedPublications = (field, value) => {
+    setContent((current) => {
+      if (!current) return current
+      return {
+        ...current,
+        refereedPublications: {
+          ...(current.refereedPublications ?? getDefaultAboutContent().refereedPublications),
+          [field]: value,
+        },
+      }
+    })
+  }
+
+  const saveProfile = () => {
+    persistFromCurrent(
+      (current) => ({
+        ...current,
+        profileImage: current.profileImage ? withCacheBust(current.profileImage) : '',
+      }),
+      'Profile saved.',
+    )
+  }
+
+  const saveCareerImpact = () => {
+    persistFromCurrent((current) => current, 'Career impact cards saved.')
+  }
+
+  const saveCertificatesHeader = () => {
+    persistFromCurrent((current) => current, 'Certificates section saved.')
+  }
+
+  const saveCareerTimelineHeader = () => {
+    persistFromCurrent((current) => current, 'Career timeline header saved.')
+  }
+
+  const saveAcademicHeader = () => {
+    persistFromCurrent((current) => current, 'Leadership section header saved.')
+  }
+
+  const savePublicationsHeader = () => {
+    persistFromCurrent((current) => current, 'Publications header saved.')
+  }
 
   const saveListItem = (listKey, item, setEditing) => {
-    const list = content[listKey]
+    const list = contentRef.current?.[listKey] ?? []
     const exists = list.some((entry) => entry.id === item.id)
-    const nextList = exists ? list.map((entry) => (entry.id === item.id ? item : entry)) : [item, ...list]
-    persist({ ...content, [listKey]: nextList }, exists ? 'Entry updated.' : 'Entry created.')
+
+    persistFromCurrent((current) => {
+      const currentList = current[listKey] ?? []
+      const normalizedItem =
+        listKey === 'certificates'
+          ? { ...item, image: item.image ? withCacheBust(item.image) : '' }
+          : item
+      const nextList = exists
+        ? currentList.map((entry) => (entry.id === normalizedItem.id ? normalizedItem : entry))
+        : [normalizedItem, ...currentList]
+      return { ...current, [listKey]: nextList }
+    }, exists ? 'Entry updated.' : 'Entry created.')
+
     setEditing(null)
   }
 
   const deleteListItem = (listKey, id, setEditing, editingId) => {
-    persist({ ...content, [listKey]: content[listKey].filter((entry) => entry.id !== id) }, 'Entry deleted.')
+    persistFromCurrent(
+      (current) => ({
+        ...current,
+        [listKey]: (current[listKey] ?? []).filter((entry) => entry.id !== id),
+      }),
+      'Entry deleted.',
+    )
     if (editingId === id) setEditing(null)
   }
 
   const saveAcademicCategory = (category) => {
-    const academicServices = content.academicServices ?? getDefaultAboutContent().academicServices
-    const categories = academicServices.categories ?? []
-    const exists = categories.some((entry) => entry.id === category.id)
-    const nextCategories = exists
-      ? categories.map((entry) => (entry.id === category.id ? category : entry))
-      : [category, ...categories]
-    persist(
-      {
-        ...content,
+    const exists = (contentRef.current?.academicServices?.categories ?? []).some((entry) => entry.id === category.id)
+
+    persistFromCurrent((current) => {
+      const academicServices = current.academicServices ?? getDefaultAboutContent().academicServices
+      const categories = academicServices.categories ?? []
+      const nextCategories = exists
+        ? categories.map((entry) => (entry.id === category.id ? category : entry))
+        : [category, ...categories]
+      return {
+        ...current,
         academicServices: { ...academicServices, categories: nextCategories },
-      },
-      exists ? 'Category updated.' : 'Category created.',
-    )
+      }
+    }, exists ? 'Category updated.' : 'Category created.')
+
     setEditingAcademicCategoryId(null)
   }
 
   const deleteAcademicCategory = (id) => {
-    const academicServices = content.academicServices ?? getDefaultAboutContent().academicServices
-    persist(
-      {
-        ...content,
+    persistFromCurrent((current) => {
+      const academicServices = current.academicServices ?? getDefaultAboutContent().academicServices
+      return {
+        ...current,
         academicServices: {
           ...academicServices,
           categories: (academicServices.categories ?? []).filter((entry) => entry.id !== id),
         },
-      },
-      'Category deleted.',
-    )
+      }
+    }, 'Category deleted.')
     if (editingAcademicCategoryId === id) setEditingAcademicCategoryId(null)
   }
 
   const savePublication = (paper) => {
-    const refereedPublications = content.refereedPublications ?? getDefaultAboutContent().refereedPublications
-    const papers = refereedPublications.papers ?? []
-    const exists = papers.some((entry) => entry.id === paper.id)
-    const nextPapers = exists ? papers.map((entry) => (entry.id === paper.id ? paper : entry)) : [paper, ...papers]
+    const exists = (contentRef.current?.refereedPublications?.papers ?? []).some((entry) => entry.id === paper.id)
 
-    persist(
-      {
-        ...content,
+    persistFromCurrent((current) => {
+      const refereedPublications = current.refereedPublications ?? getDefaultAboutContent().refereedPublications
+      const papers = refereedPublications.papers ?? []
+      const nextPapers = exists ? papers.map((entry) => (entry.id === paper.id ? paper : entry)) : [paper, ...papers]
+      return {
+        ...current,
         refereedPublications: { ...refereedPublications, papers: nextPapers },
-      },
-      exists ? 'Publication updated.' : 'Publication added.',
-    )
+      }
+    }, exists ? 'Publication updated.' : 'Publication added.')
+
     setEditingPublicationId(null)
   }
 
   const deletePublication = (id) => {
-    const refereedPublications = content.refereedPublications ?? getDefaultAboutContent().refereedPublications
-    persist(
-      {
-        ...content,
+    persistFromCurrent((current) => {
+      const refereedPublications = current.refereedPublications ?? getDefaultAboutContent().refereedPublications
+      return {
+        ...current,
         refereedPublications: {
           ...refereedPublications,
           papers: (refereedPublications.papers ?? []).filter((entry) => entry.id !== id),
         },
-      },
-      'Publication deleted.',
-    )
+      }
+    }, 'Publication deleted.')
     if (editingPublicationId === id) setEditingPublicationId(null)
   }
-
-  const academicCategories = content.academicServices?.categories ?? []
-
   return (
-    <PanelShell eyebrow="About Me" title="Profile, certificates & career" description="Manage Dr. Wael's biography, international leadership, academic services, refereed publications, certificates, career timeline, and leadership roles on the About Me page.">
+    <PanelShell eyebrow="About Me" title="Profile, certificates & career" description="Sections follow the About Me page order. Every save writes to Supabase and updates the live site.">
+      <DashboardSaveNotice message={savedMessage} error={saveError} saving={isSaving} />
       <DashboardSectionLoader loading={loading} loadError={loadError} />
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+      {!loading && !loadError && content ? (
+        <>
+      <div className="mb-6">
         <a href="/about-me" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-brand">Preview live page →</a>
-        <div className="flex gap-2">
-          {saveError ? <span className="rounded-full bg-accent/10 px-3 py-1 text-xs font-semibold text-accent-hover">{saveError}</span> : null}
-          {savedMessage ? <span className="rounded-full bg-brand-muted px-3 py-1 text-xs font-semibold text-brand">{savedMessage}</span> : null}
-        </div>
       </div>
 
-      <section className="rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm">
-        <h2 className="font-serif text-xl text-ink">About Dr. Wael</h2>
+      <section className="rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
+        <p className="text-[0.65rem] font-semibold tracking-wide text-brand uppercase">1 · Top of page</p>
+        <h2 className="mt-1 font-serif text-xl text-ink">About Dr. Wael</h2>
+        <p className="mt-1 text-sm text-ink-muted">Profile section at the top of the About Me page, including the four stat cards below the bio.</p>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           <div><label className={labelClassName}>Name</label><input className={fieldClassName} value={content.profileDetails.name} onChange={(e) => updateProfile('name', e.target.value)} /></div>
           <div><label className={labelClassName}>Tagline</label><input className={fieldClassName} value={content.profileDetails.tagline} onChange={(e) => updateProfile('tagline', e.target.value)} /></div>
@@ -621,7 +727,7 @@ export default function AboutMePanel() {
               onChange={(bio) => updateProfile('bio', bio)}
               addLabel="Add paragraph"
             />
-            <p className="mt-1 text-xs text-ink-muted">Shown on the home page profile section (usually 2 short paragraphs).</p>
+            <p className="mt-1 text-xs text-ink-muted">Shown on the home page profile section only.</p>
           </div>
           <div className="md:col-span-2">
             <StringListEditor
@@ -630,40 +736,114 @@ export default function AboutMePanel() {
               onChange={(bioExtended) => updateProfile('bioExtended', bioExtended)}
               addLabel="Add paragraph"
             />
-            <p className="mt-1 text-xs text-ink-muted">All paragraphs shown on the About Me page under About Dr. Wael (currently 5).</p>
           </div>
-          <div className="md:col-span-2"><label className={labelClassName}>Profile photo</label><MediaDropzone image={content.profileImage} video="" onChange={({ image }) => setContent((c) => ({ ...c, profileImage: image }))} onClear={() => setContent((c) => ({ ...c, profileImage: '' }))} /></div>
+          <div className="md:col-span-2">
+            <label className={labelClassName}>Profile photo</label>
+            <MediaDropzone
+              image={content.profileImage}
+              video=""
+              onChange={({ image }) => setContent((current) => (current ? { ...current, profileImage: image } : current))}
+              onClear={() => setContent((current) => (current ? { ...current, profileImage: '' } : current))}
+            />
+          </div>
         </div>
-        <button type="button" onClick={saveProfile} className="mt-4 rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase">Save profile</button>
+        <div className="mt-6 border-t border-slate-200/80 pt-5">
+          <p className="text-sm font-medium text-ink">Career impact stat cards</p>
+          <div className="mt-4">
+            <CareerStatsEditor
+              stats={content.careerImpact.stats}
+              onChange={(stats) => updateCareerImpact('stats', stats)}
+            />
+          </div>
+        </div>
+        <div className="mt-4 flex flex-wrap gap-3">
+          <button type="button" onClick={saveProfile} className="rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase">Save profile</button>
+          <button type="button" onClick={saveCareerImpact} className="rounded-lg border border-slate-200 px-5 py-2.5 text-xs font-semibold tracking-wide text-brand uppercase">Save stat cards</button>
+        </div>
       </section>
 
-      <section className="mt-6 rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm">
-        <h2 className="font-serif text-xl text-ink">Career impact cards</h2>
-        <p className="mt-1 text-sm text-ink-muted">The four stat cards below the About Dr. Wael section on the About Me page.</p>
+      <section className="mt-6 rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
+        <p className="text-[0.65rem] font-semibold tracking-wide text-brand uppercase">2 · Certificates</p>
+        <h2 className="mt-1 font-serif text-xl text-ink">Certificates &amp; training archive</h2>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           <div>
             <label className={labelClassName}>Section label</label>
-            <input className={fieldClassName} value={content.careerImpact.label} onChange={(e) => updateCareerImpact('label', e.target.value)} />
+            <input className={fieldClassName} value={content.certificatesSection?.label ?? ''} onChange={(e) => updateCertificatesSection('label', e.target.value)} />
           </div>
           <div>
             <label className={labelClassName}>Section title</label>
-            <input className={fieldClassName} value={content.careerImpact.title} onChange={(e) => updateCareerImpact('title', e.target.value)} />
+            <input className={fieldClassName} value={content.certificatesSection?.title ?? ''} onChange={(e) => updateCertificatesSection('title', e.target.value)} />
           </div>
         </div>
-        <div className="mt-4">
-          <CareerStatsEditor
-            stats={content.careerImpact.stats}
-            onChange={(stats) => updateCareerImpact('stats', stats)}
-          />
+        <button type="button" onClick={saveCertificatesHeader} className="mt-4 rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase">Save section header</button>
+
+        <div className="mt-6">
+        <DashboardItemList
+          title="Certificate cards"
+          countLabel={`${content.certificates.length} certificate${content.certificates.length === 1 ? '' : 's'}`}
+          items={content.certificates}
+          editingId={editingCertId}
+          onAdd={() => setEditingCertId('new')}
+          onEdit={setEditingCertId}
+          onDelete={(id) => deleteListItem('certificates', id, setEditingCertId, editingCertId)}
+          getItemId={(i) => i.id}
+          addLabel="Add certificate"
+          addEditorPosition="top"
+          renderPreview={(item) => (
+            <div className="flex gap-3">
+              <div className="h-14 w-20 overflow-hidden rounded bg-slate-100">
+                {item.image ? (
+                  <img src={item.image} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center text-[0.6rem] font-medium text-ink-muted uppercase">
+                    No image
+                  </div>
+                )}
+              </div>
+              <div>
+                <p className="font-medium text-ink">{item.title}</p>
+                <p className="text-xs text-ink-muted">{item.issuer} · {item.year}</p>
+              </div>
+            </div>
+          )}
+          renderEditor={(item) => item === 'new' ? <CertificateEditor initialItem={emptyCertificate} onSave={(entry) => saveListItem('certificates', entry, setEditingCertId)} onCancel={() => setEditingCertId(null)} /> : <CertificateEditor key={item.id} initialItem={item} onSave={(entry) => saveListItem('certificates', entry, setEditingCertId)} onCancel={() => setEditingCertId(null)} />}
+        />
         </div>
-        <button type="button" onClick={saveCareerImpact} className="mt-4 rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase">Save career cards</button>
       </section>
 
-      <section className="mt-6 rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm">
-        <h2 className="font-serif text-xl text-ink">International Leadership & Professional Service</h2>
-        <p className="mt-1 text-sm text-ink-muted">
-          One section on the About Me page — use the categories below (International Roles, National Programs, etc.). No separate leadership cards.
-        </p>
+      <section className="mt-6 rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
+        <p className="text-[0.65rem] font-semibold tracking-wide text-brand uppercase">3 · Career journey</p>
+        <h2 className="mt-1 font-serif text-xl text-ink">Career timeline</h2>
+        <div className="mt-4 grid gap-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div>
+              <label className={labelClassName}>Section label</label>
+              <input className={fieldClassName} value={content.careerTimelineSection?.label ?? ''} onChange={(e) => updateCareerTimelineSection('label', e.target.value)} />
+            </div>
+            <div>
+              <label className={labelClassName}>Section title</label>
+              <input className={fieldClassName} value={content.careerTimelineSection?.title ?? ''} onChange={(e) => updateCareerTimelineSection('title', e.target.value)} />
+            </div>
+          </div>
+          <div>
+            <label className={labelClassName}>Introduction</label>
+            <textarea className={`${fieldClassName} min-h-24 resize-y`} value={content.careerTimelineSection?.intro ?? ''} onChange={(e) => updateCareerTimelineSection('intro', e.target.value)} />
+          </div>
+        </div>
+        <button type="button" onClick={saveCareerTimelineHeader} className="mt-4 rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase">Save section header</button>
+
+        <div className="mt-6">
+        <DashboardItemList title="Timeline entries" countLabel={`${content.careerTimeline.length} entries`} items={content.careerTimeline} editingId={editingTimelineId} onAdd={() => setEditingTimelineId('new')} onEdit={setEditingTimelineId} onDelete={(id) => deleteListItem('careerTimeline', id, setEditingTimelineId, editingTimelineId)} getItemId={(i) => i.id}
+          renderPreview={(item) => (<div><p className="text-xs font-semibold text-brand uppercase">{item.year} · {item.type}</p><p className="font-medium text-ink">{item.title}</p><p className="text-sm text-ink-muted">{item.org}</p></div>)}
+          renderEditor={(item) => item === 'new' ? <TimelineEditor initialItem={emptyTimelineEntry} onSave={(entry) => saveListItem('careerTimeline', entry, setEditingTimelineId)} onCancel={() => setEditingTimelineId(null)} /> : <TimelineEditor key={item.id} initialItem={item} onSave={(entry) => saveListItem('careerTimeline', entry, setEditingTimelineId)} onCancel={() => setEditingTimelineId(null)} />}
+        />
+        </div>
+      </section>
+
+      <section className="mt-6 rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
+        <p className="text-[0.65rem] font-semibold tracking-wide text-brand uppercase">4 · Leadership</p>
+        <h2 className="mt-1 font-serif text-xl text-ink">International leadership &amp; professional service</h2>
+        <p className="mt-1 text-sm text-ink-muted">Header and tabbed categories shown on the About Me page.</p>
         <div className="mt-4 grid gap-4">
           <div className="grid gap-4 md:grid-cols-2">
             <div>
@@ -681,13 +861,12 @@ export default function AboutMePanel() {
           </div>
         </div>
         <button type="button" onClick={saveAcademicHeader} className="mt-4 rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase">Save section header</button>
-      </section>
 
-      <div className="mt-6">
+        <div className="mt-6">
         <DashboardItemList
-          title="Academic service categories"
-          countLabel={`${academicCategories.length} categor${academicCategories.length === 1 ? 'y' : 'ies'}`}
-          items={academicCategories}
+          title="Leadership categories"
+          countLabel={`${content.academicServices?.categories?.length ?? 0} categor${(content.academicServices?.categories?.length ?? 0) === 1 ? 'y' : 'ies'}`}
+          items={content.academicServices?.categories ?? []}
           editingId={editingAcademicCategoryId}
           onAdd={() => setEditingAcademicCategoryId('new')}
           onEdit={setEditingAcademicCategoryId}
@@ -711,11 +890,12 @@ export default function AboutMePanel() {
             )
           }
         />
-      </div>
+        </div>
+      </section>
 
-      <section className="mt-6 rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm">
-        <h2 className="font-serif text-xl text-ink">Refereed Publications</h2>
-        <p className="mt-1 text-sm text-ink-muted">Scholarly papers section shown below International Leadership on the About Me page.</p>
+      <section className="mt-6 rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
+        <p className="text-[0.65rem] font-semibold tracking-wide text-brand uppercase">5 · Publications</p>
+        <h2 className="mt-1 font-serif text-xl text-ink">Refereed publications</h2>
         <div className="mt-4 grid gap-4">
           <div className="grid gap-4 md:grid-cols-2">
             <div>
@@ -732,10 +912,9 @@ export default function AboutMePanel() {
             <textarea className={`${fieldClassName} min-h-24 resize-y`} value={content.refereedPublications?.intro ?? ''} onChange={(e) => updateRefereedPublications('intro', e.target.value)} />
           </div>
         </div>
-        <button type="button" onClick={savePublicationsHeader} className="mt-4 rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase">Save publications header</button>
-      </section>
+        <button type="button" onClick={savePublicationsHeader} className="mt-4 rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase">Save section header</button>
 
-      <div className="mt-6">
+        <div className="mt-6">
         <DashboardItemList
           title="Refereed papers"
           countLabel={`${content.refereedPublications?.papers?.length ?? 0} paper${content.refereedPublications?.papers?.length === 1 ? '' : 's'}`}
@@ -762,21 +941,10 @@ export default function AboutMePanel() {
             )
           }
         />
-      </div>
-
-      <div className="mt-6">
-        <DashboardItemList title="Certificates" countLabel={`${content.certificates.length} certificate${content.certificates.length === 1 ? '' : 's'}`} items={content.certificates} editingId={editingCertId} onAdd={() => setEditingCertId('new')} onEdit={setEditingCertId} onDelete={(id) => deleteListItem('certificates', id, setEditingCertId, editingCertId)} getItemId={(i) => i.id}
-          renderPreview={(item) => (<div className="flex gap-3"><div className="h-14 w-20 overflow-hidden rounded bg-slate-100">{item.image ? <img src={item.image} alt="" className="h-full w-full object-cover" /> : null}</div><div><p className="font-medium text-ink">{item.title}</p><p className="text-xs text-ink-muted">{item.issuer} · {item.year}</p></div></div>)}
-          renderEditor={(item) => item === 'new' ? <CertificateEditor initialItem={emptyCertificate} onSave={(entry) => saveListItem('certificates', entry, setEditingCertId)} onCancel={() => setEditingCertId(null)} /> : <CertificateEditor key={item.id} initialItem={item} onSave={(entry) => saveListItem('certificates', entry, setEditingCertId)} onCancel={() => setEditingCertId(null)} />}
-        />
-      </div>
-
-      <div className="mt-6">
-        <DashboardItemList title="Career timeline" countLabel={`${content.careerTimeline.length} entries`} items={content.careerTimeline} editingId={editingTimelineId} onAdd={() => setEditingTimelineId('new')} onEdit={setEditingTimelineId} onDelete={(id) => deleteListItem('careerTimeline', id, setEditingTimelineId, editingTimelineId)} getItemId={(i) => i.id}
-          renderPreview={(item) => (<div><p className="text-xs font-semibold text-brand uppercase">{item.year} · {item.type}</p><p className="font-medium text-ink">{item.title}</p><p className="text-sm text-ink-muted">{item.org}</p></div>)}
-          renderEditor={(item) => item === 'new' ? <TimelineEditor initialItem={emptyTimelineEntry} onSave={(entry) => saveListItem('careerTimeline', entry, setEditingTimelineId)} onCancel={() => setEditingTimelineId(null)} /> : <TimelineEditor key={item.id} initialItem={item} onSave={(entry) => saveListItem('careerTimeline', entry, setEditingTimelineId)} onCancel={() => setEditingTimelineId(null)} />}
-        />
-      </div>
+        </div>
+      </section>
+        </>
+      ) : null}
     </PanelShell>
   )
 }

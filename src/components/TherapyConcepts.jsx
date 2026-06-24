@@ -1,6 +1,7 @@
 import { useServicesContent } from '../hooks/useServicesContent'
 import ClinicalSpecializations from './ClinicalSpecializations'
 import ContactButton from './ContactButton'
+import { hasMediaSrc } from '../lib/mediaUrl'
 
 const cardLinkClassName =
   'relative mt-4 inline-block w-fit pb-1 text-xs font-semibold tracking-[0.12em] text-brand uppercase transition-colors after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-brand after:transition-transform after:duration-300 after:ease-out hover:text-brand-light hover:after:scale-x-100'
@@ -46,7 +47,11 @@ function CheckIcon() {
 function ServiceCardImage({ src, alt }) {
   return (
     <div className="relative h-36 w-full shrink-0 sm:h-auto sm:min-h-full sm:w-[38%] sm:max-w-[180px] sm:self-stretch">
-      <img src={src} alt={alt} className="absolute inset-0 h-full w-full object-cover" />
+      {hasMediaSrc(src) ? (
+        <img src={src} alt={alt} className="absolute inset-0 h-full w-full object-cover" />
+      ) : (
+        <div className="absolute inset-0 bg-slate-100" aria-hidden="true" />
+      )}
       <div
         className="pointer-events-none absolute inset-0 bg-linear-to-r from-brand/20 via-transparent to-transparent"
         aria-hidden="true"
@@ -84,11 +89,15 @@ function ServiceDetailCard({ concept, index }) {
       <div className={`relative flex flex-col lg:items-stretch ${reversed ? 'lg:flex-row-reverse' : 'lg:flex-row'}`}>
         <div className={`relative lg:w-[44%] xl:w-[42%] ${hasBullets ? 'lg:flex lg:flex-col' : ''}`}>
           <div className={imageWrapClass}>
-            <img
-              src={concept.image}
-              alt={`${concept.title}, ${concept.subtitle}`}
-              className="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.04]"
-            />
+            {hasMediaSrc(concept.image) ? (
+              <img
+                src={concept.image}
+                alt={`${concept.title}, ${concept.subtitle}`}
+                className="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.04]"
+              />
+            ) : (
+              <div className="absolute inset-0 bg-slate-100" aria-hidden="true" />
+            )}
             <div className={`pointer-events-none absolute inset-0 bg-linear-to-t ${accent.imageOverlay}`} />
             <div
               className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.12),transparent_55%)]"
@@ -183,11 +192,15 @@ function CasesPreviewGrid({ cases }) {
           className="group flex h-full flex-col overflow-hidden rounded-sm border border-slate-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-brand/20 hover:shadow-md hover:shadow-brand/10"
         >
           <div className="relative h-36 w-full shrink-0 overflow-hidden">
-            <img
-              src={item.image}
-              alt={item.title}
-              className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-            />
+            {hasMediaSrc(item.image) ? (
+              <img
+                src={item.image}
+                alt={item.title}
+                className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+            ) : (
+              <div className="absolute inset-0 bg-slate-100" aria-hidden="true" />
+            )}
             <div
               className="pointer-events-none absolute inset-0 bg-gradient-to-t from-brand/50 via-transparent to-transparent"
               aria-hidden="true"
@@ -213,8 +226,16 @@ function CasesPreviewGrid({ cases }) {
 }
 
 export default function TherapyConcepts({ showCasesPreview = false, fullDetail = false }) {
-  const { speechLanguageServices, therapyConcepts, casesWeServe, clinicalSpecializations } =
-    useServicesContent()
+  const {
+    isReady,
+    speechLanguageServices,
+    therapyConcepts,
+    casesWeServe,
+    clinicalSpecializations,
+  } = useServicesContent()
+
+  if (!isReady || !speechLanguageServices) return null
+
   const displayConcepts = fullDetail
     ? therapyConcepts
     : therapyConcepts.filter((concept) => !concept.pageOnly)

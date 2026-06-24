@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import DashboardItemList from './DashboardItemList'
+import DashboardSaveNotice from './DashboardSaveNotice'
 import MediaDropzone from './MediaDropzone'
 import { useConfirmDelete } from './DeleteConfirmDialog'
 import {
@@ -12,7 +13,9 @@ import {
   loadServicesContentRemote,
   saveServicesContent,
 } from '../../data/servicesContentStore'
+import { CONTENT_SECTIONS } from '../../data/contentSync'
 import { useDashboardSection } from '../../hooks/useDashboardSection'
+import { withCacheBust } from '../../lib/mediaUrl'
 import DashboardSectionLoader from './DashboardSectionLoader'
 import { persistDashboardSection } from './persistDashboardSection'
 
@@ -402,104 +405,179 @@ export default function ServicesPanel() {
   const { content, setContent, loading, loadError } = useDashboardSection(
     getDefaultServicesContent,
     loadServicesContentRemote,
+    CONTENT_SECTIONS.SERVICES,
   )
   const [editingServiceId, setEditingServiceId] = useState(null)
   const [editingCaseId, setEditingCaseId] = useState(null)
   const [editingTestimonialId, setEditingTestimonialId] = useState(null)
   const [savedMessage, setSavedMessage] = useState('')
   const [saveError, setSaveError] = useState('')
+  const [isSaving, setIsSaving] = useState(false)
+  const contentRef = useRef(content)
+  contentRef.current = content
 
-  const persist = (nextContent, message = 'Changes saved.') => {
-    persistDashboardSection({
+  const persist = (nextContent, message = 'Changes saved.', previousContent = null) => {
+    void persistDashboardSection({
       saveFn: saveServicesContent,
       nextContent,
+      previousContent,
       setContent,
       setSaveError,
       setSavedMessage,
+      setIsSaving,
       message,
       storageErrorMessage: 'Could not save — images may be too large. Try smaller files.',
     })
   }
 
+  const persistFromCurrent = (buildNextContent, message) => {
+    const current = contentRef.current
+    if (!current) {
+      setSaveError('Content is still loading. Try again in a moment.')
+      return
+    }
+
+    const nextContent = buildNextContent(current)
+    persist(nextContent, message, current)
+  }
+
+  const normalizeTherapyConcept = (concept) => ({
+    ...concept,
+    image: concept.image ? withCacheBust(concept.image) : '',
+  })
+
+  const normalizeClinicalCase = (item) => ({
+    ...item,
+    image: item.image ? withCacheBust(item.image) : '',
+  })
+
+  const normalizeTestimonial = (item) => ({
+    ...item,
+    image: item.image ? withCacheBust(item.image) : '',
+  })
+
   const updateServicesHeader = (field, value) => {
-    setContent((current) => ({
-      ...current,
-      speechLanguageServices: { ...current.speechLanguageServices, [field]: value },
-    }))
+    setContent((current) => {
+      if (!current) return current
+      return {
+        ...current,
+        speechLanguageServices: { ...current.speechLanguageServices, [field]: value },
+      }
+    })
   }
 
   const updateCasesHeader = (field, value) => {
-    setContent((current) => ({
-      ...current,
-      casesWeServe: { ...current.casesWeServe, [field]: value },
-    }))
+    setContent((current) => {
+      if (!current) return current
+      return {
+        ...current,
+        casesWeServe: { ...current.casesWeServe, [field]: value },
+      }
+    })
   }
 
   const updateTestimonialsHeader = (field, value) => {
-    setContent((current) => ({
-      ...current,
-      testimonialsSection: { ...current.testimonialsSection, [field]: value },
-    }))
+    setContent((current) => {
+      if (!current) return current
+      return {
+        ...current,
+        testimonialsSection: { ...current.testimonialsSection, [field]: value },
+      }
+    })
   }
 
-  const saveServicesHeader = () => persist(content, 'Services header saved.')
+  const saveServicesHeader = () => {
+    persistFromCurrent((current) => current, 'Services header saved.')
+  }
 
-  const saveCasesHeader = () => persist(content, 'Cases header saved.')
+  const saveCasesHeader = () => {
+    persistFromCurrent((current) => current, 'Cases header saved.')
+  }
 
-  const saveTestimonialsHeader = () => persist(content, 'Testimonials header saved.')
+  const saveTestimonialsHeader = () => {
+    persistFromCurrent((current) => current, 'Testimonials header saved.')
+  }
 
   const saveService = (concept) => {
-    const exists = content.therapyConcepts.some((item) => item.id === concept.id)
-    const therapyConcepts = exists
-      ? content.therapyConcepts.map((item) => (item.id === concept.id ? concept : item))
-      : [concept, ...content.therapyConcepts]
+    const normalized = normalizeTherapyConcept(concept)
+    const exists = (contentRef.current?.therapyConcepts ?? []).some((item) => item.id === normalized.id)
 
-    persist({ ...content, therapyConcepts }, exists ? 'Service updated.' : 'Service created.')
+    persistFromCurrent(
+      (current) => ({
+        ...current,
+        therapyConcepts: exists
+          ? current.therapyConcepts.map((item) => (item.id === normalized.id ? normalized : item))
+          : [...current.therapyConcepts, normalized],
+      }),
+      exists ? 'Service updated.' : 'Service created.',
+    )
     setEditingServiceId(null)
   }
 
   const deleteService = (id) => {
-    persist(
-      { ...content, therapyConcepts: content.therapyConcepts.filter((item) => item.id !== id) },
+    persistFromCurrent(
+      (current) => ({
+        ...current,
+        therapyConcepts: current.therapyConcepts.filter((item) => item.id !== id),
+      }),
       'Service deleted.',
     )
     if (editingServiceId === id) setEditingServiceId(null)
   }
 
   const saveCase = (item) => {
-    const exists = content.clinicalSpecializations.some((entry) => entry.id === item.id)
-    const clinicalSpecializations = exists
-      ? content.clinicalSpecializations.map((entry) => (entry.id === item.id ? item : entry))
-      : [item, ...content.clinicalSpecializations]
+    const normalized = normalizeClinicalCase(item)
+    const exists = (contentRef.current?.clinicalSpecializations ?? []).some(
+      (entry) => entry.id === normalized.id,
+    )
 
-    persist({ ...content, clinicalSpecializations }, exists ? 'Case updated.' : 'Case created.')
+    persistFromCurrent(
+      (current) => ({
+        ...current,
+        clinicalSpecializations: exists
+          ? current.clinicalSpecializations.map((entry) =>
+              entry.id === normalized.id ? normalized : entry,
+            )
+          : [normalized, ...current.clinicalSpecializations],
+      }),
+      exists ? 'Case updated.' : 'Case created.',
+    )
     setEditingCaseId(null)
   }
 
   const deleteCase = (id) => {
-    persist(
-      {
-        ...content,
-        clinicalSpecializations: content.clinicalSpecializations.filter((entry) => entry.id !== id),
-      },
+    persistFromCurrent(
+      (current) => ({
+        ...current,
+        clinicalSpecializations: current.clinicalSpecializations.filter((entry) => entry.id !== id),
+      }),
       'Case deleted.',
     )
     if (editingCaseId === id) setEditingCaseId(null)
   }
 
   const saveTestimonial = (item) => {
-    const exists = content.testimonials.some((entry) => entry.id === item.id)
-    const testimonials = exists
-      ? content.testimonials.map((entry) => (entry.id === item.id ? item : entry))
-      : [item, ...content.testimonials]
+    const normalized = normalizeTestimonial(item)
+    const exists = (contentRef.current?.testimonials ?? []).some((entry) => entry.id === normalized.id)
 
-    persist({ ...content, testimonials }, exists ? 'Testimonial updated.' : 'Testimonial created.')
+    persistFromCurrent(
+      (current) => ({
+        ...current,
+        testimonials: exists
+          ? current.testimonials.map((entry) => (entry.id === normalized.id ? normalized : entry))
+          : [normalized, ...current.testimonials],
+      }),
+      exists ? 'Testimonial updated.' : 'Testimonial created.',
+    )
     setEditingTestimonialId(null)
   }
 
   const deleteTestimonial = (id) => {
-    persist(
-      { ...content, testimonials: content.testimonials.filter((entry) => entry.id !== id) },
+    persistFromCurrent(
+      (current) => ({
+        ...current,
+        testimonials: current.testimonials.filter((entry) => entry.id !== id),
+      }),
       'Testimonial deleted.',
     )
     if (editingTestimonialId === id) setEditingTestimonialId(null)
@@ -509,28 +587,26 @@ export default function ServicesPanel() {
     <PanelShell
       eyebrow="Service"
       title="Therapy services, cases & testimonials"
-      description="Manage service pathway cards, clinical cases, and family testimonials shown on the live Services page and homepage. Saves go to Supabase."
+      description="Manage service pathway cards, clinical cases, and family testimonials shown on the live Services page and homepage. All changes save to Supabase."
     >
+      <DashboardSaveNotice message={savedMessage} error={saveError} saving={isSaving} />
       <DashboardSectionLoader loading={loading} loadError={loadError} />
+      {!loading && !loadError && content ? (
+        <>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <a href="/services" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-brand transition-colors hover:text-brand-light">
           Preview live page →
         </a>
-        <div className="flex flex-wrap items-center gap-2">
-          {saveError ? (
-            <span className="rounded-full bg-accent/10 px-3 py-1 text-xs font-semibold text-accent-hover">{saveError}</span>
-          ) : null}
-          {savedMessage ? (
-            <span className="rounded-full bg-brand-muted px-3 py-1 text-xs font-semibold text-brand">{savedMessage}</span>
-          ) : null}
-        </div>
       </div>
 
       <section className="rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
         <h2 className="font-serif text-xl text-ink">Services section header</h2>
+        <p className="mt-1 text-sm text-ink-muted">
+          The heading below the page hero on the Services page. The large hero title at the top of the page is fixed and not editable here.
+        </p>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           <div>
-            <label className={labelClassName}>Title</label>
+            <label className={labelClassName}>Section title</label>
             <input className={fieldClassName} value={content.speechLanguageServices.title} onChange={(e) => updateServicesHeader('title', e.target.value)} />
           </div>
           <div>
@@ -557,6 +633,8 @@ export default function ServicesPanel() {
           onEdit={setEditingServiceId}
           onDelete={deleteService}
           getItemId={(item) => item.id}
+          addLabel="Add service"
+          addEditorPosition="bottom"
           renderPreview={(item) => <TherapyConceptPreview concept={item} />}
           renderEditor={(item) =>
             item === 'new' ? (
@@ -663,6 +741,8 @@ export default function ServicesPanel() {
           }
         />
       </div>
+        </>
+      ) : null}
     </PanelShell>
   )
 }

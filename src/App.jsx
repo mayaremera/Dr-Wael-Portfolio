@@ -8,9 +8,7 @@ import Profile from './components/Profile'
 import ProfessionalMembership from './components/ProfessionalMembership'
 import PromoVideoSection from './components/PromoVideoSection'
 import Leadership from './components/Leadership'
-import SpeakingTraining from './components/SpeakingTraining'
 import RefereedPublications from './components/RefereedPublications'
-import ProfessionalServices from './components/ProfessionalServices'
 import CertificationGallery from './components/CertificationGallery'
 import CareerTimeline from './components/CareerTimeline'
 import TherapyConcepts from './components/TherapyConcepts'
@@ -24,9 +22,9 @@ import Footer from './components/Footer'
 import ContactButton from './components/ContactButton'
 import PageLoader from './components/PageLoader'
 import Dashboard from './components/dashboard/Dashboard'
-import { images } from './data/content'
-import { useServicesContent } from './hooks/useServicesContent'
+import { images, servicesPageHero } from './data/content'
 import { useSeo } from './hooks/useSeo'
+import { hasMediaSrc } from './lib/mediaUrl'
 
 const HOME_PATH = '/'
 const PAGE_LOADER_MS = 1000
@@ -42,11 +40,13 @@ function PageHeading({ eyebrow, title, backgroundImage, imagePosition = 'center'
   return (
     <section className="relative overflow-hidden">
       <div className="relative min-h-[300px] pt-24 sm:min-h-[340px] sm:pt-28 lg:pt-36 xl:pt-40">
-        <img
-          src={backgroundImage}
-          alt=""
-          className={`absolute inset-0 h-full w-full ${positionClass}`}
-        />
+        {hasMediaSrc(backgroundImage) ? (
+          <img
+            src={backgroundImage}
+            alt=""
+            className={`absolute inset-0 h-full w-full ${positionClass}`}
+          />
+        ) : null}
         <div className="absolute inset-0 bg-gradient-to-r from-ink/85 via-ink/65 to-ink/40" />
         <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-ink/35 to-transparent" />
 
@@ -65,11 +65,13 @@ function ServicesPageHeading({ eyebrow, title, backgroundImage }) {
   return (
     <section className="relative overflow-hidden">
       <div className="relative min-h-[300px] pt-24 sm:min-h-[340px] sm:pt-28 lg:pt-36 xl:pt-40">
-        <img
-          src={backgroundImage}
-          alt=""
-          className="absolute inset-0 h-full w-full object-cover object-top"
-        />
+        {hasMediaSrc(backgroundImage) ? (
+          <img
+            src={backgroundImage}
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover object-top"
+          />
+        ) : null}
 
         <div className="absolute inset-0 bg-linear-to-r from-ink/95 via-ink/75 to-ink/20" />
         <div className="absolute inset-0 bg-linear-to-t from-ink/80 via-ink/25 to-transparent" />
@@ -172,7 +174,6 @@ function VibeBand({
 }
 
 function App() {
-  const { speechLanguageServices } = useServicesContent()
   const [isPageReady, setIsPageReady] = useState(false)
   const rawPath = window.location.pathname.replace(/\/+$/, '') || HOME_PATH
   const pathname = rawPath === '/cases' ? '/services' : rawPath
@@ -228,9 +229,8 @@ function App() {
     '/services': (
       <PageLayout
         hero={{
-          eyebrow: 'Services',
-          title: speechLanguageServices.title,
-          description: speechLanguageServices.intro,
+          eyebrow: servicesPageHero.eyebrow,
+          title: servicesPageHero.title,
           image: images.servicesHero,
           variant: 'services',
         }}
@@ -257,7 +257,6 @@ function App() {
     '/in-the-field': (
       <>
         <GlobalEventsMap />
-        <SpeakingTraining />
         <DrWaelActivity variant="full" />
         <ProfessionalMembership />
         <VibeBand
@@ -281,7 +280,6 @@ function App() {
           image: images.screening,
         }}
       >
-        <ProfessionalServices />
         <Contact />
         <VibeBand
           label="Your Next Step"

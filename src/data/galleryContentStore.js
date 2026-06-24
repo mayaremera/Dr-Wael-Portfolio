@@ -1,13 +1,20 @@
-import { mediaGallery as defaultMediaGallery, video as defaultWatchVideo } from './content'
+import { mediaGallery as defaultMediaGallery, promoVideo as defaultPromoVideo, video as defaultWatchVideo } from './content'
+import { mergeHomeContent } from './homeContentStore'
 import {
   CONTENT_SECTIONS,
+  fetchRemoteSection,
+  markSectionLocallyPublished,
   loadSectionPrimary,
+  notifyContentUpdated,
+  publishSectionContent,
   resetSectionPrimary,
+  saveRemoteSection,
   saveSectionPrimary,
 } from './contentSync'
+import { getSupabaseSession, isSupabaseConfigured } from '../lib/supabase'
 
 export const GALLERY_STORAGE_KEY = 'drwael-gallery-content'
-export const GALLERY_PAGE_SIZE = 6
+export const GALLERY_PAGE_SIZE = 15
 
 /** First index on page 5 when using GALLERY_PAGE_SIZE (0-based). */
 export const GALLERY_BACKSEAT_POSITION = (5 - 1) * GALLERY_PAGE_SIZE
@@ -122,6 +129,7 @@ export function getDefaultGalleryContent() {
 
   return {
     watchSection: cloneContent(defaultWatchVideo),
+    promoVideo: cloneContent(defaultPromoVideo),
     videoLibrary: {
       label: 'Key Moments',
       title: 'Important Moments from Practice',
@@ -136,36 +144,66 @@ export function getDefaultGalleryContent() {
   }
 }
 
+function migratePromoCta(saved, defaults) {
+  if (!saved) return defaults
+
+  return {
+    label: saved.label ?? defaults.label,
+    href: saved.href ?? defaults.href,
+  }
+}
+
+function migratePromoVideo(saved, defaults) {
+  if (!saved) return defaults
+
+  return {
+    src: saved.src != null ? saved.src : defaults.src,
+    sectionLabel: saved.sectionLabel ?? defaults.sectionLabel,
+    sectionTitle: saved.sectionTitle ?? defaults.sectionTitle,
+    label: saved.label ?? defaults.label,
+    titleHighlight: saved.titleHighlight ?? defaults.titleHighlight,
+    description: saved.description ?? defaults.description,
+    cta: migratePromoCta(saved.cta, defaults.cta),
+    secondary: migratePromoCta(saved.secondary, defaults.secondary),
+  }
+}
+
 function mergeWithDefaults(saved) {
   const defaults = getDefaultGalleryContent()
 
-  const mergedItems = (saved.mediaGallery?.items ?? defaults.mediaGallery.items).map((item, index) =>
-    withGalleryItemDefaults(item, index),
-  )
+  const mergedItems =
+    saved.mediaGallery?.items != null
+      ? saved.mediaGallery.items.map((item, index) => withGalleryItemDefaults(item, index))
+      : defaults.mediaGallery.items
 
-  const mergedVideoItems = (saved.videoLibrary?.items ?? defaults.videoLibrary.items).map((item, index) => ({
-    id: item.id || `video-library-${index}`,
-    ...item,
-  }))
+  const mergedVideoItems =
+    saved.videoLibrary?.items != null
+      ? saved.videoLibrary.items.map((item, index) => ({
+          id: item.id || `video-library-${index}`,
+          ...item,
+        }))
+      : defaults.videoLibrary.items
 
   return {
-    ...defaults,
-    ...saved,
     watchSection: {
       ...defaults.watchSection,
       ...saved.watchSection,
-      paragraphs: saved.watchSection?.paragraphs?.length
-        ? saved.watchSection.paragraphs
-        : defaults.watchSection.paragraphs,
+      paragraphs:
+        saved.watchSection?.paragraphs != null
+          ? saved.watchSection.paragraphs
+          : defaults.watchSection.paragraphs,
     },
+    promoVideo: migratePromoVideo(saved.promoVideo, defaults.promoVideo),
     videoLibrary: {
-      ...defaults.videoLibrary,
-      ...saved.videoLibrary,
+      label: saved.videoLibrary?.label ?? defaults.videoLibrary.label,
+      title: saved.videoLibrary?.title ?? defaults.videoLibrary.title,
+      description: saved.videoLibrary?.description ?? defaults.videoLibrary.description,
       items: mergedVideoItems,
     },
     mediaGallery: {
-      ...defaults.mediaGallery,
-      ...saved.mediaGallery,
+      label: saved.mediaGallery?.label ?? defaults.mediaGallery.label,
+      title: saved.mediaGallery?.title ?? defaults.mediaGallery.title,
+      description: saved.mediaGallery?.description ?? defaults.mediaGallery.description,
       items: applyGalleryPresentationOrder(mergedItems),
     },
   }
@@ -175,7 +213,52 @@ export function loadGalleryContent() {
   return getDefaultGalleryContent()
 }
 
+function buildGallerySavePayload(data) {
+  return {
+    ...data,
+    mediaGallery: {
+      ...data.mediaGallery,
+      items: applyGalleryPresentationOrder(data.mediaGallery?.items ?? []),
+    },
+  }
+}
+
+async function persistPromoVideoMigration(remoteGallery, remoteHome) {
+  const migratedGallery = mergeWithDefaults({
+    ...(remoteGallery ?? {}),
+    promoVideo: remoteHome.promoVideo,
+  })
+
+  const session = await getSupabaseSession()
+  if (!session) {
+    publishSectionContent(CONTENT_SECTIONS.GALLERY, migratedGallery)
+    return migratedGallery
+  }
+
+  await saveRemoteSection(CONTENT_SECTIONS.GALLERY, buildGallerySavePayload(migratedGallery))
+  markSectionLocallyPublished(CONTENT_SECTIONS.GALLERY)
+  publishSectionContent(CONTENT_SECTIONS.GALLERY, migratedGallery)
+  notifyContentUpdated(CONTENT_SECTIONS.GALLERY)
+
+  const cleanedHome = mergeHomeContent(remoteHome)
+  await saveRemoteSection(CONTENT_SECTIONS.HOME, cleanedHome)
+  markSectionLocallyPublished(CONTENT_SECTIONS.HOME)
+  publishSectionContent(CONTENT_SECTIONS.HOME, cleanedHome)
+  notifyContentUpdated(CONTENT_SECTIONS.HOME)
+
+  return migratedGallery
+}
+
 export async function loadGalleryContentRemote() {
+  if (isSupabaseConfigured) {
+    const remoteGallery = await fetchRemoteSection(CONTENT_SECTIONS.GALLERY)
+    const remoteHome = await fetchRemoteSection(CONTENT_SECTIONS.HOME)
+
+    if (remoteHome?.promoVideo && remoteGallery?.promoVideo == null) {
+      return persistPromoVideoMigration(remoteGallery, remoteHome)
+    }
+  }
+
   return loadSectionPrimary({
     section: CONTENT_SECTIONS.GALLERY,
     storageKey: GALLERY_STORAGE_KEY,
@@ -185,18 +268,10 @@ export async function loadGalleryContentRemote() {
 }
 
 export async function saveGalleryContent(data) {
-  const payload = {
-    ...data,
-    mediaGallery: {
-      ...data.mediaGallery,
-      items: applyGalleryPresentationOrder(data.mediaGallery?.items ?? []),
-    },
-  }
-
   return saveSectionPrimary({
     section: CONTENT_SECTIONS.GALLERY,
     storageKey: GALLERY_STORAGE_KEY,
-    data: payload,
+    data: buildGallerySavePayload(data),
   })
 }
 

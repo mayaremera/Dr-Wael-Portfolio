@@ -1,6 +1,11 @@
 import { getSupabaseSession, isSupabaseConfigured, supabase } from './supabase'
+import { isImageFile, isVideoFile, resolveMediaContentType } from './mediaFileTypes'
 
 const MEDIA_BUCKET = 'media'
+const AUTH_CACHE_MS = 5000
+
+let cachedAuthContext = null
+let cachedAuthContextAt = 0
 
 function buildObjectPath(file) {
   const extension = file.name.split('.').pop()?.toLowerCase() || 'bin'
@@ -14,14 +19,32 @@ function buildObjectPath(file) {
   return `${Date.now()}-${safeName || 'upload'}.${extension}`
 }
 
-export async function isMediaStorageAvailable() {
-  if (!isSupabaseConfigured || !supabase) return false
+async function getAuthenticatedMediaContext() {
+  if (!isSupabaseConfigured || !supabase) return null
+
+  if (cachedAuthContext && Date.now() - cachedAuthContextAt < AUTH_CACHE_MS) {
+    return cachedAuthContext
+  }
 
   const { data, error } = await supabase.auth.getUser()
-  if (error || !data.user) return false
+  if (error || !data.user) {
+    cachedAuthContext = null
+    return null
+  }
 
   const session = await getSupabaseSession()
-  return Boolean(session)
+  if (!session) {
+    cachedAuthContext = null
+    return null
+  }
+
+  cachedAuthContext = { user: data.user, session }
+  cachedAuthContextAt = Date.now()
+  return cachedAuthContext
+}
+
+export async function isMediaStorageAvailable() {
+  return Boolean(await getAuthenticatedMediaContext())
 }
 
 export async function uploadMediaToStorage(file) {
@@ -29,16 +52,17 @@ export async function uploadMediaToStorage(file) {
     throw new Error('Supabase is not configured.')
   }
 
-  const { data: userData, error: userError } = await supabase.auth.getUser()
-  if (userError || !userData.user) {
+  const authContext = await getAuthenticatedMediaContext()
+  if (!authContext) {
     throw new Error('Sign in to Supabase before uploading media.')
   }
 
   const objectPath = buildObjectPath(file)
+  const contentType = resolveMediaContentType(file)
   const { error } = await supabase.storage.from(MEDIA_BUCKET).upload(objectPath, file, {
     cacheControl: '3600',
     upsert: false,
-    contentType: file.type,
+    contentType,
   })
 
   if (error) {
@@ -49,6 +73,6 @@ export async function uploadMediaToStorage(file) {
 
   return {
     url: data.publicUrl,
-    isVideo: file.type.startsWith('video/'),
+    isVideo: isVideoFile(file),
   }
 }

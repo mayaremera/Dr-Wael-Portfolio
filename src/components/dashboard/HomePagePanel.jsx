@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import DashboardItemList from './DashboardItemList'
 import MediaDropzone from './MediaDropzone'
+import DashboardSaveNotice from './DashboardSaveNotice'
 import { useConfirmDelete } from './DeleteConfirmDialog'
 import {
   createContentId,
@@ -10,6 +11,7 @@ import {
   loadHomeContentRemote,
   saveHomeContent,
 } from '../../data/homeContentStore'
+import { CONTENT_SECTIONS } from '../../data/contentSync'
 import { useDashboardSection } from '../../hooks/useDashboardSection'
 import DashboardSectionLoader from './DashboardSectionLoader'
 import { persistDashboardSection } from './persistDashboardSection'
@@ -84,6 +86,19 @@ function CtaFields({ label, cta, onChange }) {
         <input className={fieldClassName} value={cta.label} onChange={(e) => onChange({ ...cta, label: e.target.value })} />
       </div>
     </div>
+  )
+}
+
+function SaveChangesButton({ onClick, disabled = false }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className="rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase transition-colors hover:bg-brand-light disabled:cursor-not-allowed disabled:opacity-50"
+    >
+      Save changes
+    </button>
   )
 }
 
@@ -250,22 +265,39 @@ export default function HomePagePanel() {
   const { content, setContent, loading, loadError } = useDashboardSection(
     getDefaultHomeContent,
     loadHomeContentRemote,
+    CONTENT_SECTIONS.HOME,
   )
   const [editingAffiliationId, setEditingAffiliationId] = useState(null)
   const [editingCredentialWheelItemId, setEditingCredentialWheelItemId] = useState(null)
   const [savedMessage, setSavedMessage] = useState('')
   const [saveError, setSaveError] = useState('')
+  const [isSaving, setIsSaving] = useState(false)
+  const contentRef = useRef(content)
+  contentRef.current = content
 
-  const persist = (nextContent, message = 'Changes saved.') => {
-    persistDashboardSection({
+  const persist = (nextContent, message = 'Changes saved.', previousContent = null) => {
+    void persistDashboardSection({
       saveFn: saveHomeContent,
       nextContent,
+      previousContent,
       setContent,
       setSaveError,
       setSavedMessage,
+      setIsSaving,
       message,
       storageErrorMessage: 'Could not save changes.',
     })
+  }
+
+  const persistFromCurrent = (buildNextContent, message) => {
+    const current = contentRef.current
+    if (!current) {
+      setSaveError('Content is still loading. Try again in a moment.')
+      return
+    }
+
+    const nextContent = buildNextContent(current)
+    persist(nextContent, message, current)
   }
 
   const updateHero = (field, value) => {
@@ -273,6 +305,31 @@ export default function HomePagePanel() {
       ...current,
       hero: { ...current.hero, [field]: value },
     }))
+  }
+
+  const updateHeroImage = (image, message = 'Hero image saved.') => {
+    persistFromCurrent(
+      (current) => ({
+        ...current,
+        hero: {
+          ...current.hero,
+          backgroundImage: image ? withCacheBust(image) : '',
+        },
+      }),
+      message,
+    )
+  }
+
+  const previewHeroImage = (image) => {
+    if (!image) return
+    setContent((current) =>
+      current
+        ? {
+            ...current,
+            hero: { ...current.hero, backgroundImage: image },
+          }
+        : current,
+    )
   }
 
   const updateAffiliations = (field, value) => {
@@ -289,39 +346,45 @@ export default function HomePagePanel() {
     }))
   }
 
-  const saveWhyTrust = (nextContent = content, message = 'Why Trust section saved.') => {
-    persist(nextContent, message)
+  const saveHero = () => {
+    persistFromCurrent((current) => current, 'Hero section saved.')
   }
 
-  const updateWhyTrustImage = (image, { autoSave = false } = {}) => {
-    const nextImage = image ? withCacheBust(image) : ''
+  const saveCredentialWheelSection = () => {
+    persistFromCurrent((current) => current, 'Credentials wheel saved.')
+  }
 
-    setContent((current) => {
-      const nextContent = {
+  const saveAffiliationsSection = () => {
+    persistFromCurrent((current) => current, 'Affiliations section saved.')
+  }
+
+  const saveWhyTrust = (message = 'Why Trust section saved.') => {
+    persistFromCurrent((current) => current, message)
+  }
+
+  const updateWhyTrustImage = (image, message = 'Why Trust image saved.') => {
+    persistFromCurrent(
+      (current) => ({
         ...current,
-        whyChooseUs: { ...current.whyChooseUs, image: nextImage },
-      }
-
-      if (autoSave) {
-        persistDashboardSection({
-          saveFn: saveHomeContent,
-          nextContent,
-          setContent,
-          setSaveError,
-          setSavedMessage,
-          message: 'Why Trust image saved.',
-        })
-      }
-
-      return nextContent
-    })
+        whyChooseUs: {
+          ...current.whyChooseUs,
+          image: image ? withCacheBust(image) : '',
+        },
+      }),
+      message,
+    )
   }
 
-  const updatePromoVideo = (field, value) => {
-    setContent((current) => ({
-      ...current,
-      promoVideo: { ...current.promoVideo, [field]: value },
-    }))
+  const previewWhyTrustImage = (image) => {
+    if (!image) return
+    setContent((current) =>
+      current
+        ? {
+            ...current,
+            whyChooseUs: { ...current.whyChooseUs, image },
+          }
+        : current,
+    )
   }
 
   const updateCredentialWheel = (field, value) => {
@@ -331,89 +394,100 @@ export default function HomePagePanel() {
     }))
   }
 
-  const saveAffiliation = (item) => {
-    const companies = content.affiliations.companies
-    const exists = companies.some((entry) => entry.id === item.id)
-    const nextCompanies = exists
-      ? companies.map((entry) => (entry.id === item.id ? item : entry))
-      : [item, ...companies]
+  const normalizeAffiliationItem = (item) => ({
+    ...item,
+    logo: item.logo ? withCacheBust(item.logo) : '',
+    badgeLogo: item.badgeLogo ? withCacheBust(item.badgeLogo) : '',
+  })
 
-    persist(
-      {
-        ...content,
-        affiliations: { ...content.affiliations, companies: nextCompanies },
-      },
+  const saveAffiliation = (item) => {
+    const normalized = normalizeAffiliationItem(item)
+    const companies = contentRef.current?.affiliations?.companies ?? []
+    const exists = companies.some((entry) => entry.id === normalized.id)
+
+    persistFromCurrent(
+      (current) => ({
+        ...current,
+        affiliations: {
+          ...current.affiliations,
+          companies: exists
+            ? (current.affiliations?.companies ?? []).map((entry) =>
+                entry.id === normalized.id ? normalized : entry,
+              )
+            : [normalized, ...(current.affiliations?.companies ?? [])],
+        },
+      }),
       exists ? 'Affiliation updated.' : 'Affiliation created.',
     )
     setEditingAffiliationId(null)
   }
 
   const deleteAffiliation = (id) => {
-    persist(
-      {
-        ...content,
+    persistFromCurrent(
+      (current) => ({
+        ...current,
         affiliations: {
-          ...content.affiliations,
-          companies: content.affiliations.companies.filter((entry) => entry.id !== id),
+          ...current.affiliations,
+          companies: (current.affiliations?.companies ?? []).filter((entry) => entry.id !== id),
         },
-      },
+      }),
       'Affiliation deleted.',
     )
     if (editingAffiliationId === id) setEditingAffiliationId(null)
   }
 
   const saveCredentialWheelItem = (item) => {
-    const items = content.credentialWheel?.items ?? []
+    const items = contentRef.current?.credentialWheel?.items ?? []
     const exists = items.some((entry) => entry.id === item.id)
-    const nextItems = exists
-      ? items.map((entry) => (entry.id === item.id ? item : entry))
-      : [item, ...items]
 
-    persist(
-      {
-        ...content,
-        credentialWheel: { ...content.credentialWheel, items: nextItems },
-      },
+    persistFromCurrent(
+      (current) => ({
+        ...current,
+        credentialWheel: {
+          ...current.credentialWheel,
+          items: exists
+            ? (current.credentialWheel?.items ?? []).map((entry) => (entry.id === item.id ? item : entry))
+            : [item, ...(current.credentialWheel?.items ?? [])],
+        },
+      }),
       exists ? 'Credential point updated.' : 'Credential point created.',
     )
     setEditingCredentialWheelItemId(null)
   }
 
   const deleteCredentialWheelItem = (id) => {
-    persist(
-      {
-        ...content,
+    persistFromCurrent(
+      (current) => ({
+        ...current,
         credentialWheel: {
-          ...content.credentialWheel,
-          items: (content.credentialWheel?.items ?? []).filter((entry) => entry.id !== id),
+          ...current.credentialWheel,
+          items: (current.credentialWheel?.items ?? []).filter((entry) => entry.id !== id),
         },
-      },
+      }),
       'Credential point deleted.',
     )
     if (editingCredentialWheelItemId === id) setEditingCredentialWheelItemId(null)
   }
 
-  const saveAll = () => persist(content)
-
   return (
     <PanelShell
       eyebrow="Home Page"
       title="Home page content"
-      description="Edit the hero banner, affiliations, Why Trust section, and video sections shown on the live home page."
+      description="Sections are listed in the same order they appear on the live home page."
     >
+      <DashboardSaveNotice message={savedMessage} error={saveError} saving={isSaving} />
       <DashboardSectionLoader loading={loading} loadError={loadError} />
+      {!loading && !loadError && content ? (
+        <>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <a href="/" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-brand transition-colors hover:text-brand-light">
           Preview live page →
         </a>
-        <div className="flex flex-wrap items-center gap-2">
-          {saveError ? <span className="rounded-full bg-accent/10 px-3 py-1 text-xs font-semibold text-accent-hover">{saveError}</span> : null}
-          {savedMessage ? <span className="rounded-full bg-brand-muted px-3 py-1 text-xs font-semibold text-brand">{savedMessage}</span> : null}
-        </div>
       </div>
 
       <section className="rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
-        <h2 className="font-serif text-xl text-ink">Hero section</h2>
+        <p className="text-[0.65rem] font-semibold tracking-wide text-brand uppercase">1 · Top of page</p>
+        <h2 className="mt-1 font-serif text-xl text-ink">Hero section</h2>
         <p className="mt-1 text-sm text-ink-muted">The top banner with background image, headline, and call-to-action buttons.</p>
         <div className="mt-4 grid gap-4">
           <div>
@@ -421,8 +495,9 @@ export default function HomePagePanel() {
             <MediaDropzone
               image={content.hero.backgroundImage}
               video=""
-              onChange={({ image }) => updateHero('backgroundImage', image)}
-              onClear={() => updateHero('backgroundImage', '')}
+              onChange={({ image }) => previewHeroImage(image)}
+              onUploaded={({ image }) => updateHeroImage(image)}
+              onClear={() => updateHeroImage('', 'Hero image removed.')}
             />
           </div>
           <div>
@@ -447,13 +522,17 @@ export default function HomePagePanel() {
             cta={content.hero.secondaryCta}
             onChange={(cta) => updateHero('secondaryCta', cta)}
           />
+          <div className="flex flex-wrap gap-3">
+            <SaveChangesButton onClick={saveHero} />
+          </div>
         </div>
       </section>
 
       <section className="mt-6 rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
-        <h2 className="font-serif text-xl text-ink">Credentials wheel</h2>
+        <p className="text-[0.65rem] font-semibold tracking-wide text-brand uppercase">2 · Profile section</p>
+        <h2 className="mt-1 font-serif text-xl text-ink">Credentials wheel</h2>
         <p className="mt-1 text-sm text-ink-muted">
-          The interactive compass in the About section on the home page. Each point is a credential highlight on the ring.
+          The interactive compass inside the profile section. Each point is a credential highlight on the ring.
         </p>
         <div className="mt-4">
           <label className={labelClassName}>Tagline</label>
@@ -494,11 +573,15 @@ export default function HomePagePanel() {
             }
           />
         </div>
+        <div className="mt-4 flex flex-wrap gap-3">
+          <SaveChangesButton onClick={saveCredentialWheelSection} />
+        </div>
       </section>
 
       <section className="mt-6 rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
-        <h2 className="font-serif text-xl text-ink">Affiliations section</h2>
-        <p className="mt-1 text-sm text-ink-muted">Trusted organizations and certifications shown below the profile on the home page.</p>
+        <p className="text-[0.65rem] font-semibold tracking-wide text-brand uppercase">2 · Profile section</p>
+        <h2 className="mt-1 font-serif text-xl text-ink">Affiliations section</h2>
+        <p className="mt-1 text-sm text-ink-muted">Trusted organizations and certifications shown below the profile bio on the home page.</p>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           <div>
             <label className={labelClassName}>Section title</label>
@@ -544,10 +627,14 @@ export default function HomePagePanel() {
             }
           />
         </div>
+        <div className="mt-4 flex flex-wrap gap-3">
+          <SaveChangesButton onClick={saveAffiliationsSection} />
+        </div>
       </section>
 
       <section className="mt-6 rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
-        <h2 className="font-serif text-xl text-ink">Why Trust</h2>
+        <p className="text-[0.65rem] font-semibold tracking-wide text-brand uppercase">3 · Why Trust</p>
+        <h2 className="mt-1 font-serif text-xl text-ink">Why Trust</h2>
         <p className="mt-1 text-sm text-ink-muted">The Why Trust section with image and supporting paragraphs.</p>
         <div className="mt-4 grid gap-4">
           <div className="grid gap-4 md:grid-cols-2">
@@ -565,80 +652,23 @@ export default function HomePagePanel() {
             <MediaDropzone
               image={content.whyChooseUs.image}
               video=""
-              onChange={({ image }) => updateWhyTrustImage(image)}
-              onUploaded={({ image }) => updateWhyTrustImage(image, { autoSave: true })}
-              onClear={() => {
-                const nextContent = {
-                  ...content,
-                  whyChooseUs: { ...content.whyChooseUs, image: '' },
-                }
-                setContent(nextContent)
-                saveWhyTrust(nextContent, 'Why Trust image removed.')
-              }}
+              onChange={({ image }) => previewWhyTrustImage(image)}
+              onUploaded={({ image }) => updateWhyTrustImage(image)}
+              onClear={() => updateWhyTrustImage('', 'Why Trust image removed.')}
             />
           </div>
           <StringListEditor
             label="Paragraphs"
-            items={content.whyChooseUs.paragraphs}
+            items={content.whyChooseUs.paragraphs ?? []}
             onChange={(paragraphs) => updateWhyChoose('paragraphs', paragraphs)}
           />
           <div className="flex flex-wrap gap-3">
-            <button
-              type="button"
-              onClick={() => saveWhyTrust()}
-              className="rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase transition-colors hover:bg-brand-light"
-            >
-              Save changes
-            </button>
+            <SaveChangesButton onClick={() => saveWhyTrust()} />
           </div>
         </div>
       </section>
-
-      <section className="mt-6 rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
-        <h2 className="font-serif text-xl text-ink">Featured video section</h2>
-        <p className="mt-1 text-sm text-ink-muted">The background video banner with overlay text on the home page.</p>
-        <div className="mt-4 grid gap-4">
-          <div>
-            <label className={labelClassName}>Background video</label>
-            <MediaDropzone
-              image=""
-              video={content.promoVideo.src}
-              onChange={({ video }) => updatePromoVideo('src', video)}
-              onClear={() => updatePromoVideo('src', '')}
-            />
-          </div>
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <label className={labelClassName}>Eyebrow label</label>
-              <input className={fieldClassName} value={content.promoVideo.label} onChange={(e) => updatePromoVideo('label', e.target.value)} />
-            </div>
-            <div>
-              <label className={labelClassName}>Headline</label>
-              <input className={fieldClassName} value={content.promoVideo.titleHighlight} onChange={(e) => updatePromoVideo('titleHighlight', e.target.value)} />
-            </div>
-          </div>
-          <div>
-            <label className={labelClassName}>Description</label>
-            <textarea className={`${fieldClassName} min-h-24 resize-y`} value={content.promoVideo.description} onChange={(e) => updatePromoVideo('description', e.target.value)} />
-          </div>
-          <CtaFields
-            label="Primary button"
-            cta={content.promoVideo.cta}
-            onChange={(cta) => updatePromoVideo('cta', cta)}
-          />
-          <CtaFields
-            label="Secondary button"
-            cta={content.promoVideo.secondary}
-            onChange={(cta) => updatePromoVideo('secondary', cta)}
-          />
-        </div>
-      </section>
-
-      <div className="mt-6 flex flex-wrap gap-3">
-        <button type="button" onClick={saveAll} className="rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase transition-colors hover:bg-brand-light">
-          Save all changes
-        </button>
-      </div>
+        </>
+      ) : null}
     </PanelShell>
   )
 }

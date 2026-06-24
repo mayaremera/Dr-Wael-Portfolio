@@ -91,9 +91,8 @@ function MomentVideoModal({ item, onClose }) {
   )
 }
 
-function VideoCard({ item, index, onPlay }) {
+function VideoCard({ item, onPlay }) {
   const description = getItemDescription(item)
-  const displayIndex = String(index + 1).padStart(2, '0')
 
   return (
     <article className="group h-full">
@@ -117,13 +116,6 @@ function VideoCard({ item, index, onPlay }) {
           )}
 
           <div className="absolute inset-0 bg-ink/0 transition-colors duration-300 group-hover:bg-ink/10" />
-
-          <span
-            className="pointer-events-none absolute right-4 top-4 font-serif text-4xl leading-none text-white/40 tabular-nums sm:text-5xl"
-            aria-hidden="true"
-          >
-            {displayIndex}
-          </span>
 
           <span className="absolute inset-0 flex items-center justify-center">
             <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-brand shadow-lg transition-transform duration-300 group-hover:scale-105 sm:h-14 sm:w-14">
@@ -149,9 +141,10 @@ function VideoCard({ item, index, onPlay }) {
 }
 
 export default function VideoLibrarySection() {
-  const { videoLibrary } = useGalleryContent()
-  const { label, title, description, items } = videoLibrary
+  const { isReady, videoLibrary } = useGalleryContent()
   const [activeItem, setActiveItem] = useState(null)
+
+  const items = videoLibrary?.items ?? []
 
   const playableItems = useMemo(
     () =>
@@ -164,6 +157,10 @@ export default function VideoLibrarySection() {
   )
 
   const closeModal = useCallback(() => setActiveItem(null), [])
+
+  if (!isReady || !videoLibrary) return null
+
+  const { label, title, description } = videoLibrary
 
   if (playableItems.length === 0) return null
 
@@ -183,9 +180,9 @@ export default function VideoLibrarySection() {
           ) : null}
         </header>
 
-        <div className="mt-14 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-          {playableItems.map((item, index) => (
-            <VideoCard key={item.id} item={item} index={index} onPlay={() => setActiveItem(item)} />
+        <div className="mt-14 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+          {playableItems.map((item) => (
+            <VideoCard key={item.id} item={item} onPlay={() => setActiveItem(item)} />
           ))}
         </div>
       </div>

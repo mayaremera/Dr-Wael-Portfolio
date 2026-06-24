@@ -8,7 +8,9 @@ const statAccents = [
 ]
 
 export default function CareerImpact() {
-  const { careerImpact } = useAboutContent()
+  const { isReady, careerImpact } = useAboutContent()
+
+  if (!isReady || !careerImpact) return null
 
   return (
     <section id="career-impact" className="border-t border-slate-200 bg-surface-alt py-14 lg:py-16">

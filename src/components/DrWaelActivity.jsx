@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useDrWaelActivity } from '../hooks/useDrWaelActivity'
+import { hasMediaSrc } from '../lib/mediaUrl'
 
 const sectionLinkClassName =
   'relative inline-block w-fit pb-1 text-xs font-semibold tracking-[0.12em] text-brand uppercase transition-colors after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-brand after:transition-transform after:duration-300 after:ease-out hover:text-brand-light hover:after:scale-x-100'
@@ -48,7 +49,7 @@ function ActivityCardMedia({ item }) {
 
   return (
     <div className="relative aspect-[16/7] w-full overflow-hidden bg-slate-900">
-      {item.video ? (
+      {hasMediaSrc(item.video) ? (
         <>
           <video
             ref={videoRef}
@@ -74,7 +75,7 @@ function ActivityCardMedia({ item }) {
 
           <VideoSoundWaves />
         </>
-      ) : (
+      ) : hasMediaSrc(item.image) ? (
         <>
           <img
             src={item.image}
@@ -87,6 +88,10 @@ function ActivityCardMedia({ item }) {
             aria-hidden="true"
           />
         </>
+      ) : (
+        <div className="flex h-full w-full items-center justify-center bg-slate-800 text-xs font-medium tracking-wide text-white/50 uppercase">
+          No media
+        </div>
       )}
     </div>
   )
@@ -141,8 +146,12 @@ function ActivityCard({ item, isUpcoming = false }) {
 }
 
 export default function DrWaelActivity({ variant = 'preview' }) {
-  const { label, title, description, upcoming, recent } = useDrWaelActivity()
+  const { activity, isReady } = useDrWaelActivity()
   const isFullPage = variant === 'full'
+
+  if (!isReady || !activity) return null
+
+  const { label, title, description, upcoming, recent } = activity
 
   const featuredEvents = [
     ...upcoming.slice(0, 1).map((item) => ({ ...item, isUpcoming: true })),

@@ -32,9 +32,9 @@ function CompassRose() {
 }
 
 export default function CredentialCompass() {
-  const { credentialWheel } = useHomeContent()
-  const items = credentialWheel?.items ?? []
-  const tagline = credentialWheel?.tagline ?? ''
+  const { content, isReady } = useHomeContent()
+  const items = content?.credentialWheel?.items ?? []
+  const tagline = content?.credentialWheel?.tagline ?? ''
 
   const rootRef = useRef(null)
   const [activeIndex, setActiveIndex] = useState(0)
@@ -79,7 +79,7 @@ export default function CredentialCompass() {
     }
   }, [items.length])
 
-  if (items.length === 0) return null
+  if (!isReady || !content || items.length === 0) return null
 
   const safeActiveIndex = Math.min(activeIndex, items.length - 1)
   const displayIndex = previewIndex ?? safeActiveIndex

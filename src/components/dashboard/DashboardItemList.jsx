@@ -90,6 +90,7 @@ export default function DashboardItemList({
   getItemId,
   addLabel = 'Add',
   emptyMessage = 'No items yet.',
+  addEditorPosition = 'top',
   renderItem,
   deleteTitle = 'Delete this item?',
   deleteMessage = 'This action cannot be undone. Are you sure you want to delete it?',
@@ -114,6 +115,12 @@ export default function DashboardItemList({
     }
   }, [editingId, getItemId, items, pageSize, setPage])
 
+  useEffect(() => {
+    if (editingId === 'new' && addEditorPosition === 'bottom' && items.length > 0) {
+      setPage(Math.max(0, pageCount - 1))
+    }
+  }, [editingId, addEditorPosition, items.length, pageCount, setPage])
+
   return (
     <section className="rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
       <div className="flex items-center justify-between gap-3">
@@ -130,7 +137,9 @@ export default function DashboardItemList({
         </button>
       </div>
 
-      {editingId === 'new' ? <div className="mt-5">{renderEditor('new')}</div> : null}
+      {editingId === 'new' && addEditorPosition === 'top' ? (
+        <div className="mt-5">{renderEditor('new')}</div>
+      ) : null}
 
       <div className="mt-5 space-y-4">
         {items.length === 0 ? (
@@ -175,6 +184,10 @@ export default function DashboardItemList({
 
       {needsPagination ? (
         <DashboardPagination page={page} pageCount={pageCount} onPageChange={setPage} />
+      ) : null}
+
+      {editingId === 'new' && addEditorPosition === 'bottom' ? (
+        <div className="mt-5">{renderEditor('new')}</div>
       ) : null}
     </section>
   )

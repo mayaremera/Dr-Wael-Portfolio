@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { useServicesContent } from '../hooks/useServicesContent'
+import { hasMediaSrc } from '../lib/mediaUrl'
 
 const sectionLinkClassName =
   'relative inline-block w-fit pb-1 text-xs font-semibold tracking-[0.12em] text-white uppercase transition-colors after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-accent after:transition-transform after:duration-300 after:ease-out hover:text-accent hover:after:scale-x-100'
@@ -55,11 +56,15 @@ function CaseSpotlight({ item, height }) {
       className="animate-fade-up flex flex-col overflow-hidden rounded-sm bg-white shadow-xl shadow-brand/20 lg:h-full lg:flex-row"
     >
       <div className="relative h-48 shrink-0 sm:h-52 lg:h-full lg:w-[46%] lg:max-w-[300px] lg:shrink-0 xl:w-[48%] xl:max-w-[320px]">
-        <img
-          src={item.image}
-          alt=""
-          className="absolute inset-0 h-full w-full object-cover"
-        />
+        {hasMediaSrc(item.image) ? (
+          <img
+            src={item.image}
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        ) : (
+          <div className="absolute inset-0 bg-slate-100" aria-hidden="true" />
+        )}
         <div
           className="pointer-events-none absolute inset-0 bg-gradient-to-t from-brand/80 via-brand/20 to-transparent lg:bg-gradient-to-r lg:from-transparent lg:via-brand/10 lg:to-brand/40"
           aria-hidden="true"
@@ -154,7 +159,11 @@ function CompactCaseTile({ item, isActive, onSelect }) {
     >
       <div className="flex items-stretch">
         <div className="relative w-16 shrink-0 overflow-hidden sm:w-20">
-          <img src={item.image} alt="" className="absolute inset-0 h-full w-full object-cover" />
+          {hasMediaSrc(item.image) ? (
+            <img src={item.image} alt="" className="absolute inset-0 h-full w-full object-cover" />
+          ) : (
+            <div className="absolute inset-0 bg-white/10" aria-hidden="true" />
+          )}
           <div
             className={`absolute inset-0 transition-colors ${isActive ? 'bg-accent/30' : 'bg-brand/50'}`}
             aria-hidden="true"
@@ -175,7 +184,8 @@ function CompactCaseTile({ item, isActive, onSelect }) {
 }
 
 export default function ClinicalSpecializations() {
-  const { casesWeServe, clinicalSpecializations } = useServicesContent()
+  const { isReady, casesWeServe, clinicalSpecializations } = useServicesContent()
+
   const filters = useMemo(
     () => ['All', ...new Set(clinicalSpecializations.map((item) => item.filterGroup).filter(Boolean))],
     [clinicalSpecializations],
@@ -231,6 +241,8 @@ export default function ClinicalSpecializations() {
   const handleSelectCase = (id) => {
     setActiveId(id)
   }
+
+  if (!isReady || !casesWeServe) return null
 
   return (
     <section id="cases" className="relative overflow-hidden border-t border-brand/20">

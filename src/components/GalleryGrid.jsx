@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { getGalleryItemSortTime, sortGalleryItems, GALLERY_PAGE_SIZE } from '../data/galleryContentStore'
+import { sortGalleryItems, GALLERY_PAGE_SIZE } from '../data/galleryContentStore'
 import { useGalleryContent } from '../hooks/useGalleryContent'
 import { protectedMediaProps, protectedShellProps, protectedVideoProps } from '../lib/mediaProtection'
+import { hasMediaSrc } from '../lib/mediaUrl'
 
 const FILTERS = [
   { id: 'all', label: 'All' },
@@ -12,16 +13,6 @@ const FILTERS = [
 const PAGE_SIZE = GALLERY_PAGE_SIZE
 
 const soundWaveHeights = [5, 8, 6, 10, 7, 9, 5, 8, 6, 11, 7, 9, 5, 8, 6, 10, 7, 8, 5, 9, 6, 7, 5, 8]
-
-function formatGalleryDate(item, fallbackIndex) {
-  const timestamp = getGalleryItemSortTime(item, fallbackIndex)
-  if (!timestamp) return null
-
-  const date = new Date(timestamp)
-  if (Number.isNaN(date.getTime())) return null
-
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-}
 
 function getItemTitle(item) {
   return item.title?.trim() || item.alt?.trim() || 'Untitled moment'
@@ -55,9 +46,10 @@ function VideoSoundWaves() {
 function GalleryMediaPreview({ item }) {
   const videoRef = useRef(null)
   const isVideo = item.type === 'video'
+  const mediaSrc = hasMediaSrc(item.src) ? item.src.trim() : ''
 
   useEffect(() => {
-    if (!isVideo) return undefined
+    if (!isVideo || !mediaSrc) return undefined
     const video = videoRef.current
     if (!video) return undefined
 
@@ -69,7 +61,15 @@ function GalleryMediaPreview({ item }) {
     video.addEventListener('loadeddata', playVideo)
 
     return () => video.removeEventListener('loadeddata', playVideo)
-  }, [isVideo, item.src])
+  }, [isVideo, mediaSrc])
+
+  if (!mediaSrc) {
+    return (
+      <div className="relative flex h-full w-full items-center justify-center overflow-hidden bg-slate-200 text-xs font-medium tracking-wide text-ink-muted uppercase">
+        Media unavailable
+      </div>
+    )
+  }
 
   return (
     <div className="relative h-full w-full overflow-hidden bg-slate-900">
@@ -87,13 +87,13 @@ function GalleryMediaPreview({ item }) {
             aria-hidden="true"
             {...protectedVideoProps}
           >
-            <source src={encodeURI(item.src)} type="video/mp4" />
+            <source src={encodeURI(mediaSrc)} type="video/mp4" />
           </video>
           <VideoSoundWaves />
         </>
       ) : (
         <img
-          src={encodeURI(item.src)}
+          src={encodeURI(mediaSrc)}
           alt=""
           className="absolute inset-0 h-full w-full object-cover object-[center_28%] select-none"
           loading="lazy"
@@ -114,6 +114,7 @@ function GalleryLightbox({ items, activeIndex, onClose, onNavigate }) {
   const videoRef = useRef(null)
   const item = items[activeIndex]
   const isVideo = item?.type === 'video'
+  const mediaSrc = hasMediaSrc(item?.src) ? item.src.trim() : ''
   const title = getItemTitle(item)
   const description = getItemDescription(item)
   const hasPrev = activeIndex > 0
@@ -145,7 +146,7 @@ function GalleryLightbox({ items, activeIndex, onClose, onNavigate }) {
     return () => {
       video.pause()
     }
-  }, [isVideo, item?.src, activeIndex])
+  }, [isVideo, mediaSrc, activeIndex])
 
   if (!item) return null
 
@@ -179,25 +180,31 @@ function GalleryLightbox({ items, activeIndex, onClose, onNavigate }) {
         </button>
 
         <div className="relative min-h-[45vh] flex-1 bg-slate-950 lg:min-h-0 lg:max-w-[62%]">
-          {isVideo ? (
-            <video
-              ref={videoRef}
-              className="h-full w-full object-contain select-none"
-              controls
-              autoPlay
-              playsInline
-              aria-label={title}
-              {...protectedVideoProps}
-            >
-              <source src={encodeURI(item.src)} type="video/mp4" />
-            </video>
+          {mediaSrc ? (
+            isVideo ? (
+              <video
+                key={item.id}
+                ref={videoRef}
+                className="h-full w-full object-contain select-none"
+                controls
+                autoPlay
+                playsInline
+                aria-label={title}
+                {...protectedVideoProps}
+              >
+                <source src={encodeURI(mediaSrc)} type="video/mp4" />
+              </video>
+            ) : (
+              <img
+                key={item.id}
+                src={encodeURI(mediaSrc)}
+                alt={title}
+                className="h-full w-full object-contain select-none"
+                {...protectedMediaProps}
+              />
+            )
           ) : (
-            <img
-              src={encodeURI(item.src)}
-              alt={title}
-              className="h-full w-full object-contain select-none"
-              {...protectedMediaProps}
-            />
+            <div className="flex h-full min-h-[45vh] items-center justify-center text-sm text-white/60">Media unavailable</div>
           )}
 
           {hasPrev ? (
@@ -262,10 +269,9 @@ function GalleryLightbox({ items, activeIndex, onClose, onNavigate }) {
   )
 }
 
-function GalleryCompactCard({ item, displayIndex, globalIndex, onOpen }) {
+function GalleryCompactCard({ item, globalIndex, onOpen }) {
   const title = getItemTitle(item)
   const description = getItemDescription(item)
-  const dateLabel = formatGalleryDate(item, globalIndex)
   const previewText =
     description || 'A moment from clinical practice, training, or professional events.'
 
@@ -297,15 +303,7 @@ function GalleryCompactCard({ item, displayIndex, globalIndex, onOpen }) {
         </div>
 
         <div className="flex flex-1 flex-col p-4">
-          <div className="flex items-center justify-between gap-2">
-            {dateLabel ? (
-              <p className="text-[0.62rem] font-semibold tracking-[0.14em] text-brand uppercase">{dateLabel}</p>
-            ) : (
-              <span />
-            )}
-            <span className="font-serif text-sm tabular-nums text-brand/30">{String(displayIndex).padStart(2, '0')}</span>
-          </div>
-          <h3 className="mt-1.5 line-clamp-2 font-serif text-base leading-snug text-ink">{title}</h3>
+          <h3 className="line-clamp-2 font-serif text-base leading-snug text-ink">{title}</h3>
           <p className="mt-2 line-clamp-2 flex-1 text-sm leading-relaxed text-ink-muted">{previewText}</p>
         </div>
       </button>
@@ -401,11 +399,12 @@ function GalleryPagination({ currentPage, totalPages, onPageChange }) {
 }
 
 export default function GalleryGrid() {
-  const { mediaGallery } = useGalleryContent()
-  const { label, title, description, items } = mediaGallery
+  const { isReady, mediaGallery } = useGalleryContent()
   const [activeFilter, setActiveFilter] = useState('all')
   const [currentPage, setCurrentPage] = useState(1)
   const [activeIndex, setActiveIndex] = useState(null)
+
+  const items = mediaGallery?.items ?? []
 
   const sortedItems = useMemo(() => sortGalleryItems(items), [items])
 
@@ -434,6 +433,10 @@ export default function GalleryGrid() {
 
   const closeLightbox = useCallback(() => setActiveIndex(null), [])
   const openAt = useCallback((index) => setActiveIndex(index), [])
+
+  if (!isReady || !mediaGallery) return null
+
+  const { label, title, description } = mediaGallery
 
   if (sortedItems.length === 0) return null
 
@@ -493,7 +496,6 @@ export default function GalleryGrid() {
                   <GalleryCompactCard
                     key={item.id}
                     item={item}
-                    displayIndex={globalIndex + 1}
                     globalIndex={globalIndex}
                     onOpen={openAt}
                   />

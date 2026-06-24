@@ -1,10 +1,14 @@
 import { useState } from 'react'
 import { useGalleryContent } from '../hooks/useGalleryContent'
 import { parseYoutubeId } from '../data/galleryContentStore'
+import { hasMediaSrc } from '../lib/mediaUrl'
 
 export default function VideoSection({ variant = 'default' }) {
-  const { watchSection } = useGalleryContent()
+  const { isReady, watchSection } = useGalleryContent()
   const [playing, setPlaying] = useState(false)
+
+  if (!isReady || !watchSection) return null
+
   const youtubeId = parseYoutubeId(watchSection.youtubeId || watchSection.youtubeUrl || '')
   const embedUrl = `https://www.youtube.com/embed/${youtubeId}?rel=0&autoplay=1`
   const isLight = variant === 'light'
@@ -63,7 +67,7 @@ export default function VideoSection({ variant = 'default' }) {
                 />
               ) : (
                 <div className="group/poster absolute inset-0">
-                  {watchSection.poster ? (
+                  {hasMediaSrc(watchSection.poster) ? (
                     <img
                       src={watchSection.poster}
                       alt=""

@@ -1,5 +1,5 @@
-import { drWaelActivity as defaultDrWaelActivity } from './content'
-import { globalPresenceMap, mapLocations as defaultMapLocations, normalizeGlobeCountries, normalizeGlobeCountry } from './globalEventMap'
+import { drWaelActivity as defaultDrWaelActivity, professionalMembership as defaultProfessionalMembership } from './content'
+import { globalPresenceMap, mapLocations as defaultMapLocations, normalizeGlobeCountries } from './globalEventMap'
 import {
   CONTENT_SECTIONS,
   loadSectionPrimary,
@@ -26,28 +26,8 @@ export function getDefaultDrWaelActivity() {
   return {
     ...cloneActivity(defaultDrWaelActivity),
     globe: getDefaultGlobeContent(),
+    professionalMembership: cloneActivity(defaultProfessionalMembership),
   }
-}
-
-function mergeGlobeRegions(defaultRegions = [], savedRegions = []) {
-  const defaultById = new Map(defaultRegions.map((region) => [region.id, region]))
-
-  if (!savedRegions.length) return defaultRegions
-
-  return savedRegions.map((region) => {
-    const fallback = defaultById.get(region.id) ?? {}
-    return {
-      ...fallback,
-      ...region,
-      milestones: region.milestones?.length
-        ? region.milestones.map((milestone, milestoneIndex) => ({
-            ...fallback.milestones?.[milestoneIndex],
-            ...milestone,
-            isMilestone: true,
-          }))
-        : (fallback.milestones ?? []),
-    }
-  })
 }
 
 function usesLegacyCityMarkerSchema(locations = []) {
@@ -62,20 +42,10 @@ function shouldResetToDefaultGlobe(savedLocations, defaultById) {
   return unknownCount >= Math.ceil(savedLocations.length * 0.5)
 }
 
-function mergeGlobeCountry(defaultCountry, savedCountry) {
-  const fallback = defaultCountry ?? {}
-  return normalizeGlobeCountry({
-    ...fallback,
-    ...savedCountry,
-    lat: Number.isFinite(Number(savedCountry.lat)) ? Number(savedCountry.lat) : fallback.lat,
-    lng: Number.isFinite(Number(savedCountry.lng)) ? Number(savedCountry.lng) : fallback.lng,
-    regions: mergeGlobeRegions(fallback.regions, savedCountry.regions),
-  })
-}
-
-function mergeGlobeLocations(defaultLocations, savedLocations = []) {
+function migrateGlobeLocations(savedLocations, defaultLocations) {
   const normalizedDefaults = normalizeGlobeCountries(defaultLocations)
-  if (!savedLocations.length) return normalizedDefaults
+  if (savedLocations == null) return normalizedDefaults
+  if (!savedLocations.length) return []
 
   const defaultById = new Map(normalizedDefaults.map((location) => [location.id, location]))
 
@@ -83,34 +53,45 @@ function mergeGlobeLocations(defaultLocations, savedLocations = []) {
     return normalizedDefaults
   }
 
-  const normalizedSaved = normalizeGlobeCountries(savedLocations)
-  const savedById = new Map(normalizedSaved.map((location) => [location.id, location]))
-  const merged = normalizedSaved.map((location) =>
-    mergeGlobeCountry(defaultById.get(location.id), location),
-  )
+  return normalizeGlobeCountries(savedLocations)
+}
 
-  for (const defaultLocation of normalizedDefaults) {
-    if (!savedById.has(defaultLocation.id)) {
-      merged.push(defaultLocation)
-    }
+function migrateGlobe(saved, defaults) {
+  if (!saved) return defaults
+
+  return {
+    label: saved.label ?? defaults.label,
+    title: saved.title ?? defaults.title,
+    description: saved.description ?? defaults.description,
+    locations: migrateGlobeLocations(saved.locations, defaults.locations),
   }
+}
 
-  return merged
+function migrateProfessionalMembership(saved, defaults) {
+  if (!saved) return defaults
+
+  return {
+    label: saved.label ?? defaults.label,
+    title: saved.title ?? defaults.title,
+    intro: saved.intro ?? defaults.intro,
+    organizations: saved.organizations != null ? saved.organizations : defaults.organizations,
+  }
 }
 
 function mergeWithDefaults(saved) {
   const defaults = getDefaultDrWaelActivity()
 
   return {
-    ...defaults,
-    ...saved,
-    upcoming: saved.upcoming ?? defaults.upcoming,
-    recent: saved.recent ?? defaults.recent,
-    globe: {
-      ...defaults.globe,
-      ...saved.globe,
-      locations: mergeGlobeLocations(defaults.globe.locations, saved.globe?.locations),
-    },
+    label: saved.label ?? defaults.label,
+    title: saved.title ?? defaults.title,
+    description: saved.description ?? defaults.description,
+    upcoming: saved.upcoming != null ? saved.upcoming : defaults.upcoming,
+    recent: saved.recent != null ? saved.recent : defaults.recent,
+    globe: migrateGlobe(saved.globe, defaults.globe),
+    professionalMembership: migrateProfessionalMembership(
+      saved.professionalMembership,
+      defaults.professionalMembership,
+    ),
   }
 }
 
@@ -192,3 +173,13 @@ export const emptyGlobeLocation = {
   role: '',
   regions: [{ ...emptyGlobeRegion, id: 'region-1', name: 'Main region' }],
 }
+
+export const emptyMembershipOrg = {
+  id: '',
+  abbr: '',
+  name: '',
+  scope: 'International',
+}
+
+const MEMBERSHIP_SCOPES = ['International', 'National', 'Regional']
+export { MEMBERSHIP_SCOPES }

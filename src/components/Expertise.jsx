@@ -1,8 +1,12 @@
 import { useHomeContent } from '../hooks/useHomeContent'
+import { hasMediaSrc } from '../lib/mediaUrl'
 import ContactButton from './ContactButton'
 
 export default function Expertise() {
-  const { whyChooseUs } = useHomeContent()
+  const { content, isReady } = useHomeContent()
+  if (!isReady || !content) return null
+
+  const { whyChooseUs } = content
   const imageSrc = whyChooseUs.image
 
   return (
@@ -17,7 +21,7 @@ export default function Expertise() {
               {whyChooseUs.title}
             </h2>
             <div className="mt-8 space-y-5">
-              {whyChooseUs.paragraphs.map((paragraph, index) => (
+              {(whyChooseUs.paragraphs ?? []).map((paragraph, index) => (
                 <p
                   key={index}
                   className={`text-sm leading-relaxed md:text-base ${
@@ -37,12 +41,14 @@ export default function Expertise() {
           </div>
 
           <div className="relative order-1 min-h-[260px] sm:min-h-[320px] lg:order-2 lg:min-h-[520px]">
-            <img
-              key={imageSrc}
-              src={imageSrc}
-              alt="Family receiving speech-language support"
-              className="absolute inset-0 h-full w-full object-cover"
-            />
+            {hasMediaSrc(imageSrc) ? (
+              <img
+                key={imageSrc}
+                src={imageSrc}
+                alt="Family receiving speech-language support"
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+            ) : null}
             <div
               className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.82)_0%,rgba(255,255,255,0.28)_18%,transparent_32%)]"
               aria-hidden="true"

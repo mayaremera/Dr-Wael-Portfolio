@@ -1,55 +1,84 @@
 import { useEffect, useState } from 'react'
-import { CONTENT_UPDATED_EVENT, subscribeToRemoteContent } from '../data/contentSync'
+import {
+  CONTENT_UPDATED_EVENT,
+  getCachedSectionData,
+  subscribeToRemoteContent,
+  subscribeToSectionContent,
+} from '../data/contentSync'
 import { isSupabaseConfigured } from '../lib/supabase'
 
-export function useContentSection(loadLocal, loadRemote) {
-  const [content, setContent] = useState(loadLocal)
-  const [isRemoteLoaded, setIsRemoteLoaded] = useState(false)
+export function useContentSection(loadLocal, loadRemote, sectionKey = null) {
+  const [content, setContent] = useState(() => {
+    if (isSupabaseConfigured && sectionKey) {
+      return getCachedSectionData(sectionKey)
+    }
+    return loadLocal()
+  })
+  const [isRemoteLoaded, setIsRemoteLoaded] = useState(() => {
+    if (!isSupabaseConfigured) return true
+    if (!sectionKey) return false
+    return getCachedSectionData(sectionKey) != null
+  })
 
   useEffect(() => {
+    if (!isSupabaseConfigured) {
+      setContent(loadLocal())
+      setIsRemoteLoaded(true)
+      return
+    }
+
     let cancelled = false
 
-    const refreshRemote = async () => {
-      try {
-        const remoteContent = await loadRemote()
-        if (!cancelled) {
-          setContent(remoteContent)
-          setIsRemoteLoaded(true)
-        }
-      } catch (error) {
-        console.warn('[content] Remote refresh failed.', error?.message)
-        if (!cancelled) {
-          setContent(loadLocal())
-          setIsRemoteLoaded(true)
-        }
+    const applyContent = (nextContent) => {
+      if (!cancelled) {
+        setContent(nextContent)
+        setIsRemoteLoaded(true)
       }
     }
 
-    refreshRemote()
+    const unsubscribeSection = sectionKey
+      ? subscribeToSectionContent(sectionKey, applyContent)
+      : () => {}
 
-    const refreshAfterSave = () => {
-      if (isSupabaseConfigured) {
-        refreshRemote()
-        return
-      }
-
-      setContent(loadLocal())
+    if (!sectionKey || !getCachedSectionData(sectionKey)) {
+      loadRemote()
+        .then(applyContent)
+        .catch((error) => {
+          console.warn('[content] Remote load failed.', error?.message)
+          if (!cancelled) {
+            setIsRemoteLoaded(true)
+          }
+        })
     }
 
-    window.addEventListener(CONTENT_UPDATED_EVENT, refreshAfterSave)
-    window.addEventListener('storage', refreshAfterSave)
+    const refreshRemote = (changedSection) => {
+      if (sectionKey && changedSection && changedSection !== sectionKey) return
 
-    const unsubscribeRealtime = subscribeToRemoteContent(() => {
-      refreshRemote()
-    })
+      loadRemote()
+        .then(applyContent)
+        .catch((error) => {
+          console.warn('[content] Remote refresh failed.', error?.message)
+        })
+    }
+
+    const unsubscribeRealtime = subscribeToRemoteContent(refreshRemote)
+
+    const onContentUpdated = (event) => {
+      const changedSection = event.detail?.section
+      if (sectionKey && changedSection && changedSection !== sectionKey) return
+      if (sectionKey && getCachedSectionData(sectionKey)) return
+      refreshRemote(changedSection)
+    }
+
+    window.addEventListener(CONTENT_UPDATED_EVENT, onContentUpdated)
 
     return () => {
       cancelled = true
-      window.removeEventListener(CONTENT_UPDATED_EVENT, refreshAfterSave)
-      window.removeEventListener('storage', refreshAfterSave)
+      unsubscribeSection()
       unsubscribeRealtime()
+      window.removeEventListener(CONTENT_UPDATED_EVENT, onContentUpdated)
     }
-  }, [loadLocal, loadRemote])
+  }, [loadLocal, loadRemote, sectionKey])
 
   return { content, isRemoteLoaded }
 }

@@ -14,6 +14,12 @@ function cloneContent(data) {
 
 export function getDefaultContactContent() {
   return {
+    contactSection: {
+      label: 'Contact & Appointment',
+      title: "Let's start the conversation",
+      intro:
+        'Parents, colleagues, and institutions are welcome. Reach out to book a session or ask a question.',
+    },
     contactDetails: cloneContent(defaultContactDetails),
     directContact: {
       email: defaultSite.email,
@@ -25,22 +31,27 @@ export function getDefaultContactContent() {
 
 function mergeWithDefaults(saved) {
   const defaults = getDefaultContactContent()
+  const { professionalServices: _removed, ...savedRest } = saved ?? {}
 
   return {
     ...defaults,
-    ...saved,
+    ...savedRest,
+    contactSection: {
+      ...defaults.contactSection,
+      ...savedRest.contactSection,
+    },
     contactDetails: {
       ...defaults.contactDetails,
-      ...saved.contactDetails,
+      ...savedRest.contactDetails,
       workplace: {
         ...defaults.contactDetails.workplace,
-        ...saved.contactDetails?.workplace,
+        ...savedRest.contactDetails?.workplace,
       },
-      schedule: saved.contactDetails?.schedule ?? defaults.contactDetails.schedule,
+      schedule: savedRest.contactDetails?.schedule ?? defaults.contactDetails.schedule,
     },
     directContact: {
       ...defaults.directContact,
-      ...saved.directContact,
+      ...savedRest.directContact,
     },
   }
 }
@@ -59,10 +70,11 @@ export async function loadContactContentRemote() {
 }
 
 export async function saveContactContent(data) {
+  const { professionalServices: _removed, ...payload } = data ?? {}
   return saveSectionPrimary({
     section: CONTENT_SECTIONS.CONTACT,
     storageKey: CONTACT_STORAGE_KEY,
-    data,
+    data: payload,
   })
 }
 

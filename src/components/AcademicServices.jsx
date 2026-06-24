@@ -1,18 +1,105 @@
 import { useEffect, useState } from 'react'
 import { useAboutContent } from '../hooks/useAboutContent'
 
+const MONTH_INDEX = {
+  jan: 0,
+  january: 0,
+  feb: 1,
+  february: 1,
+  mar: 2,
+  march: 2,
+  apr: 3,
+  april: 3,
+  may: 4,
+  jun: 5,
+  june: 5,
+  jul: 6,
+  july: 6,
+  aug: 7,
+  august: 7,
+  sep: 8,
+  sept: 8,
+  september: 8,
+  oct: 9,
+  october: 9,
+  nov: 10,
+  november: 10,
+  dec: 11,
+  december: 11,
+}
+
+function parseMonthToken(token = '') {
+  return MONTH_INDEX[token.trim().toLowerCase()] ?? -1
+}
+
+export function isOngoingAcademicPeriod(period) {
+  if (!period || typeof period !== 'string') return false
+
+  const text = period.trim()
+  const lower = text.toLowerCase()
+
+  if (/\bongoing\b/.test(lower)) return true
+  if (/\bpresent\b/.test(lower)) return true
+  if (/^since\s+/i.test(text)) return true
+
+  const now = new Date()
+  const currentYear = now.getFullYear()
+  const currentMonth = now.getMonth()
+
+  const yearRange = lower.match(/(\d{4})\s*[–—-]\s*(\d{4}|present|ongoing)/)
+  if (yearRange) {
+    const end = yearRange[2]
+    if (end === 'present' || end === 'ongoing') return true
+    return parseInt(end, 10) >= currentYear
+  }
+
+  const monthRange = lower.match(/([a-z]+)\s+(\d{4})\s*[–—-]\s*([a-z]+|present|ongoing)(?:\s+(\d{4}))?/)
+  if (monthRange) {
+    const endToken = monthRange[3]
+    if (endToken === 'present' || endToken === 'ongoing') return true
+
+    const endYear = parseInt(monthRange[4] ?? monthRange[2], 10)
+    const endMonth = parseMonthToken(endToken)
+    if (Number.isNaN(endYear) || endMonth < 0) return false
+
+    if (endYear > currentYear) return true
+    if (endYear === currentYear) return endMonth >= currentMonth
+    return false
+  }
+
+  return false
+}
+
 function ServiceItem({ item }) {
+  const isOngoing = isOngoingAcademicPeriod(item.period)
+
   return (
-    <article className="rounded-sm border border-slate-200/80 bg-white p-5 shadow-sm transition-all duration-300 hover:border-brand/20 hover:shadow-md">
+    <article
+      className={`relative overflow-hidden rounded-sm border p-5 shadow-sm transition-all duration-300 ${
+        isOngoing
+          ? 'border-brand/35 bg-gradient-to-br from-brand-muted/50 via-white to-accent/5 shadow-brand/10 hover:border-brand/45 hover:shadow-md'
+          : 'border-slate-200/80 bg-white hover:border-brand/20 hover:shadow-md'
+      }`}
+    >
+      {isOngoing ? (
+        <span
+          className="pointer-events-none absolute inset-y-3 left-0 w-1 rounded-r-full bg-accent"
+          aria-hidden="true"
+        />
+      ) : null}
+
       <div className="flex flex-wrap items-start justify-between gap-2">
-        <h3 className="font-serif text-lg leading-snug text-ink">{item.title}</h3>
+        <h3 className={`font-serif text-lg leading-snug ${isOngoing ? 'text-brand' : 'text-ink'}`}>{item.title}</h3>
         {item.period ? (
-          <span className="shrink-0 rounded-full bg-surface-tint px-2.5 py-0.5 text-[0.65rem] font-semibold tracking-[0.1em] text-ink-muted uppercase">
+          <span
+            className={`shrink-0 rounded-full px-2.5 py-0.5 text-[0.65rem] font-semibold tracking-[0.1em] uppercase ${
+              isOngoing ? 'bg-brand text-white shadow-sm shadow-brand/20' : 'bg-surface-tint text-ink-muted'
+            }`}
+          >
             {item.period}
           </span>
         ) : null}
       </div>
-
       <p className="mt-1 text-sm font-medium text-brand">{item.org}</p>
 
       {item.description ? (
@@ -59,17 +146,20 @@ function ServiceItem({ item }) {
 }
 
 export default function AcademicServices({ embedded = false }) {
-  const { academicServices } = useAboutContent()
-  const { label, title, intro, categories } = academicServices
-  const [activeId, setActiveId] = useState(categories[0]?.id ?? '')
+  const { isReady, academicServices } = useAboutContent()
+  const categories = academicServices?.categories ?? []
+  const [activeId, setActiveId] = useState('')
 
   useEffect(() => {
+    if (!categories.length) return
     if (!categories.some((category) => category.id === activeId)) {
       setActiveId(categories[0]?.id ?? '')
     }
   }, [categories, activeId])
 
-  if (!categories.length) return null
+  if (!isReady || !academicServices || !categories.length) return null
+
+  const { label, title, intro } = academicServices
 
   const activeCategory = categories.find((category) => category.id === activeId) ?? categories[0]
 

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useServicesContent } from '../hooks/useServicesContent'
+import { hasMediaSrc } from '../lib/mediaUrl'
 
 function excerpt(quote, max = 88) {
   if (quote.length <= max) return quote
@@ -91,7 +92,11 @@ function VoiceSelector({ item, index, isActive, onSelect, inert = false, light =
               : 'ring-white/25 group-hover:ring-white/40'
         }`}
       >
-        <img src={item.image} alt="" className="h-full w-full object-cover object-top" />
+        {hasMediaSrc(item.image) ? (
+          <img src={item.image} alt="" className="h-full w-full object-cover object-top" />
+        ) : (
+          <div className="h-full w-full bg-slate-200" aria-hidden="true" />
+        )}
       </div>
 
       <span className="min-w-0 flex-1">
@@ -382,7 +387,11 @@ function GalleryCard({ item, index }) {
   return (
     <article className="group flex h-full min-h-[32rem] flex-col overflow-hidden rounded-sm border border-slate-100 bg-white shadow-sm transition-shadow duration-300 hover:border-brand/20 hover:shadow-lg hover:shadow-brand/10 sm:min-h-[34rem]">
       <div className="relative h-52 shrink-0 overflow-hidden sm:h-56">
-        <img src={item.image} alt={item.name} className="h-full w-full object-cover object-top" />
+        {hasMediaSrc(item.image) ? (
+          <img src={item.image} alt={item.name} className="h-full w-full object-cover object-top" />
+        ) : (
+          <div className="h-full w-full bg-slate-200" aria-hidden="true" />
+        )}
         <div
           className="absolute inset-0 bg-gradient-to-t from-brand/75 via-brand/20 to-transparent"
           aria-hidden="true"
@@ -445,7 +454,9 @@ function TestimonialsGallery({ testimonials, testimonialsSection }) {
 }
 
 export default function Testimonials({ variant = 'showcase' }) {
-  const { testimonialsSection, testimonials } = useServicesContent()
+  const { isReady, testimonialsSection, testimonials } = useServicesContent()
+
+  if (!isReady || !testimonialsSection) return null
 
   if (variant === 'gallery') {
     return <TestimonialsGallery testimonials={testimonials} testimonialsSection={testimonialsSection} />

@@ -1,7 +1,6 @@
 import {
   images,
   profileDetails,
-  promoVideo as defaultPromoVideo,
   site,
   trustedCompanies as defaultTrustedCompanies,
   whyChooseUs as defaultWhyChooseUs,
@@ -93,7 +92,6 @@ export function getDefaultHomeContent() {
       ...cloneContent(defaultWhyChooseUs),
       image: images.whyTrust,
     },
-    promoVideo: cloneContent(defaultPromoVideo),
     credentialWheel: {
       tagline: 'A Career Dedicated to Communication, Education, and Impact',
       items: cloneContent(defaultCredentialWheelItems),
@@ -110,12 +108,50 @@ function migrateImagePath(url, legacyPath, nextPath) {
   return query ? `${nextPath}?${query}` : nextPath
 }
 
+function migrateWhyChooseUs(saved, defaults) {
+  if (!saved) return defaults
+
+  return {
+    label: saved.label ?? defaults.label,
+    title: saved.title ?? defaults.title,
+    image: migrateImagePath(
+      saved.image ?? defaults.image,
+      '/images/family.jpg',
+      '/images/whytrust.jpg',
+    ),
+    paragraphs: saved.paragraphs != null ? saved.paragraphs : defaults.paragraphs,
+  }
+}
+
+function migrateAffiliationCompany(company, defaults) {
+  const defaultCambridge = defaults.affiliations.companies.find((entry) => entry.id === 'cambridge')
+  const usesLegacyCambridgeAssets =
+    company.id === 'cambridge' &&
+    (company.logoLayout === 'split' ||
+      company.badgeLogo ||
+      company.logo?.includes('trusted8banner'))
+
+  if (usesLegacyCambridgeAssets && defaultCambridge) {
+    return {
+      ...company,
+      logo: defaultCambridge.logo,
+      badgeLogo: defaultCambridge.badgeLogo ?? '',
+      badgeLabel: defaultCambridge.badgeLabel ?? '',
+      logoLayout: defaultCambridge.logoLayout ?? '',
+      logoFit: defaultCambridge.logoFit ?? 'cover',
+    }
+  }
+
+  return company
+}
+
 function mergeWithDefaults(saved) {
   const defaults = getDefaultHomeContent()
+  const { promoVideo: _legacyPromoVideo, ...savedWithoutPromo } = saved ?? {}
 
   return {
     ...defaults,
-    ...saved,
+    ...savedWithoutPromo,
     hero: {
       ...defaults.hero,
       ...saved.hero,
@@ -123,70 +159,36 @@ function mergeWithDefaults(saved) {
       secondaryCta: { ...defaults.hero.secondaryCta, ...saved.hero?.secondaryCta },
     },
     affiliations: {
-      ...defaults.affiliations,
-      ...saved.affiliations,
-      companies: saved.affiliations?.companies?.length
-        ? saved.affiliations.companies.map((company, index) => {
-            const merged = {
-              ...defaults.affiliations.companies[index],
-              ...company,
-            }
-
-            const defaultCambridge = defaults.affiliations.companies.find((entry) => entry.id === 'cambridge')
-            const usesLegacyCambridgeAssets =
-              merged.id === 'cambridge' &&
-              (merged.logoLayout === 'split' ||
-                merged.badgeLogo ||
-                merged.logo?.includes('trusted8banner'))
-
-            if (usesLegacyCambridgeAssets && defaultCambridge) {
-              return {
-                ...merged,
-                logo: defaultCambridge.logo,
-                badgeLogo: defaultCambridge.badgeLogo ?? '',
-                badgeLabel: defaultCambridge.badgeLabel ?? '',
-                logoLayout: defaultCambridge.logoLayout ?? '',
-                logoFit: defaultCambridge.logoFit ?? 'cover',
-              }
-            }
-
-            return merged
-          })
-        : defaults.affiliations.companies,
+      title: saved.affiliations?.title ?? defaults.affiliations.title,
+      subtitle: saved.affiliations?.subtitle ?? defaults.affiliations.subtitle,
+      viewAllLabel: saved.affiliations?.viewAllLabel ?? defaults.affiliations.viewAllLabel,
+      viewAllHref: saved.affiliations?.viewAllHref ?? defaults.affiliations.viewAllHref,
+      companies:
+        saved.affiliations?.companies != null
+          ? saved.affiliations.companies.map((company) => migrateAffiliationCompany(company, defaults))
+          : defaults.affiliations.companies,
     },
-    whyChooseUs: {
-      ...defaults.whyChooseUs,
-      ...saved.whyChooseUs,
-      image: migrateImagePath(
-        saved.whyChooseUs?.image ?? defaults.whyChooseUs.image,
-        '/images/family.jpg',
-        '/images/whytrust.jpg',
-      ),
-      paragraphs: saved.whyChooseUs?.paragraphs?.length
-        ? saved.whyChooseUs.paragraphs
-        : defaults.whyChooseUs.paragraphs,
-    },
-    promoVideo: {
-      ...defaults.promoVideo,
-      ...saved.promoVideo,
-      cta: { ...defaults.promoVideo.cta, ...saved.promoVideo?.cta },
-      secondary: { ...defaults.promoVideo.secondary, ...saved.promoVideo?.secondary },
-    },
+    whyChooseUs: migrateWhyChooseUs(saved.whyChooseUs, defaults.whyChooseUs),
     credentialWheel: {
       ...defaults.credentialWheel,
       ...saved.credentialWheel,
-      items: saved.credentialWheel?.items?.length
-        ? saved.credentialWheel.items.map((item, index) => ({
-            ...defaults.credentialWheel.items[index],
-            ...item,
-          }))
-        : defaults.credentialWheel.items,
+      tagline: saved.credentialWheel?.tagline ?? defaults.credentialWheel.tagline,
+      items:
+        saved.credentialWheel?.items != null
+          ? saved.credentialWheel.items
+          : defaults.credentialWheel.items,
     },
   }
 }
 
 export function loadHomeContent() {
   return getDefaultHomeContent()
+}
+
+/** Merges remote home data and strips legacy promoVideo (now stored under gallery). */
+export function mergeHomeContent(saved = {}) {
+  const { promoVideo: _legacy, ...rest } = saved
+  return mergeWithDefaults(rest)
 }
 
 export async function loadHomeContentRemote() {

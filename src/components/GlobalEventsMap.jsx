@@ -233,15 +233,18 @@ function EventsPanel({ location, activeRegion, isPinned, onClose, anchor, onRegi
 }
 
 export default function GlobalEventsMap() {
-  const activity = useDrWaelActivity()
+  const { activity, isReady } = useDrWaelActivity()
   const mapAreaRef = useRef(null)
   const [selectedId, setSelectedId] = useState(null)
   const [hoveredId, setHoveredId] = useState(null)
   const [anchor, setAnchor] = useState(null)
   const [activeRegionByCountry, setActiveRegionByCountry] = useState({})
 
-  const globeMeta = activity.globe ?? globalPresenceMap
-  const locations = useMemo(() => buildMapLocationsWithEvents(activity), [activity])
+  const globeMeta = activity?.globe ?? globalPresenceMap
+  const locations = useMemo(
+    () => (activity ? buildMapLocationsWithEvents(activity) : []),
+    [activity],
+  )
 
   const selectedLocation = locations.find((loc) => loc.id === selectedId) ?? null
   const hoveredLocation = locations.find((loc) => loc.id === hoveredId) ?? null
@@ -282,6 +285,8 @@ export default function GlobalEventsMap() {
       return next
     })
   }, [])
+
+  if (!isReady || !activity) return null
 
   return (
     <section

@@ -11,7 +11,7 @@ import {
   subscribeToAuthChanges,
 } from '../../lib/supabase'
 
-const DEFAULT_SECTION = 'in-the-field'
+const DEFAULT_SECTION = 'home'
 const VALID_SECTIONS = new Set([
   'home',
   'about-me',

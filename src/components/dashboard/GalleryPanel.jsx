@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import DashboardItemList from './DashboardItemList'
+import DashboardSaveNotice from './DashboardSaveNotice'
 import MediaDropzone from './MediaDropzone'
 import { useConfirmDelete } from './DeleteConfirmDialog'
 import {
@@ -14,7 +15,9 @@ import {
   parseYoutubeId,
   saveGalleryContent,
 } from '../../data/galleryContentStore'
+import { CONTENT_SECTIONS } from '../../data/contentSync'
 import { useDashboardSection } from '../../hooks/useDashboardSection'
+import { withCacheBust } from '../../lib/mediaUrl'
 import DashboardSectionLoader from './DashboardSectionLoader'
 import { persistDashboardSection } from './persistDashboardSection'
 
@@ -75,6 +78,31 @@ function StringListEditor({ label, items, onChange, addLabel = 'Add paragraph' }
         {addLabel}
       </button>
     </div>
+  )
+}
+
+function CtaFields({ label, cta, onChange }) {
+  return (
+    <div>
+      <p className="mb-2 text-xs font-semibold text-ink">{label}</p>
+      <div>
+        <label className={labelClassName}>Button label</label>
+        <input className={fieldClassName} value={cta.label} onChange={(e) => onChange({ ...cta, label: e.target.value })} />
+      </div>
+    </div>
+  )
+}
+
+function SaveChangesButton({ onClick, disabled = false }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className="rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase transition-colors hover:bg-brand-light disabled:cursor-not-allowed disabled:opacity-50"
+    >
+      Save changes
+    </button>
   )
 }
 
@@ -320,74 +348,173 @@ export default function GalleryPanel() {
   const { content, setContent, loading, loadError } = useDashboardSection(
     getDefaultGalleryContent,
     loadGalleryContentRemote,
+    CONTENT_SECTIONS.GALLERY,
   )
   const [editingId, setEditingId] = useState(null)
   const [editingVideoId, setEditingVideoId] = useState(null)
   const [savedMessage, setSavedMessage] = useState('')
   const [saveError, setSaveError] = useState('')
+  const [isSaving, setIsSaving] = useState(false)
+  const contentRef = useRef(content)
+  contentRef.current = content
 
-  const persist = (nextContent, message = 'Changes saved.') => {
-    persistDashboardSection({
+  const persist = (nextContent, message = 'Changes saved.', previousContent = null) => {
+    void persistDashboardSection({
       saveFn: saveGalleryContent,
       nextContent,
+      previousContent,
       setContent,
       setSaveError,
       setSavedMessage,
+      setIsSaving,
       message,
       storageErrorMessage: 'Could not save — media may be too large. Try a smaller file.',
     })
   }
 
+  const persistFromCurrent = (buildNextContent, message) => {
+    const current = contentRef.current
+    if (!current) {
+      setSaveError('Content is still loading. Try again in a moment.')
+      return
+    }
+
+    const nextContent = buildNextContent(current)
+    persist(nextContent, message, current)
+  }
+
+  const normalizeGalleryItem = (item) => ({
+    ...item,
+    src: item.src ? withCacheBust(item.src) : '',
+  })
+
+  const normalizeVideoLibraryItem = (item) => ({
+    ...item,
+    poster: item.poster ? withCacheBust(item.poster) : '',
+    videoSrc: item.videoSrc ? withCacheBust(item.videoSrc) : '',
+  })
+
   const updateGalleryMeta = (field, value) => {
-    setContent((current) => ({
-      ...current,
-      mediaGallery: { ...current.mediaGallery, [field]: value },
-    }))
+    setContent((current) => {
+      if (!current) return current
+      return {
+        ...current,
+        mediaGallery: { ...current.mediaGallery, [field]: value },
+      }
+    })
   }
 
   const updateWatchSection = (field, value) => {
-    setContent((current) => ({
-      ...current,
-      watchSection: { ...current.watchSection, [field]: value },
-    }))
+    setContent((current) => {
+      if (!current) return current
+      return {
+        ...current,
+        watchSection: { ...current.watchSection, [field]: value },
+      }
+    })
   }
 
   const updateVideoLibraryMeta = (field, value) => {
-    setContent((current) => ({
-      ...current,
-      videoLibrary: { ...current.videoLibrary, [field]: value },
-    }))
+    setContent((current) => {
+      if (!current) return current
+      return {
+        ...current,
+        videoLibrary: { ...current.videoLibrary, [field]: value },
+      }
+    })
   }
 
-  const saveHeader = () => persist(content, 'Gallery header saved.')
-  const saveWatchSection = () => persist(content, 'Watch section saved.')
-  const saveVideoLibraryHeader = () => persist(content, 'Video library header saved.')
+  const saveHeader = () => {
+    persistFromCurrent((current) => current, 'Gallery header saved.')
+  }
+
+  const saveWatchSection = () => {
+    persistFromCurrent(
+      (current) => ({
+        ...current,
+        watchSection: {
+          ...current.watchSection,
+          poster: current.watchSection.poster ? withCacheBust(current.watchSection.poster) : '',
+        },
+      }),
+      'Watch section saved.',
+    )
+  }
+
+  const savePromoVideo = () => {
+    persistFromCurrent((current) => current, 'Featured video section saved.')
+  }
+
+  const updatePromoVideo = (field, value) => {
+    setContent((current) => {
+      if (!current) return current
+      return {
+        ...current,
+        promoVideo: { ...current.promoVideo, [field]: value },
+      }
+    })
+  }
+
+  const updatePromoVideoSrc = (video, message = 'Featured video saved.') => {
+    persistFromCurrent(
+      (current) => ({
+        ...current,
+        promoVideo: {
+          ...current.promoVideo,
+          src: video ? withCacheBust(video) : '',
+        },
+      }),
+      message,
+    )
+  }
+
+  const previewPromoVideoSrc = (video) => {
+    if (!video) return
+    setContent((current) =>
+      current
+        ? {
+            ...current,
+            promoVideo: { ...current.promoVideo, src: video },
+          }
+        : current,
+    )
+  }
+
+  const saveVideoLibraryHeader = () => {
+    persistFromCurrent((current) => current, 'Video library header saved.')
+  }
 
   const saveItem = (item) => {
-    const items = content.mediaGallery.items
-    const exists = items.some((entry) => entry.id === item.id)
-    const existing = items.find((entry) => entry.id === item.id)
+    const normalized = normalizeGalleryItem(item)
+    const items = contentRef.current?.mediaGallery?.items ?? []
+    const exists = items.some((entry) => entry.id === normalized.id)
+    const existing = items.find((entry) => entry.id === normalized.id)
     const nextSortOrder = exists
-      ? (typeof item.sortOrder === 'number' ? item.sortOrder : existing?.sortOrder ?? 0)
+      ? typeof normalized.sortOrder === 'number'
+        ? normalized.sortOrder
+        : (existing?.sortOrder ?? 0)
       : getNextGallerySortOrder(items)
 
     const nextItem = {
-      ...item,
+      ...normalized,
       sortOrder: nextSortOrder,
-      createdAt: item.createdAt || existing?.createdAt || new Date().toISOString(),
+      createdAt: normalized.createdAt || existing?.createdAt || new Date().toISOString(),
     }
 
-    const nextItems = exists
-      ? items.map((entry) => (entry.id === item.id ? nextItem : entry))
-      : [...items, nextItem]
+    persistFromCurrent(
+      (current) => {
+        const currentItems = current.mediaGallery.items
+        const nextItems = exists
+          ? currentItems.map((entry) => (entry.id === normalized.id ? nextItem : entry))
+          : [...currentItems, nextItem]
 
-    persist(
-      {
-        ...content,
-        mediaGallery: {
-          ...content.mediaGallery,
-          items: applyGalleryPresentationOrder(nextItems),
-        },
+        return {
+          ...current,
+          mediaGallery: {
+            ...current.mediaGallery,
+            items: applyGalleryPresentationOrder(nextItems),
+          },
+        }
       },
       exists ? 'Gallery item updated.' : 'Gallery item added.',
     )
@@ -395,28 +522,36 @@ export default function GalleryPanel() {
   }
 
   const deleteItem = (id) => {
-    persist(
-      {
-        ...content,
+    persistFromCurrent(
+      (current) => ({
+        ...current,
         mediaGallery: {
-          ...content.mediaGallery,
-          items: content.mediaGallery.items.filter((entry) => entry.id !== id),
+          ...current.mediaGallery,
+          items: current.mediaGallery.items.filter((entry) => entry.id !== id),
         },
-      },
+      }),
       'Gallery item deleted.',
     )
     if (editingId === id) setEditingId(null)
   }
 
   const saveVideoItem = (item) => {
-    const items = content.videoLibrary.items
-    const exists = items.some((entry) => entry.id === item.id)
-    const nextItems = exists ? items.map((entry) => (entry.id === item.id ? item : entry)) : [item, ...items]
+    const normalized = normalizeVideoLibraryItem(item)
+    const exists = (contentRef.current?.videoLibrary?.items ?? []).some(
+      (entry) => entry.id === normalized.id,
+    )
 
-    persist(
-      {
-        ...content,
-        videoLibrary: { ...content.videoLibrary, items: nextItems },
+    persistFromCurrent(
+      (current) => {
+        const items = current.videoLibrary.items
+        const nextItems = exists
+          ? items.map((entry) => (entry.id === normalized.id ? normalized : entry))
+          : [normalized, ...items]
+
+        return {
+          ...current,
+          videoLibrary: { ...current.videoLibrary, items: nextItems },
+        }
       },
       exists ? 'Library video updated.' : 'Library video added.',
     )
@@ -424,42 +559,39 @@ export default function GalleryPanel() {
   }
 
   const deleteVideoItem = (id) => {
-    persist(
-      {
-        ...content,
+    persistFromCurrent(
+      (current) => ({
+        ...current,
         videoLibrary: {
-          ...content.videoLibrary,
-          items: content.videoLibrary.items.filter((entry) => entry.id !== id),
+          ...current.videoLibrary,
+          items: current.videoLibrary.items.filter((entry) => entry.id !== id),
         },
-      },
+      }),
       'Library video deleted.',
     )
     if (editingVideoId === id) setEditingVideoId(null)
   }
 
-  const items = content.mediaGallery.items
-  const videoItems = content.videoLibrary.items
-
   return (
     <PanelShell
       eyebrow="Gallery"
       title="Video & gallery page"
-      description="Edit the Watch section, key moment videos, and the paginated photo & video gallery. Each gallery item supports a title, description, and alt text."
+      description="Sections are listed in the same order they appear on the live Video & Gallery page."
     >
+      <DashboardSaveNotice message={savedMessage} error={saveError} saving={isSaving} />
       <DashboardSectionLoader loading={loading} loadError={loadError} />
+      {!loading && !loadError && content ? (
+        <>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <a href="/video-gallery" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-brand transition-colors hover:text-brand-light">
           Preview live page →
         </a>
-        <div className="flex flex-wrap items-center gap-2">
-          {saveError ? <span className="rounded-full bg-accent/10 px-3 py-1 text-xs font-semibold text-accent-hover">{saveError}</span> : null}
-          {savedMessage ? <span className="rounded-full bg-brand-muted px-3 py-1 text-xs font-semibold text-brand">{savedMessage}</span> : null}
-        </div>
       </div>
 
       <section className="rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
-        <h2 className="font-serif text-xl text-ink">Watch section</h2>
-        <p className="mt-1 text-sm text-ink-muted">The featured YouTube block below the page hero.</p>
+        <p className="text-[0.65rem] font-semibold tracking-wide text-brand uppercase">1 · Top of page</p>
+        <h2 className="mt-1 font-serif text-xl text-ink">Watch section</h2>
+        <p className="mt-1 text-sm text-ink-muted">The featured YouTube block directly below the page hero.</p>
         <div className="mt-4 grid gap-4">
           <div>
             <label className={labelClassName}>YouTube ID or URL</label>
@@ -468,14 +600,17 @@ export default function GalleryPanel() {
               value={content.watchSection.youtubeId || content.watchSection.youtubeUrl || ''}
               onChange={(e) => {
                 const value = e.target.value
-                setContent((current) => ({
-                  ...current,
-                  watchSection: {
-                    ...current.watchSection,
-                    youtubeId: parseYoutubeId(value),
-                    youtubeUrl: value.includes('http') ? value : current.watchSection.youtubeUrl,
-                  },
-                }))
+                setContent((current) => {
+                  if (!current) return current
+                  return {
+                    ...current,
+                    watchSection: {
+                      ...current.watchSection,
+                      youtubeId: parseYoutubeId(value),
+                      youtubeUrl: value.includes('http') ? value : current.watchSection.youtubeUrl,
+                    },
+                  }
+                })
               }}
             />
           </div>
@@ -504,8 +639,9 @@ export default function GalleryPanel() {
       </section>
 
       <section className="mt-6 rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
-        <h2 className="font-serif text-xl text-ink">Key moments</h2>
-        <p className="mt-1 text-sm text-ink-muted">Important video moments shown as cards below the Watch section. Add as many as you need.</p>
+        <p className="text-[0.65rem] font-semibold tracking-wide text-brand uppercase">2 · Key moments</p>
+        <h2 className="mt-1 font-serif text-xl text-ink">Video library</h2>
+        <p className="mt-1 text-sm text-ink-muted">Important video moments shown as cards below the Watch section.</p>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           <div>
             <label className={labelClassName}>Label</label>
@@ -531,8 +667,8 @@ export default function GalleryPanel() {
         <div className="mt-6">
           <DashboardItemList
             title="Moment videos"
-            countLabel={`${videoItems.length} video${videoItems.length === 1 ? '' : 's'}`}
-            items={videoItems}
+            countLabel={`${content.videoLibrary.items.length} video${content.videoLibrary.items.length === 1 ? '' : 's'}`}
+            items={content.videoLibrary.items}
             editingId={editingVideoId}
             onAdd={() => setEditingVideoId('new')}
             onEdit={setEditingVideoId}
@@ -552,8 +688,68 @@ export default function GalleryPanel() {
       </section>
 
       <section className="mt-6 rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
-        <h2 className="font-serif text-xl text-ink">Gallery section</h2>
-        <p className="mt-1 text-sm text-ink-muted">Header and paginated photo & video cards at the bottom of the page.</p>
+        <p className="text-[0.65rem] font-semibold tracking-wide text-brand uppercase">3 · Featured video banner</p>
+        <h2 className="mt-1 font-serif text-xl text-ink">Promo video section</h2>
+        <p className="mt-1 text-sm text-ink-muted">
+          The background video banner with overlay text — below Key moments on this page, and after the services preview on the home page.
+        </p>
+        <div className="mt-4 grid gap-4">
+          <div>
+            <label className={labelClassName}>Background video</label>
+            <MediaDropzone
+              image=""
+              video={content.promoVideo.src ?? ''}
+              onChange={({ video }) => previewPromoVideoSrc(video)}
+              onUploaded={({ video }) => updatePromoVideoSrc(video)}
+              onClear={() => updatePromoVideoSrc('', 'Featured video removed.')}
+            />
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div>
+              <label className={labelClassName}>Eyebrow label</label>
+              <input
+                className={fieldClassName}
+                value={content.promoVideo.label ?? ''}
+                onChange={(e) => updatePromoVideo('label', e.target.value)}
+              />
+            </div>
+            <div>
+              <label className={labelClassName}>Headline</label>
+              <input
+                className={fieldClassName}
+                value={content.promoVideo.titleHighlight ?? ''}
+                onChange={(e) => updatePromoVideo('titleHighlight', e.target.value)}
+              />
+            </div>
+          </div>
+          <div>
+            <label className={labelClassName}>Description</label>
+            <textarea
+              className={`${fieldClassName} min-h-24 resize-y`}
+              value={content.promoVideo.description ?? ''}
+              onChange={(e) => updatePromoVideo('description', e.target.value)}
+            />
+          </div>
+          <CtaFields
+            label="Primary button"
+            cta={content.promoVideo.cta}
+            onChange={(cta) => updatePromoVideo('cta', cta)}
+          />
+          <CtaFields
+            label="Secondary button"
+            cta={content.promoVideo.secondary}
+            onChange={(cta) => updatePromoVideo('secondary', cta)}
+          />
+          <div className="flex flex-wrap gap-3">
+            <SaveChangesButton onClick={savePromoVideo} />
+          </div>
+        </div>
+      </section>
+
+      <section className="mt-6 rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
+        <p className="text-[0.65rem] font-semibold tracking-wide text-brand uppercase">4 · Bottom of page</p>
+        <h2 className="mt-1 font-serif text-xl text-ink">Photo &amp; video gallery</h2>
+        <p className="mt-1 text-sm text-ink-muted">Section header and paginated gallery cards at the bottom of the page.</p>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           <div>
             <label className={labelClassName}>Label</label>
@@ -580,8 +776,8 @@ export default function GalleryPanel() {
       <div className="mt-6">
         <DashboardItemList
           title="Gallery items"
-          countLabel={`${items.length} item${items.length === 1 ? '' : 's'}`}
-          items={items}
+          countLabel={`${content.mediaGallery.items.length} item${content.mediaGallery.items.length === 1 ? '' : 's'}`}
+          items={content.mediaGallery.items}
           editingId={editingId}
           onAdd={() => setEditingId('new')}
           onEdit={setEditingId}
@@ -598,6 +794,8 @@ export default function GalleryPanel() {
           }
         />
       </div>
+        </>
+      ) : null}
     </PanelShell>
   )
 }

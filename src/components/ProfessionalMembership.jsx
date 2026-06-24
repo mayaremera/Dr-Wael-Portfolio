@@ -1,4 +1,4 @@
-import { professionalMembership } from '../data/content'
+import { useDrWaelActivity } from '../hooks/useDrWaelActivity'
 
 const scopeStyles = {
   International: {
@@ -69,9 +69,11 @@ function MembershipCard({ org }) {
 }
 
 export default function ProfessionalMembership() {
-  const { label, title, intro, organizations } = professionalMembership
-  const international = organizations.filter((org) => org.scope === 'International')
-  const regional = organizations.filter((org) => org.scope !== 'International')
+  const { activity, isReady } = useDrWaelActivity()
+
+  if (!isReady || !activity?.professionalMembership) return null
+
+  const { label, title, intro, organizations } = activity.professionalMembership
 
   return (
     <section
@@ -108,14 +110,8 @@ export default function ProfessionalMembership() {
               </span>
             </div>
 
-            <div className="mt-8 grid gap-5 lg:grid-cols-3">
-              {international.map((org) => (
-                <MembershipCard key={org.id} org={org} />
-              ))}
-            </div>
-
-            <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:mx-auto lg:max-w-4xl">
-              {regional.map((org) => (
+            <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {organizations.map((org) => (
                 <MembershipCard key={org.id} org={org} />
               ))}
             </div>

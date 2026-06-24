@@ -1,20 +1,26 @@
 import { useHomeContent } from '../hooks/useHomeContent'
 import ContactButton from './ContactButton'
+import { hasMediaSrc } from '../lib/mediaUrl'
 
 const heroButtonClassName =
   '!px-4 !py-2 !text-xs sm:!px-[1.125rem] sm:!py-[0.5625rem] sm:!text-[0.8125rem] lg:!px-5 lg:!py-2.5 lg:!text-sm'
 
 export default function HeroBanner() {
-  const { hero } = useHomeContent()
+  const { content, isReady } = useHomeContent()
+  if (!isReady || !content) return null
+
+  const { hero } = content
   const { backgroundImage, subtitle, name, description, primaryCta, secondaryCta } = hero
 
   return (
     <section className="relative overflow-hidden max-lg:min-h-[56vh] sm:max-lg:min-h-[68vh] md:max-lg:min-h-[64vh] lg:min-h-[95vh]">
-      <img
-        src={backgroundImage}
-        alt="Dr. Wael A. Al-Dakroury, speech and language pathology"
-        className="absolute inset-0 h-full w-full scale-105 object-cover object-[62%_12%] sm:object-[center_20%] lg:scale-100 lg:object-center"
-      />
+      {hasMediaSrc(backgroundImage) ? (
+        <img
+          src={backgroundImage}
+          alt="Dr. Wael A. Al-Dakroury, speech and language pathology"
+          className="absolute inset-0 h-full w-full scale-105 object-cover object-[62%_12%] sm:object-[center_20%] lg:scale-100 lg:object-center"
+        />
+      ) : null}
       <div className="absolute inset-0 bg-gradient-to-t from-ink/95 via-ink/70 to-ink/35 sm:bg-gradient-to-r sm:from-ink/85 sm:via-ink/60 sm:to-ink/30" />
 
       <div className="relative mx-auto flex max-w-6xl flex-col px-9 pt-[5rem] pb-[0rem] sm:px-9 sm:pt-[7.02rem] sm:pb-[3.51rem] md:pt-[8.19rem] md:pb-[4.1rem] lg:min-h-[85vh] lg:justify-end lg:px-8 lg:pt-48 lg:pb-24">

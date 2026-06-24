@@ -145,37 +145,20 @@ function AffiliationTile({ company }) {
 }
 
 function AffiliationGrid({ companies }) {
-  const midpoint = Math.ceil(companies.length / 2)
-  const rowOne = companies.slice(0, midpoint)
-  const rowTwo = companies.slice(midpoint)
-
   return (
-    <>
-      <div className="grid grid-cols-2 gap-3 md:gap-3.5 lg:hidden">
-        {companies.map((company) => (
-          <AffiliationTile key={company.id} company={company} />
-        ))}
-      </div>
-
-      <div className="hidden space-y-4 lg:block">
-        <div className={`grid gap-4 ${rowOne.length >= 4 ? 'grid-cols-4' : 'grid-cols-3'}`}>
-          {rowOne.map((company) => (
-            <AffiliationTile key={company.id} company={company} />
-          ))}
-        </div>
-
-        <div className={`grid gap-4 ${rowTwo.length >= 3 ? 'grid-cols-3' : 'grid-cols-2'}`}>
-          {rowTwo.map((company) => (
-            <AffiliationTile key={company.id} company={company} />
-          ))}
-        </div>
-      </div>
-    </>
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 lg:gap-4">
+      {companies.map((company) => (
+        <AffiliationTile key={company.id} company={company} />
+      ))}
+    </div>
   )
 }
 
 function TrustedCompanies() {
-  const { affiliations } = useHomeContent()
+  const { content, isReady } = useHomeContent()
+  if (!isReady || !content) return null
+
+  const { affiliations } = content
   const { title, subtitle, viewAllLabel, viewAllHref, companies } = affiliations
   const visibleCompanies = companies.filter((company) => company.id !== 'asha')
 
@@ -199,10 +182,13 @@ function TrustedCompanies() {
 }
 
 export default function Profile({ variant = 'home' }) {
-  const { profileDetails, profileImage, careerImpact } = useAboutContent()
+  const { isReady, profileDetails, profileImage, careerImpact } = useAboutContent()
+  const isPage = variant === 'page'
+
+  if (!isReady || !profileDetails || !careerImpact) return null
+
   const { name, title, credentials, tagline } = profileDetails
   const photo = profileImage || images.drWael
-  const isPage = variant === 'page'
   const displayBio = isPage
     ? (profileDetails.bioExtended ?? profileDetails.bio)
     : profileDetails.bio

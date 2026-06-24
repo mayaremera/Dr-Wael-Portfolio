@@ -4,6 +4,7 @@ import {
   certificatePlaceholders,
   certificates as defaultCertificates,
   images,
+  internationalLeadership,
   leadershipRoles as defaultLeadershipRoles,
   profileDetails as defaultProfileDetails,
 } from './content'
@@ -18,6 +19,18 @@ import {
 import { createContentId } from './servicesContentStore'
 
 export const ABOUT_STORAGE_KEY = 'drwael-about-content'
+
+const defaultCertificatesSection = {
+  label: 'Highlighted Collection',
+  title: 'Certificates & Training Archive',
+}
+
+const defaultCareerTimelineSection = {
+  label: 'Career Journey',
+  title: 'A timeline of milestones',
+  intro:
+    'Education, clinical leadership, and academic appointments — the foundation of Dr. Wael\'s career in speech-language pathology.',
+}
 
 function cloneContent(data) {
   return JSON.parse(JSON.stringify(data))
@@ -100,9 +113,16 @@ export function getDefaultAboutContent() {
     profileDetails: cloneContent(defaultProfileDetails),
     profileImage: images.drWael,
     careerImpact: cloneContent(defaultCareerImpact),
-    academicServices: normalizeAcademicServices(defaultAcademicServices),
+    academicServices: normalizeAcademicServices({
+      ...defaultAcademicServices,
+      label: internationalLeadership.label,
+      title: internationalLeadership.title,
+      intro: internationalLeadership.intro,
+    }),
+    certificatesSection: cloneContent(defaultCertificatesSection),
     refereedPublications: normalizeRefereedPublications(defaultRefereedPublications),
     certificates: cloneContent(getDefaultCertificates()),
+    careerTimelineSection: cloneContent(defaultCareerTimelineSection),
     careerTimeline: normalizeCareerTimeline(cloneContent(defaultCareerTimeline)),
     leadershipRoles: cloneContent(defaultLeadershipRoles).map((role, index) => ({
       id: `leadership-${index}`,
@@ -136,10 +156,23 @@ function mergeWithDefaults(saved) {
     },
     academicServices: mergeAcademicServices(
       saved.academicServices ?? defaults.academicServices,
-      normalizeAcademicServices(defaultAcademicServices),
+      normalizeAcademicServices({
+        ...defaultAcademicServices,
+        label: internationalLeadership.label,
+        title: internationalLeadership.title,
+        intro: internationalLeadership.intro,
+      }),
     ),
+    certificatesSection: {
+      ...defaults.certificatesSection,
+      ...saved.certificatesSection,
+    },
     refereedPublications: normalizeRefereedPublications(saved.refereedPublications ?? defaults.refereedPublications),
     certificates: saved.certificates ?? defaults.certificates,
+    careerTimelineSection: {
+      ...defaults.careerTimelineSection,
+      ...saved.careerTimelineSection,
+    },
     careerTimeline: normalizeCareerTimeline(saved.careerTimeline ?? defaults.careerTimeline).map((item, index) => ({
       id: item.id || `timeline-${index}`,
       ...item,

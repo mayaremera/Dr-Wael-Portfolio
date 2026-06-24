@@ -11,7 +11,63 @@ export const CONTENT_SECTIONS = {
   HOME: 'home',
 }
 
+const memoryCache = new Map()
+const inFlightLoads = new Map()
+const sectionSubscribers = new Map()
+const localPublishTimestamps = new Map()
+
+const LOCAL_PUBLISH_GRACE_MS = 5000
+
+export function markSectionLocallyPublished(section) {
+  if (!section) return
+  localPublishTimestamps.set(section, Date.now())
+}
+
+function shouldIgnoreRealtimeUpdate(section) {
+  const publishedAt = localPublishTimestamps.get(section)
+  if (!publishedAt) return false
+
+  if (Date.now() - publishedAt > LOCAL_PUBLISH_GRACE_MS) {
+    localPublishTimestamps.delete(section)
+    return false
+  }
+
+  return true
+}
+
+export function getCachedSectionData(section) {
+  return memoryCache.get(section) ?? null
+}
+
+export function invalidateSectionCache(section) {
+  memoryCache.delete(section)
+  inFlightLoads.delete(section)
+}
+
+export function publishSectionContent(section, data) {
+  memoryCache.set(section, data)
+  sectionSubscribers.get(section)?.forEach((listener) => listener(data))
+}
+
+export function subscribeToSectionContent(section, onUpdate) {
+  if (!sectionSubscribers.has(section)) {
+    sectionSubscribers.set(section, new Set())
+  }
+
+  sectionSubscribers.get(section).add(onUpdate)
+
+  const cached = memoryCache.get(section)
+  if (cached) {
+    onUpdate(cached)
+  }
+
+  return () => {
+    sectionSubscribers.get(section)?.delete(onUpdate)
+  }
+}
+
 export function cacheSectionLocally(storageKey, data) {
+  if (isSupabaseConfigured) return
   localStorage.setItem(storageKey, JSON.stringify(data))
 }
 
@@ -20,6 +76,8 @@ export function clearCachedSection(storageKey) {
 }
 
 export function loadCachedSection(storageKey) {
+  if (isSupabaseConfigured) return null
+
   try {
     const saved = localStorage.getItem(storageKey)
     return saved ? JSON.parse(saved) : null
@@ -97,8 +155,9 @@ export async function saveSectionPrimary({ section, storageKey, data }) {
       throw new Error('Supabase is not configured.')
     }
 
-    cacheSectionLocally(storageKey, data)
-    notifyContentUpdated()
+    markSectionLocallyPublished(section)
+    publishSectionContent(section, data)
+    notifyContentUpdated(section)
     return result
   }
 
@@ -111,21 +170,37 @@ export async function saveSectionPrimary({ section, storageKey, data }) {
     throw error
   }
 
-  notifyContentUpdated()
+  notifyContentUpdated(section)
   return { synced: false, reason: 'local_only' }
+}
+
+async function loadSectionFromSupabase({ section, mergeWithDefaults, getDefaults }) {
+  if (inFlightLoads.has(section)) {
+    return inFlightLoads.get(section)
+  }
+
+  const loadPromise = (async () => {
+    const remote = await fetchRemoteSection(section)
+    const merged = remote ? mergeWithDefaults(remote) : getDefaults()
+    publishSectionContent(section, merged)
+    return merged
+  })()
+
+  inFlightLoads.set(section, loadPromise)
+
+  try {
+    return await loadPromise
+  } finally {
+    inFlightLoads.delete(section)
+  }
 }
 
 export async function loadSectionPrimary({ section, storageKey, mergeWithDefaults, getDefaults }) {
   if (isSupabaseConfigured) {
-    const remote = await fetchRemoteSection(section)
+    const cached = getCachedSectionData(section)
+    if (cached) return cached
 
-    if (remote) {
-      const merged = mergeWithDefaults(remote)
-      cacheSectionLocally(storageKey, merged)
-      return merged
-    }
-
-    return getDefaults()
+    return loadSectionFromSupabase({ section, mergeWithDefaults, getDefaults })
   }
 
   const cached = loadCachedSection(storageKey)
@@ -152,12 +227,13 @@ export async function deleteRemoteSection(section) {
 
 export async function resetSectionPrimary({ section, storageKey }) {
   clearCachedSection(storageKey)
-  notifyContentUpdated()
+  invalidateSectionCache(section)
+  notifyContentUpdated(section)
   return deleteRemoteSection(section)
 }
 
-export function notifyContentUpdated() {
-  window.dispatchEvent(new Event(CONTENT_UPDATED_EVENT))
+export function notifyContentUpdated(section) {
+  window.dispatchEvent(new CustomEvent(CONTENT_UPDATED_EVENT, { detail: { section } }))
 }
 
 const realtimeListeners = new Set()
@@ -171,8 +247,12 @@ function ensureRealtimeChannel() {
     .on(
       'postgres_changes',
       { event: '*', schema: 'public', table: 'site_sections' },
-      () => {
-        realtimeListeners.forEach((listener) => listener())
+      (payload) => {
+        const section = payload.new?.section ?? payload.old?.section
+        if (!section || shouldIgnoreRealtimeUpdate(section)) return
+
+        invalidateSectionCache(section)
+        realtimeListeners.forEach((listener) => listener(section))
       },
     )
     .subscribe()
@@ -183,6 +263,21 @@ function teardownRealtimeChannel() {
 
   supabase.removeChannel(realtimeChannel)
   realtimeChannel = null
+}
+
+export function clearLegacyLocalCaches() {
+  if (!isSupabaseConfigured) return
+
+  const legacyKeys = [
+    'drwael-home-content',
+    'drwael-activity-content',
+    'drwael-services-content',
+    'drwael-gallery-content',
+    'drwael-about-content',
+    'drwael-contact-content',
+  ]
+
+  legacyKeys.forEach(clearCachedSection)
 }
 
 export function subscribeToRemoteContent(onChange) {

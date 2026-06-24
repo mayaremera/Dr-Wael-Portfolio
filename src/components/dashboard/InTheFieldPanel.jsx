@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import DashboardItemList from './DashboardItemList'
+import DashboardSaveNotice from './DashboardSaveNotice'
 import EventDatePicker from './EventDatePicker'
 import MediaDropzone from './MediaDropzone'
 import { useConfirmDelete } from './DeleteConfirmDialog'
@@ -9,11 +10,15 @@ import {
   emptyGlobeLocation,
   emptyGlobeMilestone,
   emptyGlobeRegion,
+  emptyMembershipOrg,
   getDefaultDrWaelActivity,
   loadDrWaelActivityRemote,
+  MEMBERSHIP_SCOPES,
   saveDrWaelActivity,
 } from '../../data/contentStore'
+import { CONTENT_SECTIONS } from '../../data/contentSync'
 import { useDashboardSection } from '../../hooks/useDashboardSection'
+import { withCacheBust } from '../../lib/mediaUrl'
 import DashboardSectionLoader from './DashboardSectionLoader'
 import { persistDashboardSection } from './persistDashboardSection'
 
@@ -623,45 +628,144 @@ function GlobeMilestoneEditor({ initialMilestone, onSave, onCancel }) {
   )
 }
 
+function MembershipOrgPreview({ org }) {
+  return (
+    <div>
+      <p className="text-sm font-semibold text-ink">{org.abbr || '—'}</p>
+      <p className="mt-1 font-medium text-ink">{org.name || 'Untitled organization'}</p>
+      <p className="mt-1 text-xs text-ink-muted">{org.scope || 'International'}</p>
+    </div>
+  )
+}
+
+function MembershipOrgEditor({ initialOrg, onSave, onCancel }) {
+  const [org, setOrg] = useState({ ...emptyMembershipOrg, ...initialOrg })
+  const update = (field, value) => setOrg((current) => ({ ...current, [field]: value }))
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault()
+        onSave({ ...org, id: org.id || createActivityId(org.abbr || org.name) })
+      }}
+      className="rounded-xl border border-brand/20 bg-brand-muted/30 p-5 shadow-sm"
+    >
+      <h3 className="font-serif text-xl text-ink">{org.id ? 'Edit membership' : 'New membership'}</h3>
+      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        <div>
+          <label className={labelClassName}>Abbreviation</label>
+          <input
+            className={fieldClassName}
+            value={org.abbr}
+            onChange={(e) => update('abbr', e.target.value)}
+            placeholder="ASHA"
+            required
+          />
+        </div>
+        <div>
+          <label className={labelClassName}>Scope</label>
+          <select className={fieldClassName} value={org.scope} onChange={(e) => update('scope', e.target.value)} required>
+            {MEMBERSHIP_SCOPES.map((scope) => (
+              <option key={scope} value={scope}>
+                {scope}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="sm:col-span-2">
+          <label className={labelClassName}>Organization name</label>
+          <input
+            className={fieldClassName}
+            value={org.name}
+            onChange={(e) => update('name', e.target.value)}
+            placeholder="American Speech-Language-Hearing Association"
+            required
+          />
+        </div>
+      </div>
+      <div className="mt-5 flex flex-wrap gap-3">
+        <button
+          type="submit"
+          className="rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase transition-colors hover:bg-brand-light"
+        >
+          Save
+        </button>
+        <button
+          type="button"
+          onClick={onCancel}
+          className="rounded-lg border border-slate-200 px-5 py-2.5 text-xs font-semibold tracking-wide text-ink-muted uppercase transition-colors hover:border-brand/25 hover:text-brand"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  )
+}
+
 export default function InTheFieldPanel() {
   const confirmDelete = useConfirmDelete()
   const { content: activity, setContent: setActivity, loading, loadError } = useDashboardSection(
     getDefaultDrWaelActivity,
     loadDrWaelActivityRemote,
+    CONTENT_SECTIONS.ACTIVITY,
   )
   const [editingId, setEditingId] = useState(null)
   const [editingGlobeLocationId, setEditingGlobeLocationId] = useState(null)
+  const [editingMembershipOrgId, setEditingMembershipOrgId] = useState(null)
   const [savedMessage, setSavedMessage] = useState('')
   const [saveError, setSaveError] = useState('')
+  const [isSaving, setIsSaving] = useState(false)
+  const activityRef = useRef(activity)
+  activityRef.current = activity
 
-  const globeLocations = activity.globe?.locations ?? []
+  const globeLocations = activity?.globe?.locations ?? []
+  const membershipOrganizations = activity?.professionalMembership?.organizations ?? []
 
   const allEvents = useMemo(
     () => [
-      ...activity.upcoming.map((event) => ({ ...event, status: 'upcoming' })),
-      ...activity.recent.map((event) => ({ ...event, status: 'recent' })),
+      ...(activity?.upcoming ?? []).map((event) => ({ ...event, status: 'upcoming' })),
+      ...(activity?.recent ?? []).map((event) => ({ ...event, status: 'recent' })),
     ],
     [activity],
   )
 
-  const persist = (nextActivity, message = 'Changes saved.') => {
-    persistDashboardSection({
+  const persist = (nextActivity, message = 'Changes saved.', previousContent = null) => {
+    void persistDashboardSection({
       saveFn: saveDrWaelActivity,
       nextContent: nextActivity,
+      previousContent,
       setContent: setActivity,
       setSaveError,
       setSavedMessage,
+      setIsSaving,
       message,
-      storageErrorMessage: 'Could not save — media may be too large. Try a smaller file.',
+      storageErrorMessage: 'Could not save changes.',
     })
   }
+
+  const persistFromCurrent = (buildNextActivity, message) => {
+    const current = activityRef.current
+    if (!current) {
+      setSaveError('Content is still loading. Try again in a moment.')
+      return
+    }
+
+    const nextActivity = buildNextActivity(current)
+    persist(nextActivity, message, current)
+  }
+
+  const normalizeEventMedia = (event) => ({
+    ...event,
+    image: event.image ? withCacheBust(event.image) : '',
+    video: event.video ? withCacheBust(event.video) : '',
+  })
 
   const updateMeta = (field, value) => {
     setActivity((current) => ({ ...current, [field]: value }))
   }
 
   const saveMeta = () => {
-    persist(activity)
+    persistFromCurrent((current) => current, 'Section header saved.')
   }
 
   const updateGlobeMeta = (field, value) => {
@@ -672,80 +776,147 @@ export default function InTheFieldPanel() {
   }
 
   const saveGlobeMeta = () => {
-    persist(activity, 'Globe header saved.')
+    persistFromCurrent((current) => current, 'Globe header saved.')
   }
 
   const saveGlobeLocation = (location) => {
-    const locations = globeLocations
-    const exists = locations.some((entry) => entry.id === location.id)
-    const nextLocations = exists
-      ? locations.map((entry) => (entry.id === location.id ? location : entry))
-      : [location, ...locations]
+    const exists = (activityRef.current?.globe?.locations ?? []).some((entry) => entry.id === location.id)
 
-    persist(
-      {
-        ...activity,
-        globe: { ...activity.globe, locations: nextLocations },
-      },
-      exists ? 'Globe country updated.' : 'Globe country created.',
-    )
+    persistFromCurrent((current) => {
+      const locations = current.globe?.locations ?? []
+      const nextLocations = exists
+        ? locations.map((entry) => (entry.id === location.id ? location : entry))
+        : [location, ...locations]
+
+      return {
+        ...current,
+        globe: { ...current.globe, locations: nextLocations },
+      }
+    }, exists ? 'Globe country updated.' : 'Globe country created.')
+
     setEditingGlobeLocationId(null)
   }
 
   const deleteGlobeLocation = (id) => {
-    persist(
-      {
-        ...activity,
+    persistFromCurrent(
+      (current) => ({
+        ...current,
         globe: {
-          ...activity.globe,
-          locations: globeLocations.filter((entry) => entry.id !== id),
+          ...current.globe,
+          locations: (current.globe?.locations ?? []).filter((entry) => entry.id !== id),
         },
-      },
+      }),
       'Globe country deleted.',
     )
     if (editingGlobeLocationId === id) setEditingGlobeLocationId(null)
   }
 
   const handleSaveEvent = (event, status) => {
-    const sourceStatus = event.id ? getEventStatus(activity, event.id) : null
+    const normalizedEvent = normalizeEventMedia(event)
+    const current = activityRef.current
 
-    let nextUpcoming = activity.upcoming.filter((item) => item.id !== event.id)
-    let nextRecent = activity.recent.filter((item) => item.id !== event.id)
-
-    if (status === 'upcoming') {
-      nextUpcoming = [event, ...nextUpcoming]
-    } else {
-      nextRecent = [event, ...nextRecent]
+    if (!current) {
+      setSaveError('Content is still loading. Try again in a moment.')
+      return
     }
 
+    const sourceStatus = normalizedEvent.id ? getEventStatus(current, normalizedEvent.id) : null
     const exists = Boolean(sourceStatus)
-    const nextActivity = { ...activity, upcoming: nextUpcoming, recent: nextRecent }
+    const message =
+      exists && sourceStatus !== status
+        ? 'Event moved and saved.'
+        : exists
+          ? 'Event updated.'
+          : 'Event created.'
 
-    persist(
-      nextActivity,
-      exists && sourceStatus !== status ? 'Event moved and saved.' : exists ? 'Event updated.' : 'Event created.',
-    )
+    persistFromCurrent((currentActivity) => {
+      let nextUpcoming = (currentActivity.upcoming ?? []).filter((item) => item.id !== normalizedEvent.id)
+      let nextRecent = (currentActivity.recent ?? []).filter((item) => item.id !== normalizedEvent.id)
+
+      if (status === 'upcoming') {
+        nextUpcoming = [normalizedEvent, ...nextUpcoming]
+      } else {
+        nextRecent = [normalizedEvent, ...nextRecent]
+      }
+
+      return { ...currentActivity, upcoming: nextUpcoming, recent: nextRecent }
+    }, message)
+
     setEditingId(null)
   }
 
   const handleDeleteEvent = (eventId) => {
-    const nextActivity = {
-      ...activity,
-      upcoming: activity.upcoming.filter((item) => item.id !== eventId),
-      recent: activity.recent.filter((item) => item.id !== eventId),
-    }
-
-    persist(nextActivity, 'Event deleted.')
+    persistFromCurrent(
+      (current) => ({
+        ...current,
+        upcoming: (current.upcoming ?? []).filter((item) => item.id !== eventId),
+        recent: (current.recent ?? []).filter((item) => item.id !== eventId),
+      }),
+      'Event deleted.',
+    )
     if (editingId === eventId) setEditingId(null)
+  }
+
+  const updateMembershipMeta = (field, value) => {
+    setActivity((current) => ({
+      ...current,
+      professionalMembership: { ...current.professionalMembership, [field]: value },
+    }))
+  }
+
+  const saveMembershipMeta = () => {
+    persistFromCurrent((current) => current, 'Professional membership saved.')
+  }
+
+  const saveMembershipOrg = (org) => {
+    const exists = (activityRef.current?.professionalMembership?.organizations ?? []).some(
+      (entry) => entry.id === org.id,
+    )
+
+    persistFromCurrent((current) => {
+      const organizations = current.professionalMembership?.organizations ?? []
+      const nextOrganizations = exists
+        ? organizations.map((entry) => (entry.id === org.id ? org : entry))
+        : [org, ...organizations]
+
+      return {
+        ...current,
+        professionalMembership: {
+          ...current.professionalMembership,
+          organizations: nextOrganizations,
+        },
+      }
+    }, exists ? 'Membership updated.' : 'Membership created.')
+
+    setEditingMembershipOrgId(null)
+  }
+
+  const deleteMembershipOrg = (id) => {
+    persistFromCurrent(
+      (current) => ({
+        ...current,
+        professionalMembership: {
+          ...current.professionalMembership,
+          organizations: (current.professionalMembership?.organizations ?? []).filter(
+            (entry) => entry.id !== id,
+          ),
+        },
+      }),
+      'Membership deleted.',
+    )
+    if (editingMembershipOrgId === id) setEditingMembershipOrgId(null)
   }
 
   return (
     <PanelShell
       eyebrow="In the Field"
       title="Professional activity"
-      description="Create, edit, and delete event cards and globe locations for the live In the Field page. Saves go to Supabase and update the website for all visitors."
+      description="Sections are listed in the same order they appear on the live In the Field page."
     >
+      <DashboardSaveNotice message={savedMessage} error={saveError} saving={isSaving} />
       <DashboardSectionLoader loading={loading} loadError={loadError} />
+      {!loading && !loadError && activity ? (
+        <>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <a
           href="/in-the-field"
@@ -755,18 +926,79 @@ export default function InTheFieldPanel() {
         >
           Preview live page →
         </a>
-        <div className="flex flex-wrap items-center gap-2">
-          {saveError ? (
-            <span className="rounded-full bg-accent/10 px-3 py-1 text-xs font-semibold text-accent-hover">{saveError}</span>
-          ) : null}
-          {savedMessage ? (
-            <span className="rounded-full bg-brand-muted px-3 py-1 text-xs font-semibold text-brand">{savedMessage}</span>
-          ) : null}
-        </div>
       </div>
 
       <section className="rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
-        <h2 className="font-serif text-xl text-ink">Section header</h2>
+        <p className="text-[0.65rem] font-semibold tracking-wide text-brand uppercase">1 · Top of page</p>
+        <h2 className="mt-1 font-serif text-xl text-ink">Earth globe</h2>
+        <p className="mt-1 text-sm text-ink-muted">
+          The interactive globe at the top of the page — header text and countries on the map.
+        </p>
+        <div className="mt-4 grid gap-4 md:grid-cols-2">
+          <div>
+            <label className={labelClassName}>Label</label>
+            <input className={fieldClassName} value={activity.globe?.label ?? ''} onChange={(e) => updateGlobeMeta('label', e.target.value)} />
+          </div>
+          <div>
+            <label className={labelClassName}>Title</label>
+            <input className={fieldClassName} value={activity.globe?.title ?? ''} onChange={(e) => updateGlobeMeta('title', e.target.value)} />
+          </div>
+          <div className="md:col-span-2">
+            <label className={labelClassName}>Description</label>
+            <textarea
+              className={`${fieldClassName} min-h-24 resize-y`}
+              value={activity.globe?.description ?? ''}
+              onChange={(e) => updateGlobeMeta('description', e.target.value)}
+            />
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={saveGlobeMeta}
+          className="mt-4 rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase transition-colors hover:bg-brand-light"
+        >
+          Save changes
+        </button>
+      </section>
+
+      <div className="mt-6">
+        <DashboardItemList
+          title="Globe countries"
+          countLabel={`${globeLocations.length} countr${globeLocations.length === 1 ? 'y' : 'ies'} on the map`}
+          items={globeLocations}
+          editingId={editingGlobeLocationId}
+          onAdd={() => setEditingGlobeLocationId('new')}
+          onEdit={setEditingGlobeLocationId}
+          onDelete={deleteGlobeLocation}
+          getItemId={(item) => item.id}
+          addLabel="Add country"
+          emptyMessage="No globe countries yet."
+          renderPreview={(item) => <GlobeLocationPreview location={item} />}
+          renderEditor={(item) =>
+            item === 'new' ? (
+              <GlobeLocationEditor
+                initialLocation={emptyGlobeLocation}
+                onSave={saveGlobeLocation}
+                onCancel={() => setEditingGlobeLocationId(null)}
+              />
+            ) : (
+              <GlobeLocationEditor
+                key={item.id}
+                initialLocation={item}
+                onSave={saveGlobeLocation}
+                onCancel={() => setEditingGlobeLocationId(null)}
+              />
+            )
+          }
+        />
+      </div>
+
+      <section className="mt-6 rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
+        <p className="text-[0.65rem] font-semibold tracking-wide text-brand uppercase">2 · Events timeline</p>
+        <h2 className="mt-1 font-serif text-xl text-ink">Dr. Wael&apos;s month &amp; year</h2>
+        <p className="mt-1 text-sm text-ink-muted">
+          The events section below the globe — section header and upcoming/recent event cards.
+        </p>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           <div>
             <label className={labelClassName}>Label</label>
@@ -790,7 +1022,7 @@ export default function InTheFieldPanel() {
           onClick={saveMeta}
           className="mt-4 rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase transition-colors hover:bg-brand-light"
         >
-          Save header
+          Save changes
         </button>
       </section>
 
@@ -864,68 +1096,79 @@ export default function InTheFieldPanel() {
       </div>
 
       <section className="mt-6 rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
-        <h2 className="font-serif text-xl text-ink">Earth globe section</h2>
+        <p className="text-[0.65rem] font-semibold tracking-wide text-brand uppercase">3 · Memberships</p>
+        <h2 className="mt-1 font-serif text-xl text-ink">Professional membership</h2>
         <p className="mt-1 text-sm text-ink-muted">
-          Edit the interactive globe header and the countries/regions shown on the In the Field page.
+          The membership grid below the events timeline — section header and organization cards.
         </p>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           <div>
             <label className={labelClassName}>Label</label>
-            <input className={fieldClassName} value={activity.globe?.label ?? ''} onChange={(e) => updateGlobeMeta('label', e.target.value)} />
-          </div>
-          <div>
-            <label className={labelClassName}>Title</label>
-            <input className={fieldClassName} value={activity.globe?.title ?? ''} onChange={(e) => updateGlobeMeta('title', e.target.value)} />
+            <input
+              className={fieldClassName}
+              value={activity.professionalMembership?.label ?? ''}
+              onChange={(e) => updateMembershipMeta('label', e.target.value)}
+            />
           </div>
           <div className="md:col-span-2">
-            <label className={labelClassName}>Description</label>
+            <label className={labelClassName}>Title</label>
+            <input
+              className={fieldClassName}
+              value={activity.professionalMembership?.title ?? ''}
+              onChange={(e) => updateMembershipMeta('title', e.target.value)}
+            />
+          </div>
+          <div className="md:col-span-2">
+            <label className={labelClassName}>Introduction</label>
             <textarea
               className={`${fieldClassName} min-h-24 resize-y`}
-              value={activity.globe?.description ?? ''}
-              onChange={(e) => updateGlobeMeta('description', e.target.value)}
+              value={activity.professionalMembership?.intro ?? ''}
+              onChange={(e) => updateMembershipMeta('intro', e.target.value)}
             />
           </div>
         </div>
         <button
           type="button"
-          onClick={saveGlobeMeta}
+          onClick={saveMembershipMeta}
           className="mt-4 rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase transition-colors hover:bg-brand-light"
         >
-          Save globe header
+          Save changes
         </button>
       </section>
 
       <div className="mt-6">
         <DashboardItemList
-          title="Globe countries"
-          countLabel={`${globeLocations.length} countr${globeLocations.length === 1 ? 'y' : 'ies'} on the map`}
-          items={globeLocations}
-          editingId={editingGlobeLocationId}
-          onAdd={() => setEditingGlobeLocationId('new')}
-          onEdit={setEditingGlobeLocationId}
-          onDelete={deleteGlobeLocation}
+          title="Organizations"
+          countLabel={`${membershipOrganizations.length} membership${membershipOrganizations.length === 1 ? '' : 's'}`}
+          items={membershipOrganizations}
+          editingId={editingMembershipOrgId}
+          onAdd={() => setEditingMembershipOrgId('new')}
+          onEdit={setEditingMembershipOrgId}
+          onDelete={deleteMembershipOrg}
           getItemId={(item) => item.id}
-          addLabel="Add country"
-          emptyMessage="No globe countries yet."
-          renderPreview={(item) => <GlobeLocationPreview location={item} />}
+          addLabel="Add organization"
+          emptyMessage="No memberships yet."
+          renderPreview={(item) => <MembershipOrgPreview org={item} />}
           renderEditor={(item) =>
             item === 'new' ? (
-              <GlobeLocationEditor
-                initialLocation={emptyGlobeLocation}
-                onSave={saveGlobeLocation}
-                onCancel={() => setEditingGlobeLocationId(null)}
+              <MembershipOrgEditor
+                initialOrg={emptyMembershipOrg}
+                onSave={saveMembershipOrg}
+                onCancel={() => setEditingMembershipOrgId(null)}
               />
             ) : (
-              <GlobeLocationEditor
+              <MembershipOrgEditor
                 key={item.id}
-                initialLocation={item}
-                onSave={saveGlobeLocation}
-                onCancel={() => setEditingGlobeLocationId(null)}
+                initialOrg={item}
+                onSave={saveMembershipOrg}
+                onCancel={() => setEditingMembershipOrgId(null)}
               />
             )
           }
         />
       </div>
+        </>
+      ) : null}
     </PanelShell>
   )
 }
