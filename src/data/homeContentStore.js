@@ -8,10 +8,12 @@ import {
 import { createContentId } from './servicesContentStore'
 import {
   CONTENT_SECTIONS,
+  fetchRemoteSection,
   loadSectionPrimary,
   resetSectionPrimary,
   saveSectionPrimary,
 } from './contentSync'
+import { isSupabaseConfigured } from '../lib/supabase'
 
 export const HOME_STORAGE_KEY = 'drwael-home-content'
 
@@ -191,6 +193,40 @@ export function mergeHomeContent(saved = {}) {
   return mergeWithDefaults(rest)
 }
 
+function patchHomeContent(base, patch) {
+  const next = { ...base }
+
+  for (const key of Object.keys(patch)) {
+    const patchValue = patch[key]
+    const baseValue = base?.[key]
+
+    if (
+      patchValue != null &&
+      typeof patchValue === 'object' &&
+      !Array.isArray(patchValue) &&
+      baseValue != null &&
+      typeof baseValue === 'object' &&
+      !Array.isArray(baseValue)
+    ) {
+      next[key] = { ...baseValue, ...patchValue }
+    } else {
+      next[key] = patchValue
+    }
+  }
+
+  return next
+}
+
+async function buildHomeSavePayload(patch) {
+  if (!isSupabaseConfigured) {
+    return patchHomeContent(getDefaultHomeContent(), patch)
+  }
+
+  const remote = await fetchRemoteSection(CONTENT_SECTIONS.HOME)
+  const base = remote ?? getDefaultHomeContent()
+  return patchHomeContent(base, patch)
+}
+
 export async function loadHomeContentRemote() {
   return loadSectionPrimary({
     section: CONTENT_SECTIONS.HOME,
@@ -206,6 +242,12 @@ export async function saveHomeContent(data) {
     storageKey: HOME_STORAGE_KEY,
     data,
   })
+}
+
+/** Saves only the provided home subsections on top of the latest Supabase row. */
+export async function saveHomeContentPartial(patch) {
+  const payload = await buildHomeSavePayload(patch)
+  return saveHomeContent(payload)
 }
 
 export async function resetHomeContent() {

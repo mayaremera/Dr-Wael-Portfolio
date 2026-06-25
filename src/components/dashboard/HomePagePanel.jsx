@@ -9,7 +9,7 @@ import {
   emptyCredentialWheelItem,
   getDefaultHomeContent,
   loadHomeContentRemote,
-  saveHomeContent,
+  saveHomeContentPartial,
 } from '../../data/homeContentStore'
 import { CONTENT_SECTIONS } from '../../data/contentSync'
 import { useDashboardSection } from '../../hooks/useDashboardSection'
@@ -275,10 +275,14 @@ export default function HomePagePanel() {
   const contentRef = useRef(content)
   contentRef.current = content
 
-  const persist = (nextContent, message = 'Changes saved.', previousContent = null) => {
+  const persistPartial = (patch, message = 'Changes saved.', previousContent = null) => {
     void persistDashboardSection({
-      saveFn: saveHomeContent,
-      nextContent,
+      saveFn: async () => {
+        await saveHomeContentPartial(patch)
+        const refreshed = await loadHomeContentRemote()
+        return { synced: true, data: refreshed }
+      },
+      nextContent: null,
       previousContent,
       setContent,
       setSaveError,
@@ -289,15 +293,14 @@ export default function HomePagePanel() {
     })
   }
 
-  const persistFromCurrent = (buildNextContent, message) => {
+  const persistFromCurrent = (buildPatch, message) => {
     const current = contentRef.current
     if (!current) {
       setSaveError('Content is still loading. Try again in a moment.')
       return
     }
 
-    const nextContent = buildNextContent(current)
-    persist(nextContent, message, current)
+    persistPartial(buildPatch(current), message, current)
   }
 
   const updateHero = (field, value) => {
@@ -310,7 +313,6 @@ export default function HomePagePanel() {
   const updateHeroImage = (image, message = 'Hero image saved.') => {
     persistFromCurrent(
       (current) => ({
-        ...current,
         hero: {
           ...current.hero,
           backgroundImage: image ? withCacheBust(image) : '',
@@ -347,25 +349,30 @@ export default function HomePagePanel() {
   }
 
   const saveHero = () => {
-    persistFromCurrent((current) => current, 'Hero section saved.')
+    persistFromCurrent((current) => ({ hero: current.hero }), 'Hero section saved.')
   }
 
   const saveCredentialWheelSection = () => {
-    persistFromCurrent((current) => current, 'Credentials wheel saved.')
+    persistFromCurrent(
+      (current) => ({ credentialWheel: current.credentialWheel }),
+      'Credentials wheel saved.',
+    )
   }
 
   const saveAffiliationsSection = () => {
-    persistFromCurrent((current) => current, 'Affiliations section saved.')
+    persistFromCurrent(
+      (current) => ({ affiliations: current.affiliations }),
+      'Affiliations section saved.',
+    )
   }
 
   const saveWhyTrust = (message = 'Why Trust section saved.') => {
-    persistFromCurrent((current) => current, message)
+    persistFromCurrent((current) => ({ whyChooseUs: current.whyChooseUs }), message)
   }
 
   const updateWhyTrustImage = (image, message = 'Why Trust image saved.') => {
     persistFromCurrent(
       (current) => ({
-        ...current,
         whyChooseUs: {
           ...current.whyChooseUs,
           image: image ? withCacheBust(image) : '',
@@ -407,7 +414,6 @@ export default function HomePagePanel() {
 
     persistFromCurrent(
       (current) => ({
-        ...current,
         affiliations: {
           ...current.affiliations,
           companies: exists
@@ -425,7 +431,6 @@ export default function HomePagePanel() {
   const deleteAffiliation = (id) => {
     persistFromCurrent(
       (current) => ({
-        ...current,
         affiliations: {
           ...current.affiliations,
           companies: (current.affiliations?.companies ?? []).filter((entry) => entry.id !== id),
@@ -442,7 +447,6 @@ export default function HomePagePanel() {
 
     persistFromCurrent(
       (current) => ({
-        ...current,
         credentialWheel: {
           ...current.credentialWheel,
           items: exists
@@ -458,7 +462,6 @@ export default function HomePagePanel() {
   const deleteCredentialWheelItem = (id) => {
     persistFromCurrent(
       (current) => ({
-        ...current,
         credentialWheel: {
           ...current.credentialWheel,
           items: (current.credentialWheel?.items ?? []).filter((entry) => entry.id !== id),

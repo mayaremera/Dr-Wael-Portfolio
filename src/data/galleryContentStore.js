@@ -240,10 +240,11 @@ async function persistPromoVideoMigration(remoteGallery, remoteHome) {
   publishSectionContent(CONTENT_SECTIONS.GALLERY, migratedGallery)
   notifyContentUpdated(CONTENT_SECTIONS.GALLERY)
 
-  const cleanedHome = mergeHomeContent(remoteHome)
+  // Only remove the legacy promoVideo field from home — never rewrite other home sections.
+  const { promoVideo: _legacyPromoVideo, ...cleanedHome } = remoteHome ?? {}
   await saveRemoteSection(CONTENT_SECTIONS.HOME, cleanedHome)
   markSectionLocallyPublished(CONTENT_SECTIONS.HOME)
-  publishSectionContent(CONTENT_SECTIONS.HOME, cleanedHome)
+  publishSectionContent(CONTENT_SECTIONS.HOME, mergeHomeContent(cleanedHome))
   notifyContentUpdated(CONTENT_SECTIONS.HOME)
 
   return migratedGallery
