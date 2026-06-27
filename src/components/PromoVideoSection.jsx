@@ -3,11 +3,23 @@ import { useGalleryContent } from '../hooks/useGalleryContent'
 
 const PROMO_PLAYBACK_RATE = 0.65
 
-export default function PromoVideoSection({ ctaHref, secondaryHref, variant = 'alt' }) {
+export default function PromoVideoSection({ ctaHref, secondaryHref, variant = 'alt', fullBleedMobile = false }) {
   const { isReady, promoVideo } = useGalleryContent()
   const src = promoVideo?.src ?? ''
   const videoRef = useRef(null)
   const isLight = variant === 'light'
+  const mobileBleed = fullBleedMobile
+    ? 'max-md:py-0 max-md:border-t-0'
+    : ''
+  const mobileContainerBleed = fullBleedMobile
+    ? 'max-md:max-w-none max-md:px-0'
+    : ''
+  const mobileFrameBleed = fullBleedMobile
+    ? 'max-md:!min-h-[85vh] max-md:rounded-none max-md:shadow-none'
+    : ''
+  const mobileContentBleed = fullBleedMobile
+    ? 'max-md:!min-h-[85vh]'
+    : ''
 
   useEffect(() => {
     const video = videoRef.current
@@ -30,11 +42,13 @@ export default function PromoVideoSection({ ctaHref, secondaryHref, variant = 'a
   return (
     <section
       id="promo"
-      className={`border-t border-slate-200 py-16 lg:py-20 ${isLight ? 'bg-white' : 'bg-surface-alt'}`}
+      className={`border-t border-slate-200 py-16 lg:py-20 ${isLight ? 'bg-white' : 'bg-surface-alt'} ${mobileBleed}`}
       aria-labelledby="promo-heading"
     >
-      <div className="mx-auto max-w-6xl px-6 lg:px-8">
-        <div className="relative min-h-[min(46vh,360px)] overflow-hidden rounded-sm shadow-xl shadow-brand/15 sm:min-h-[min(50vh,400px)] lg:min-h-[min(72vh,640px)]">
+      <div className={`mx-auto max-w-6xl px-6 lg:px-8 ${mobileContainerBleed}`}>
+        <div
+          className={`relative min-h-[min(46vh,360px)] overflow-hidden rounded-sm shadow-xl shadow-brand/15 sm:min-h-[min(50vh,400px)] lg:min-h-[min(72vh,640px)] ${mobileFrameBleed}`}
+        >
           <video
             key={src}
             ref={videoRef}
@@ -75,7 +89,9 @@ export default function PromoVideoSection({ ctaHref, secondaryHref, variant = 'a
             aria-hidden="true"
           />
 
-          <div className="relative flex min-h-[min(46vh,360px)] items-center justify-center px-4 py-8 sm:min-h-[min(50vh,400px)] sm:px-6 sm:py-10 lg:min-h-[min(72vh,640px)] lg:px-12 lg:py-16">
+          <div
+            className={`relative flex min-h-[min(46vh,360px)] items-center justify-center px-4 py-8 sm:min-h-[min(50vh,400px)] sm:px-6 sm:py-10 lg:min-h-[min(72vh,640px)] lg:px-12 lg:py-16 ${mobileContentBleed}`}
+          >
             <div className="mx-auto max-w-3xl text-center">
               <p className="animate-promo-fade-up inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3 py-1 text-[0.625rem] font-semibold tracking-[0.18em] text-white uppercase backdrop-blur-sm sm:px-4 sm:py-1.5 sm:text-xs sm:tracking-[0.22em] lg:px-4 lg:py-1.5">
                 <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" aria-hidden="true" />

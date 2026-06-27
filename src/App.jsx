@@ -95,7 +95,7 @@ function HomePage() {
       <Profile />
       <Expertise />
       <TherapyConcepts showCasesPreview />
-      <PromoVideoSection />
+      <PromoVideoSection fullBleedMobile />
       <DrWaelActivity />
       <Testimonials variant="showcase" />
       <Contact />
