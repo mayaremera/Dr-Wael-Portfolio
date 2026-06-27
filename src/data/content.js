@@ -1,5 +1,7 @@
 /** Site content — Dr. Wael A. Al-Dakroury, SLP (drwaelslp.com) */
 
+import heroMobileVertical from '../assets/hero-mobile-vertical.png'
+
 export const site = {
   name: 'Dr. Wael A. Al-Dakroury',
   title:
@@ -30,6 +32,7 @@ export const images = {
   aboutHero: '/images/aboutmesection.jpeg',
   servicesHero: '/images/services-hero-v3.png',
   heroBanner: '/images/hero1.jpeg',
+  heroMobileVertical,
   family: '/images/family.jpg',
   whyTrust: '/images/whytrust.jpg',
   familyTraining: '/images/familytraining.jpg',

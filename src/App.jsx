@@ -79,7 +79,7 @@ function ServicesPageHeading({ eyebrow, title, backgroundImage }) {
 
         <div className="relative mx-auto flex min-h-[300px] max-w-6xl flex-col justify-end px-6 pb-10 sm:min-h-[340px] sm:pb-12 lg:px-8">
           <p className="text-xs font-semibold tracking-[0.24em] text-accent uppercase">{eyebrow}</p>
-          <h1 className="mt-3 font-serif text-xl leading-tight whitespace-nowrap text-white sm:text-2xl md:text-3xl lg:text-5xl">
+          <h1 className="mt-3 max-lg:whitespace-normal font-serif text-xl leading-tight whitespace-nowrap text-white sm:text-2xl md:text-3xl lg:text-5xl">
             {title}
           </h1>
         </div>
@@ -297,7 +297,7 @@ function App() {
   const pageContent = pages[pathname]
 
   return (
-    <div className="min-h-screen bg-surface pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0">
+    <div className="min-h-screen overflow-x-clip bg-surface pb-[calc(5rem+env(safe-area-inset-bottom))] lg:overflow-visible lg:pb-0">
       {isPageReady ? <Header /> : null}
       <div className={!isPageReady ? 'pointer-events-none select-none' : undefined} aria-hidden={!isPageReady}>
         <main>

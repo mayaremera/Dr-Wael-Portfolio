@@ -188,9 +188,11 @@ export default function DrWaelActivity({ variant = 'preview' }) {
         </header>
 
         {isFullPage ? (
-          <div className="mt-12 grid items-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-12 mobile-card-scroll mobile-card-scroll--gap-lg lg:grid lg:grid-cols-3 lg:items-start lg:gap-6">
             {allEvents.map((item) => (
-              <ActivityCard key={item.id} item={item} isUpcoming={item.isUpcoming} />
+              <div key={item.id} className="mobile-card-scroll__item lg:w-auto">
+                <ActivityCard item={item} isUpcoming={item.isUpcoming} />
+              </div>
             ))}
           </div>
         ) : (
@@ -201,9 +203,11 @@ export default function DrWaelActivity({ variant = 'preview' }) {
               </a>
             </div>
 
-            <div className="grid items-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mobile-card-scroll mobile-card-scroll--gap-lg lg:grid lg:grid-cols-3 lg:items-start lg:gap-6">
               {featuredEvents.map((item) => (
-                <ActivityCard key={item.id} item={item} isUpcoming={item.isUpcoming} />
+                <div key={item.id} className="mobile-card-scroll__item lg:w-auto">
+                  <ActivityCard item={item} isUpcoming={item.isUpcoming} />
+                </div>
               ))}
             </div>
           </>

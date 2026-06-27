@@ -185,11 +185,11 @@ function ServiceDetailCard({ concept, index }) {
 
 function CasesPreviewGrid({ cases }) {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="mobile-card-scroll lg:grid lg:grid-cols-3 lg:gap-4">
       {cases.map((item) => (
         <article
           key={item.id}
-          className="group flex h-full flex-col overflow-hidden rounded-sm border border-slate-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-brand/20 hover:shadow-md hover:shadow-brand/10"
+          className="mobile-card-scroll__item group flex h-full flex-col overflow-hidden rounded-sm border border-slate-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-brand/20 hover:shadow-md hover:shadow-brand/10 lg:w-auto"
         >
           <div className="relative h-36 w-full shrink-0 overflow-hidden">
             {hasMediaSrc(item.image) ? (
@@ -282,11 +282,11 @@ export default function TherapyConcepts({ showCasesPreview = false, fullDetail =
               ))}
             </div>
           ) : (
-            <div className="grid items-stretch gap-4 md:grid-cols-2">
+            <div className="mobile-card-scroll lg:grid lg:grid-cols-2 lg:items-stretch lg:gap-4">
               {displayConcepts.map((concept) => (
                 <article
                   key={concept.id}
-                  className="group flex h-full flex-col overflow-hidden rounded-sm border border-slate-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-brand/20 hover:shadow-md sm:flex-row"
+                  className="mobile-card-scroll__item mobile-card-scroll__item--service group flex h-full flex-col overflow-hidden rounded-sm border border-slate-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-brand/20 hover:shadow-md lg:w-auto lg:flex-row"
                 >
                   <ServiceCardImage
                     src={concept.image}

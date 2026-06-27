@@ -180,9 +180,11 @@ export default function VideoLibrarySection() {
           ) : null}
         </header>
 
-        <div className="mt-14 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-14 mobile-card-scroll mobile-card-scroll--gap-lg lg:grid lg:grid-cols-3 lg:gap-x-6 lg:gap-y-10">
           {playableItems.map((item) => (
-            <VideoCard key={item.id} item={item} onPlay={() => setActiveItem(item)} />
+            <div key={item.id} className="mobile-card-scroll__item h-full lg:w-auto">
+              <VideoCard item={item} onPlay={() => setActiveItem(item)} />
+            </div>
           ))}
         </div>
       </div>

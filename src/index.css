@@ -786,3 +786,67 @@ select {
   animation: globe-event-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   opacity: 0;
 }
+
+/* ── Mobile-only layout helpers (max-width: 1023px) ── */
+@media (max-width: 1023px) {
+  html,
+  body {
+    overflow-x: clip;
+  }
+
+  .mobile-card-scroll {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 1rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin-inline: -1.5rem;
+    padding-inline: 1.5rem;
+    padding-bottom: 0.35rem;
+  }
+
+  .mobile-card-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mobile-card-scroll--gap-lg {
+    gap: 1.25rem;
+  }
+
+  .mobile-card-scroll__item {
+    flex: 0 0 auto;
+    width: min(82vw, 20rem);
+    scroll-snap-align: start;
+  }
+
+  .mobile-card-scroll__item--wide {
+    width: min(88vw, 22rem);
+  }
+
+  .mobile-card-scroll__item--service {
+    width: min(90vw, 21rem);
+  }
+
+  .mobile-card-scroll__item--stat {
+    width: min(72vw, 16rem);
+  }
+
+  .mobile-icon-scroll {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .mobile-icon-scroll--inset {
+    margin-inline: -0.25rem;
+    padding-inline: 0.25rem;
+  }
+
+  .mobile-icon-scroll::-webkit-scrollbar {
+    display: none;
+  }
+}

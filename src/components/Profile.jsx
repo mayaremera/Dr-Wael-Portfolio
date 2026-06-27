@@ -81,7 +81,7 @@ function AffiliationBadge({ logo, label, compact = false }) {
   )
 }
 
-function AffiliationTile({ company }) {
+function AffiliationTile({ company, className = '' }) {
   const [logoFailed, setLogoFailed] = useState(false)
   const fullCover = company.logoFit === 'cover'
   const logoLayout = company.logoLayout || (company.badgeLogo ? 'split' : 'single')
@@ -90,7 +90,7 @@ function AffiliationTile({ company }) {
 
   return (
     <article
-      className="group relative h-32 overflow-hidden rounded-sm border border-slate-200/80 bg-white shadow-sm transition-[box-shadow,border-color,transform] duration-300 hover:-translate-y-0.5 hover:border-brand/20 hover:shadow-md hover:shadow-brand/10 focus-within:-translate-y-0.5 focus-within:border-brand/20 focus-within:shadow-md focus-within:shadow-brand/10 lg:h-36"
+      className={`group relative h-32 overflow-hidden rounded-sm border border-slate-200/80 bg-white shadow-sm transition-[box-shadow,border-color,transform] duration-300 hover:-translate-y-0.5 hover:border-brand/20 hover:shadow-md hover:shadow-brand/10 focus-within:-translate-y-0.5 focus-within:border-brand/20 focus-within:shadow-md focus-within:shadow-brand/10 lg:h-36 ${className}`.trim()}
       tabIndex={0}
     >
       <div className="relative h-full w-full overflow-hidden">
@@ -146,9 +146,9 @@ function AffiliationTile({ company }) {
 
 function AffiliationGrid({ companies }) {
   return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 lg:gap-4">
+    <div className="mobile-card-scroll lg:grid lg:grid-cols-3 lg:gap-4">
       {companies.map((company) => (
-        <AffiliationTile key={company.id} company={company} />
+        <AffiliationTile key={company.id} company={company} className="mobile-card-scroll__item lg:w-auto" />
       ))}
     </div>
   )
@@ -276,11 +276,11 @@ export default function Profile({ variant = 'home' }) {
         </div>
 
         {isPage ? (
-          <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
+          <div className="mt-12 mobile-card-scroll lg:grid lg:grid-cols-4 lg:gap-5">
             {careerImpact.stats.map((stat, index) => (
               <article
                 key={stat.label}
-                className={`rounded-sm border p-5 text-center shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${statAccents[index % statAccents.length]}`}
+                className={`mobile-card-scroll__item mobile-card-scroll__item--stat rounded-sm border p-5 text-center shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md lg:w-auto ${statAccents[index % statAccents.length]}`}
               >
                 <p className="font-serif text-3xl tabular-nums text-brand md:text-4xl">{stat.value}</p>
                 <p className="mt-2 text-xs font-semibold tracking-[0.14em] text-ink uppercase">{stat.label}</p>

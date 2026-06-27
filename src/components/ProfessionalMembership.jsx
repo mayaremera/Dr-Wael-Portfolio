@@ -110,9 +110,11 @@ export default function ProfessionalMembership() {
               </span>
             </div>
 
-            <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-8 mobile-card-scroll mobile-card-scroll--gap-lg lg:grid lg:grid-cols-3 lg:gap-5">
               {organizations.map((org) => (
-                <MembershipCard key={org.id} org={org} />
+                <div key={org.id} className="mobile-card-scroll__item lg:w-auto">
+                  <MembershipCard org={org} />
+                </div>
               ))}
             </div>
           </div>

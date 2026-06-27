@@ -269,14 +269,14 @@ function GalleryLightbox({ items, activeIndex, onClose, onNavigate }) {
   )
 }
 
-function GalleryCompactCard({ item, globalIndex, onOpen }) {
+function GalleryCompactCard({ item, globalIndex, onOpen, className = '' }) {
   const title = getItemTitle(item)
   const description = getItemDescription(item)
   const previewText =
     description || 'A moment from clinical practice, training, or professional events.'
 
   return (
-    <article className="group h-full">
+    <article className={`group h-full ${className}`.trim()}>
       <button
         type="button"
         onClick={() => onOpen(globalIndex)}
@@ -489,7 +489,7 @@ export default function GalleryGrid() {
           </p>
         ) : (
           <>
-            <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-8 mobile-card-scroll mobile-card-scroll--gap-lg lg:grid lg:grid-cols-3 lg:gap-5">
               {pageItems.map((item, index) => {
                 const globalIndex = (currentPage - 1) * PAGE_SIZE + index
                 return (
@@ -498,6 +498,7 @@ export default function GalleryGrid() {
                     item={item}
                     globalIndex={globalIndex}
                     onOpen={openAt}
+                    className="mobile-card-scroll__item lg:w-auto"
                   />
                 )
               })}

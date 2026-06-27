@@ -151,7 +151,7 @@ function CompactCaseTile({ item, isActive, onSelect }) {
       type="button"
       onClick={onSelect}
       aria-current={isActive ? 'true' : undefined}
-      className={`group relative overflow-hidden rounded-sm border text-left transition-all duration-300 ${
+      className={`mobile-card-scroll__item mobile-card-scroll__item--wide group relative overflow-hidden rounded-sm border text-left transition-all duration-300 lg:w-auto ${
         isActive
           ? 'border-accent bg-white shadow-md ring-2 ring-accent/20'
           : 'border-white/20 bg-white/5 hover:border-white/35 hover:bg-white/10'
@@ -332,7 +332,7 @@ export default function ClinicalSpecializations() {
                 <p className="mb-2.5 text-xs font-semibold tracking-[0.18em] text-white/50 uppercase">
                   Browse cases
                 </p>
-                <div className="mb-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <div className="mb-4 mobile-card-scroll lg:grid lg:grid-cols-2 lg:gap-2">
                   {filtered.map((item) => (
                     <CompactCaseTile
                       key={item.id}

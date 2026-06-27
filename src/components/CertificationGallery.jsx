@@ -129,11 +129,11 @@ export default function CertificationGallery() {
           </div>
         </div>
 
-        <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 mobile-card-scroll lg:grid lg:grid-cols-3 lg:gap-4">
           {pageItems.map((certificate) => (
             <article
               key={certificate.id}
-              className="group relative overflow-hidden rounded-sm border border-slate-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-brand/40 hover:shadow-md hover:shadow-brand/15"
+              className="mobile-card-scroll__item group relative overflow-hidden rounded-sm border border-slate-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-brand/40 hover:shadow-md hover:shadow-brand/15 lg:w-auto"
             >
               <div className="relative aspect-4/3 overflow-hidden bg-slate-100">
                 {certificate.image ? (

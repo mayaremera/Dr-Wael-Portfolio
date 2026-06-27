@@ -43,18 +43,20 @@ export default function HopeGallery() {
           </h2>
         </header>
 
-        <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-12 lg:grid-rows-2 lg:gap-4">
-          <GalleryTile
-            item={main}
-            className="min-h-[260px] sm:min-h-[280px] sm:col-span-2 lg:col-span-7 lg:row-span-2 lg:min-h-[400px]"
-          />
+        <div className="grid gap-3 lg:grid-cols-12 lg:grid-rows-2 lg:gap-4">
+        <GalleryTile
+          item={main}
+          className="min-h-[260px] sm:min-h-[280px] lg:col-span-7 lg:row-span-2 lg:min-h-[400px]"
+        />
+        <div className="mobile-card-scroll lg:contents">
           {rest.map((item) => (
             <GalleryTile
               key={item.src}
               item={item}
-              className="min-h-[200px] sm:min-h-[220px] lg:col-span-5 lg:min-h-0"
+              className="mobile-card-scroll__item min-h-[200px] sm:min-h-[220px] lg:col-span-5 lg:min-h-0 lg:w-auto"
             />
           ))}
+        </div>
         </div>
       </div>
     </section>
