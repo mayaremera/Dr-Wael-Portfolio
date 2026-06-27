@@ -55,29 +55,30 @@ export default function HeroBanner() {
         aria-hidden="true"
       />
 
-      {/* Mobile: bottom dock */}
-      <div className="max-md:absolute max-md:inset-x-0 max-md:bottom-5 max-md:z-10 max-md:px-3 md:hidden">
-        <div className="overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-t from-ink/55 via-ink/25 to-ink/5 px-4 pb-4 pt-5">
-          <h1 className="font-serif text-[1.375rem] leading-[1.25] font-semibold text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)]">
+      {/* Mobile: editorial bottom layout — no box, content floats on the hero */}
+      <div className="max-md:absolute max-md:inset-x-0 max-md:bottom-5 max-md:z-10 max-md:px-5 md:hidden">
+        <div className="pb-4">
+          <div className="mb-3 h-0.5 w-12 rounded-full bg-brand-light" aria-hidden="true" />
+          <h1 className="font-serif text-[1.375rem] leading-[1.25] font-semibold text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">
             <HeroName name={name} />
           </h1>
-          <p className="mt-2 line-clamp-2 text-[0.625rem] leading-[1.55] font-medium tracking-wide text-white/90 drop-shadow-[0_1px_4px_rgba(0,0,0,0.4)]">
+          <p className="mt-2 line-clamp-2 text-[0.625rem] leading-[1.55] font-medium tracking-wide text-white/90 drop-shadow-[0_1px_6px_rgba(0,0,0,0.45)]">
             {subtitle}
           </p>
-          <p className="mt-2 line-clamp-2 text-[0.6875rem] leading-[1.6] text-white/80 drop-shadow-[0_1px_4px_rgba(0,0,0,0.35)]">
+          <p className="mt-2 line-clamp-2 text-[0.6875rem] leading-[1.6] text-white/80 drop-shadow-[0_1px_6px_rgba(0,0,0,0.4)]">
             {description}
           </p>
-          <div className="mt-4 flex w-full flex-col gap-2">
+          <div className="mt-5 flex w-full flex-col gap-2.5">
             <ContactButton
               href={primaryCta.href}
               headerState={{ active: false, scrolled: false }}
-              className={`${heroButtonClassName} !min-h-10 !w-full !max-w-full !justify-center !rounded-lg !py-2.5 !text-xs`}
+              className={`${heroButtonClassName} !min-h-10 !w-full !max-w-full !justify-center !rounded-lg !py-2.5 !text-xs !shadow-lg !shadow-black/20`}
             >
               {primaryCta.label}
             </ContactButton>
             <a
               href={secondaryCta.href}
-              className="inline-flex min-h-10 w-full max-w-full items-center justify-center rounded-lg border border-white/35 bg-white/10 px-4 py-2.5 text-xs font-medium tracking-wide text-white transition-colors hover:border-white/55 hover:bg-white/15"
+              className="inline-flex min-h-10 w-full max-w-full items-center justify-center rounded-lg border border-white/50 bg-transparent px-4 py-2.5 text-xs font-medium tracking-wide text-white drop-shadow-[0_1px_4px_rgba(0,0,0,0.3)] transition-colors hover:border-white hover:bg-white/10"
             >
               {secondaryCta.label}
             </a>
