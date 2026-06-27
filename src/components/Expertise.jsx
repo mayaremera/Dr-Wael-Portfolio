@@ -10,23 +10,39 @@ export default function Expertise() {
   const imageSrc = whyChooseUs.image
 
   return (
-    <section id="expertise" className="border-t border-slate-200 bg-surface-alt py-20 lg:py-28">
+    <section id="expertise" className="bg-surface-alt pb-12 max-lg:pt-0 lg:border-t lg:border-slate-200 lg:py-28">
+      {/* Mobile: full-width image banner */}
+      {hasMediaSrc(imageSrc) ? (
+        <div className="relative mb-6 aspect-[16/10] w-full overflow-hidden lg:hidden">
+          <img
+            key={imageSrc}
+            src={imageSrc}
+            alt="Family receiving speech-language support"
+            className="absolute inset-0 h-full w-full object-cover object-center"
+          />
+          <div
+            className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/25 via-transparent to-transparent"
+            aria-hidden="true"
+          />
+        </div>
+      ) : null}
+
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
-        <div className="overflow-hidden rounded-sm bg-white shadow-md ring-1 ring-slate-200/80 lg:grid lg:grid-cols-2">
-          <div className="order-2 flex flex-col justify-center px-8 py-10 sm:px-10 lg:order-1 lg:px-12 lg:py-14 xl:px-14">
+        <div className="overflow-hidden lg:rounded-sm lg:bg-white lg:shadow-md lg:ring-1 lg:ring-slate-200/80 lg:grid lg:grid-cols-2">
+          <div className="flex flex-col justify-center max-lg:px-0 lg:order-1 lg:px-12 lg:py-14 xl:px-14">
             <p className="text-xs font-semibold tracking-[0.22em] text-brand uppercase">
               {whyChooseUs.label}
             </p>
-            <h2 className="mt-4 font-serif text-3xl leading-tight text-ink md:text-[2.125rem] lg:text-4xl">
+            <h2 className="mt-2 font-serif text-2xl leading-tight text-ink max-lg:max-w-none md:text-[2.125rem] lg:mt-4 lg:text-4xl">
               {whyChooseUs.title}
             </h2>
-            <div className="mt-8 space-y-5">
+            <div className="mt-4 space-y-3 lg:mt-8 lg:space-y-5">
               {(whyChooseUs.paragraphs ?? []).map((paragraph, index) => (
                 <p
                   key={index}
-                  className={`text-sm leading-relaxed md:text-base ${
+                  className={`text-sm leading-relaxed lg:text-base ${
                     index === 0
-                      ? 'text-ink md:text-[1.05rem] md:leading-relaxed'
+                      ? 'text-ink lg:text-[1.05rem] lg:leading-relaxed'
                       : 'text-ink-muted'
                   }`}
                 >
@@ -35,12 +51,15 @@ export default function Expertise() {
               ))}
             </div>
 
-            <ContactButton href="#contact" className="mt-10 w-fit">
+            <ContactButton
+              href="#contact"
+              className="mt-6 w-full max-lg:!min-h-10 max-lg:!justify-center max-lg:!rounded-lg max-lg:!py-2.5 max-lg:!text-xs lg:mt-10 lg:w-fit"
+            >
               Contact Us Now
             </ContactButton>
           </div>
 
-          <div className="relative order-1 min-h-[260px] sm:min-h-[320px] lg:order-2 lg:min-h-[520px]">
+          <div className="relative hidden min-h-[520px] lg:order-2 lg:block">
             {hasMediaSrc(imageSrc) ? (
               <img
                 key={imageSrc}

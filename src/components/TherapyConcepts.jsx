@@ -9,6 +9,14 @@ const cardLinkClassName =
 const sectionLinkClassName =
   'relative inline-block w-fit pb-1 text-xs font-semibold tracking-[0.12em] text-brand uppercase transition-colors after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-brand after:transition-transform after:duration-300 after:ease-out hover:text-brand-light hover:after:scale-x-100'
 
+function truncatePreviewText(text, maxLength = 100) {
+  if (!text || text.length <= maxLength) return text
+  const slice = text.slice(0, maxLength)
+  const lastSpace = slice.lastIndexOf(' ')
+  const trimmed = (lastSpace > maxLength * 0.55 ? slice.slice(0, lastSpace) : slice).trim()
+  return `${trimmed}...`
+}
+
 const serviceAccents = [
   {
     badge: 'border-brand/15 bg-brand/8 text-brand',
@@ -46,9 +54,9 @@ function CheckIcon() {
 
 function ServiceCardImage({ src, alt }) {
   return (
-    <div className="relative h-36 w-full shrink-0 sm:h-auto sm:min-h-full sm:w-[38%] sm:max-w-[180px] sm:self-stretch">
+    <div className="relative h-36 w-full shrink-0 lg:h-auto lg:min-h-full lg:w-[38%] lg:max-w-[180px] lg:self-stretch">
       {hasMediaSrc(src) ? (
-        <img src={src} alt={alt} className="absolute inset-0 h-full w-full object-cover" />
+        <img src={src} alt={alt} className="absolute inset-0 h-full w-full object-cover object-top lg:object-center" />
       ) : (
         <div className="absolute inset-0 bg-slate-100" aria-hidden="true" />
       )}
@@ -189,14 +197,14 @@ function CasesPreviewGrid({ cases }) {
       {cases.map((item) => (
         <article
           key={item.id}
-          className="mobile-card-scroll__item group flex h-full flex-col overflow-hidden rounded-sm border border-slate-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-brand/20 hover:shadow-md hover:shadow-brand/10 lg:w-auto"
+          className="mobile-card-scroll__item group flex h-full max-lg:h-[20rem] flex-col overflow-hidden rounded-sm border border-slate-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-brand/20 hover:shadow-md hover:shadow-brand/10 lg:h-auto lg:w-auto"
         >
           <div className="relative h-36 w-full shrink-0 overflow-hidden">
             {hasMediaSrc(item.image) ? (
               <img
                 src={item.image}
                 alt={item.title}
-                className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                className="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-105 lg:object-center"
               />
             ) : (
               <div className="absolute inset-0 bg-slate-100" aria-hidden="true" />
@@ -210,14 +218,19 @@ function CasesPreviewGrid({ cases }) {
             </span>
           </div>
 
-          <div className="flex flex-1 flex-col px-4 py-4 sm:px-5 sm:py-5">
-            <h4 className="font-serif text-lg leading-snug text-ink">{item.title}</h4>
-            {item.abbr ? (
-              <p className="mt-1 text-[0.65rem] font-semibold tracking-[0.12em] text-brand uppercase">
-                {item.abbr}
-              </p>
-            ) : null}
-            <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-ink-muted">{item.excerpt}</p>
+          <div className="flex min-h-0 flex-1 flex-col px-4 py-4 sm:px-5 sm:py-5">
+            <h4 className="line-clamp-2 min-h-[2.75rem] shrink-0 font-serif text-lg leading-snug text-ink">
+              {item.title}
+            </h4>
+            <p className="mt-1 line-clamp-1 min-h-[0.875rem] shrink-0 text-[0.65rem] font-semibold tracking-[0.12em] text-brand uppercase">
+              {item.abbr || '\u00A0'}
+            </p>
+            <p className="mt-2 shrink-0 text-sm leading-relaxed text-ink-muted lg:hidden">
+              {truncatePreviewText(item.excerpt, 100)}
+            </p>
+            <p className="mt-2 hidden text-sm leading-relaxed text-ink-muted lg:block line-clamp-3">
+              {item.excerpt}
+            </p>
           </div>
         </article>
       ))}
@@ -286,20 +299,25 @@ export default function TherapyConcepts({ showCasesPreview = false, fullDetail =
               {displayConcepts.map((concept) => (
                 <article
                   key={concept.id}
-                  className="mobile-card-scroll__item mobile-card-scroll__item--service group flex h-full flex-col overflow-hidden rounded-sm border border-slate-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-brand/20 hover:shadow-md lg:w-auto lg:flex-row"
+                  className="mobile-card-scroll__item mobile-card-scroll__item--service group flex max-lg:h-[20rem] h-full flex-col overflow-hidden rounded-sm border border-slate-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-brand/20 hover:shadow-md lg:h-auto lg:w-auto lg:flex-row"
                 >
                   <ServiceCardImage
                     src={concept.image}
                     alt={`${concept.title}, ${concept.subtitle}`}
                   />
 
-                  <div className="flex min-w-0 flex-1 flex-col justify-center p-4 sm:p-5 lg:p-6">
-                    <h3 className="font-serif text-lg leading-snug text-ink sm:text-xl">
+                  <div className="flex min-h-0 min-w-0 flex-1 flex-col p-4 sm:p-5 lg:justify-center lg:p-6">
+                    <h3 className="line-clamp-2 shrink-0 font-serif text-lg leading-snug text-ink sm:text-xl">
                       {concept.title}
                     </h3>
-                    <p className="mt-1 text-sm font-medium text-brand">{concept.subtitle}</p>
-                    <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-ink-muted">{concept.summary}</p>
-                    <a href={ctaHref} className={cardLinkClassName}>
+                    <p className="mt-1 line-clamp-1 shrink-0 text-sm font-medium text-brand">{concept.subtitle}</p>
+                    <p className="mt-2 shrink-0 text-sm leading-relaxed text-ink-muted lg:hidden">
+                      {truncatePreviewText(concept.summary)}
+                    </p>
+                    <p className="mt-2 hidden text-sm leading-relaxed text-ink-muted lg:block">
+                      {concept.summary}
+                    </p>
+                    <a href={ctaHref} className={`${cardLinkClassName} mt-auto shrink-0 pt-3`}>
                       More Details
                     </a>
                   </div>
@@ -309,7 +327,7 @@ export default function TherapyConcepts({ showCasesPreview = false, fullDetail =
           )}
 
           {showCasesPreview ? (
-            <div className="mt-12 border-t border-slate-100 pt-10">
+            <div className="mt-12 border-t border-slate-100 pt-10 max-lg:mt-14 max-lg:border-slate-300 max-lg:border-t-2 lg:mt-12 lg:border-t lg:border-slate-100">
               <header className="mx-auto max-w-3xl text-center">
                 <p className="text-xs font-semibold tracking-[0.22em] text-brand uppercase">Clinical cases</p>
                 <h3 className="mt-3 font-serif text-2xl leading-tight text-ink md:text-3xl">

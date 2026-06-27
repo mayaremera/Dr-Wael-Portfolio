@@ -232,7 +232,7 @@ function TestimonialsShowcase({ testimonials, testimonialsSection, light = false
           &ldquo;
         </p>
 
-        <div className="relative mx-auto max-w-6xl px-6 py-12 lg:px-8 lg:py-14">
+        <div className="relative mx-auto max-w-6xl px-6 pt-12 max-lg:pb-0 lg:px-8 lg:py-14">
           <header className="mx-auto max-w-2xl text-center">
             <p
               className={`text-xs font-semibold tracking-[0.22em] uppercase ${
@@ -323,12 +323,12 @@ function TestimonialsShowcase({ testimonials, testimonialsSection, light = false
               </div>
             </div>
 
-            <div className="mt-8 flex min-h-0 min-w-0 flex-col lg:mt-0">
+            <div className="mt-8 flex min-h-0 min-w-0 flex-col max-lg:-mx-6 lg:mt-0">
               <article
                 key={active.id}
-                className={`animate-testimonial-spotlight relative flex h-full min-h-0 flex-col overflow-hidden rounded-sm bg-white ${
+                className={`animate-testimonial-spotlight relative flex h-full min-h-0 flex-col overflow-hidden rounded-sm bg-white max-lg:rounded-none ${
                   light
-                    ? 'border border-slate-200/80 shadow-lg shadow-brand/10'
+                    ? 'border border-slate-200/80 shadow-lg shadow-brand/10 max-lg:border-x-0'
                     : 'shadow-xl shadow-black/20'
                 }`}
               >

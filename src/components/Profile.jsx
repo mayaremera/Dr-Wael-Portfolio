@@ -146,9 +146,9 @@ function AffiliationTile({ company, className = '' }) {
 
 function AffiliationGrid({ companies }) {
   return (
-    <div className="mobile-card-scroll lg:grid lg:grid-cols-3 lg:gap-4">
+    <div className="grid grid-cols-1 gap-3 lg:grid-cols-3 lg:gap-4">
       {companies.map((company) => (
-        <AffiliationTile key={company.id} company={company} className="mobile-card-scroll__item lg:w-auto" />
+        <AffiliationTile key={company.id} company={company} />
       ))}
     </div>
   )
@@ -257,10 +257,10 @@ export default function Profile({ variant = 'home' }) {
             ) : null}
 
             {!isPage ? (
-              <div className="mt-8">
+              <div className="mt-8 max-md:flex max-md:justify-center">
                 <a
                   href="/about-me"
-                  className="inline-block rounded-sm bg-brand px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-light"
+                  className="inline-flex min-h-10 w-full max-w-full items-center justify-center rounded-lg bg-brand px-6 py-2.5 text-xs font-medium tracking-wide text-white transition-colors hover:bg-brand-light md:inline-block md:w-auto md:min-h-0 md:rounded-sm md:py-2.5 md:text-sm"
                 >
                   More About Me
                 </a>
