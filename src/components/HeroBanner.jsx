@@ -46,14 +46,8 @@ export default function HeroBanner() {
         />
       ) : null}
 
-      {/* Tablet / desktop overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-ink/95 via-ink/70 to-ink/35 max-md:hidden sm:bg-gradient-to-r sm:from-ink/85 sm:via-ink/60 sm:to-ink/30" />
-
-      {/* Mobile: light top fade for header only */}
-      <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-ink/45 to-transparent max-md:block md:hidden"
-        aria-hidden="true"
-      />
+      {/* Hero overlay — same gradient as desktop */}
+      <div className="absolute inset-0 bg-gradient-to-r from-ink/85 via-ink/60 to-ink/30" />
 
       {/* Tablet / desktop top fade */}
       <div
@@ -63,7 +57,7 @@ export default function HeroBanner() {
 
       {/* Mobile: bottom dock */}
       <div className="max-md:absolute max-md:inset-x-0 max-md:bottom-5 max-md:z-10 max-md:px-3 md:hidden">
-        <div className="overflow-hidden rounded-2xl bg-black/45 px-4 pb-4 pt-5">
+        <div className="overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-t from-ink/55 via-ink/25 to-ink/5 px-4 pb-4 pt-5">
           <h1 className="font-serif text-[1.375rem] leading-[1.25] font-semibold text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)]">
             <HeroName name={name} />
           </h1>
@@ -83,7 +77,7 @@ export default function HeroBanner() {
             </ContactButton>
             <a
               href={secondaryCta.href}
-              className="inline-flex min-h-10 w-full max-w-full items-center justify-center rounded-lg border border-white/40 bg-black/30 px-4 py-2.5 text-xs font-medium tracking-wide text-white transition-colors hover:border-white hover:bg-black/40"
+              className="inline-flex min-h-10 w-full max-w-full items-center justify-center rounded-lg border border-white/35 bg-white/10 px-4 py-2.5 text-xs font-medium tracking-wide text-white transition-colors hover:border-white/55 hover:bg-white/15"
             >
               {secondaryCta.label}
             </a>
