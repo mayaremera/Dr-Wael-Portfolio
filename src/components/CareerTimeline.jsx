@@ -59,55 +59,103 @@ export default function CareerTimeline() {
         </header>
 
         <div className="relative mt-12 lg:mt-14">
-          <div className="absolute top-0 bottom-0 left-4 w-px bg-linear-to-b from-brand/30 via-accent/25 to-brand/10 md:left-1/2 md:-translate-x-px" />
-
-          <div className="space-y-8">
+          {/* Mobile — full-width vertical milestones with year rail */}
+          <div className="space-y-1 lg:hidden">
             {careerTimeline.map((item, index) => {
               const styles = typeStyles[item.type] ?? typeStyles.leadership
-              const isEven = index % 2 === 0
+              const isLast = index === careerTimeline.length - 1
 
               return (
                 <div
                   key={item.id}
-                  className={`relative flex flex-col md:flex-row ${
-                    isEven ? 'md:flex-row' : 'md:flex-row-reverse'
-                  }`}
+                  className="relative flex gap-4"
                   style={{ animationDelay: `${index * 80}ms` }}
                 >
-                  <div className="hidden w-1/2 md:block" />
-
-                  <div
-                    className={`absolute top-6 left-4 z-10 flex h-3.5 w-3.5 -translate-x-1/2 items-center justify-center rounded-full border-2 border-white shadow-sm ${styles.dot} md:left-1/2`}
-                  />
-
-                  <div
-                    className={`w-full pl-12 md:w-1/2 md:pl-0 ${
-                      isEven ? 'md:pr-12 md:text-right' : 'md:pl-12 md:text-left'
-                    }`}
-                  >
-                    <article
-                      className={`animate-fade-up rounded-sm border bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${styles.card}`}
-                      style={{ animationDelay: `${index * 80}ms` }}
-                    >
+                  <div className="flex w-14 shrink-0 flex-col items-center pt-1">
+                    <span className="font-serif text-base font-semibold tabular-nums leading-none text-brand">
+                      {item.year}
+                    </span>
+                    <div
+                      className={`mt-2 flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full border-2 border-white shadow-sm ${styles.dot}`}
+                      aria-hidden="true"
+                    />
+                    {!isLast ? (
                       <div
-                        className={`inline-flex items-center gap-2 ${isEven ? 'md:flex-row-reverse' : ''}`}
-                      >
-                        <span
-                          className={`rounded-full px-2.5 py-0.5 text-[0.65rem] font-semibold tracking-[0.12em] uppercase ${styles.badge}`}
-                        >
-                          {typeLabels[item.type]}
-                        </span>
-                        <span className="text-xs font-semibold tracking-wide text-ink-muted">
-                          {item.year}
-                        </span>
-                      </div>
-                      <h3 className="mt-3 font-serif text-lg text-ink md:text-xl">{item.title}</h3>
-                      <p className="mt-1 text-sm font-medium text-brand">{item.org}</p>
-                    </article>
+                        className="mt-2 w-px flex-1 min-h-8 bg-linear-to-b from-brand/35 via-accent/20 to-brand/10"
+                        aria-hidden="true"
+                      />
+                    ) : null}
                   </div>
+
+                  <article
+                    className={`animate-fade-up mb-5 min-w-0 flex-1 rounded-xl border bg-white p-4 shadow-sm ${styles.card}`}
+                    style={{ animationDelay: `${index * 80}ms` }}
+                  >
+                    <span
+                      className={`inline-flex rounded-full px-2.5 py-0.5 text-[0.62rem] font-semibold tracking-[0.12em] uppercase ${styles.badge}`}
+                    >
+                      {typeLabels[item.type]}
+                    </span>
+                    <h3 className="mt-2.5 font-serif text-base leading-snug text-ink">{item.title}</h3>
+                    <p className="mt-1.5 text-sm font-medium text-brand">{item.org}</p>
+                  </article>
                 </div>
               )
             })}
+          </div>
+
+          {/* Desktop — alternating timeline */}
+          <div className="hidden lg:block">
+            <div className="absolute top-0 bottom-0 left-4 w-px bg-linear-to-b from-brand/30 via-accent/25 to-brand/10 md:left-1/2 md:-translate-x-px" />
+
+            <div className="space-y-8">
+              {careerTimeline.map((item, index) => {
+                const styles = typeStyles[item.type] ?? typeStyles.leadership
+                const isEven = index % 2 === 0
+
+                return (
+                  <div
+                    key={item.id}
+                    className={`relative flex flex-col md:flex-row ${
+                      isEven ? 'md:flex-row' : 'md:flex-row-reverse'
+                    }`}
+                    style={{ animationDelay: `${index * 80}ms` }}
+                  >
+                    <div className="hidden w-1/2 md:block" />
+
+                    <div
+                      className={`absolute top-6 left-4 z-10 flex h-3.5 w-3.5 -translate-x-1/2 items-center justify-center rounded-full border-2 border-white shadow-sm ${styles.dot} md:left-1/2`}
+                    />
+
+                    <div
+                      className={`w-full pl-12 md:w-1/2 md:pl-0 ${
+                        isEven ? 'md:pr-12 md:text-right' : 'md:pl-12 md:text-left'
+                      }`}
+                    >
+                      <article
+                        className={`animate-fade-up rounded-sm border bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${styles.card}`}
+                        style={{ animationDelay: `${index * 80}ms` }}
+                      >
+                        <div
+                          className={`inline-flex items-center gap-2 ${isEven ? 'md:flex-row-reverse' : ''}`}
+                        >
+                          <span
+                            className={`rounded-full px-2.5 py-0.5 text-[0.65rem] font-semibold tracking-[0.12em] uppercase ${styles.badge}`}
+                          >
+                            {typeLabels[item.type]}
+                          </span>
+                          <span className="text-xs font-semibold tracking-wide text-ink-muted">
+                            {item.year}
+                          </span>
+                        </div>
+                        <h3 className="mt-3 font-serif text-lg text-ink md:text-xl">{item.title}</h3>
+                        <p className="mt-1 text-sm font-medium text-brand">{item.org}</p>
+                      </article>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
           </div>
         </div>
       </div>

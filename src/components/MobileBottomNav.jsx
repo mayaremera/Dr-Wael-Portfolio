@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react'
+
 function getCurrentPath() {
   const rawPath = window.location.pathname.replace(/\/+$/, '') || '/'
   return rawPath === '/cases' ? '/services' : rawPath
@@ -8,8 +10,16 @@ function isLinkActive(href, currentPath) {
   return currentPath === href
 }
 
-function NavIcon({ name, active }) {
-  const className = `h-5 w-5 ${active ? 'text-white' : 'text-white/70'}`
+function NavIcon({ name, active, onLightBackground }) {
+  const className = `h-5 w-5 transition-colors duration-300 ${
+    onLightBackground
+      ? active
+        ? 'text-white'
+        : 'text-brand/65'
+      : active
+        ? 'text-white'
+        : 'text-white/75'
+  }`
 
   switch (name) {
     case 'home':
@@ -65,13 +75,31 @@ const mobileNavLinks = [
 
 export default function MobileBottomNav() {
   const currentPath = getCurrentPath()
+  const [isOverFooter, setIsOverFooter] = useState(false)
+
+  useEffect(() => {
+    const footer = document.getElementById('site-footer')
+    if (!footer) return undefined
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsOverFooter(entry.isIntersecting),
+      { threshold: 0 },
+    )
+
+    observer.observe(footer)
+    return () => observer.disconnect()
+  }, [])
 
   return (
     <nav
       aria-label="Mobile navigation"
-      className="fixed right-0 bottom-0 left-0 z-50 px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-50 px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] lg:hidden"
     >
-      <div className="mx-auto flex max-w-lg rounded-2xl border border-brand-light/30 bg-brand px-1 py-1.5 shadow-lg shadow-brand/25">
+      <div
+        className={`mx-auto flex max-w-lg items-stretch justify-between rounded-2xl border border-brand-light/30 px-1 py-1.5 shadow-lg shadow-brand/25 transition-colors duration-300 ${
+          isOverFooter ? 'bg-white' : 'bg-brand'
+        }`}
+      >
         {mobileNavLinks.map((link) => {
           const active = isLinkActive(link.href, currentPath)
 
@@ -80,14 +108,24 @@ export default function MobileBottomNav() {
               key={link.href}
               href={link.href}
               aria-current={active ? 'page' : undefined}
-              className={`flex min-w-0 flex-1 flex-col items-center gap-0.5 rounded-xl px-0.5 py-1.5 transition-colors ${
-                active ? 'bg-brand-light' : 'hover:bg-white/10'
+              className={`flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-xl px-0.5 py-2 transition-colors duration-300 ${
+                active
+                  ? isOverFooter
+                    ? 'bg-brand'
+                    : 'bg-brand-light'
+                  : isOverFooter
+                    ? 'hover:bg-brand/8'
+                    : 'hover:bg-white/10'
               }`}
             >
-              <NavIcon name={link.icon} active={active} />
+              <NavIcon name={link.icon} active={active} onLightBackground={isOverFooter} />
               <span
-                className={`max-w-full truncate text-center text-[0.625rem] leading-tight font-medium ${
-                  active ? 'text-white' : 'text-white/70'
+                className={`max-w-full px-0.5 text-center text-[0.58rem] leading-tight font-medium transition-colors duration-300 ${
+                  active
+                    ? 'text-white'
+                    : isOverFooter
+                      ? 'text-brand/65'
+                      : 'text-white/75'
                 }`}
               >
                 {link.label}

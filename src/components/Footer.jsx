@@ -33,7 +33,7 @@ export default function Footer() {
   ]
 
   return (
-    <footer className="bg-brand">
+    <footer id="site-footer" className="bg-brand">
       <div className="mx-auto max-w-6xl px-6 py-14 lg:px-8 lg:py-16">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
           <div className="sm:col-span-2 lg:col-span-1">
@@ -98,6 +98,10 @@ export default function Footer() {
           </p>
         </div>
       </div>
+      <div
+        className="h-[calc(5.25rem+env(safe-area-inset-bottom))] lg:hidden"
+        aria-hidden="true"
+      />
     </footer>
   )
 }

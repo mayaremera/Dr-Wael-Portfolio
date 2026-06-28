@@ -836,6 +836,17 @@ select {
     width: min(72vw, 16rem);
   }
 
+  /* Homepage — stronger section dividers on mobile/tablet only */
+  .home-page-sections > * + * {
+    border-top-width: 2px !important;
+    border-top-style: solid !important;
+    border-top-color: #cbd5e1 !important;
+  }
+
+  .home-page-sections > #testimonials {
+    border-top-color: rgb(255 255 255 / 0.28) !important;
+  }
+
   .mobile-icon-scroll {
     overflow-x: auto;
     overscroll-behavior-x: contain;
