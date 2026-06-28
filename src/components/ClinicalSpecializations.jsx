@@ -53,9 +53,9 @@ function CaseSpotlight({ item, height }) {
   return (
     <article
       style={height ? { height: `${height}px` } : undefined}
-      className="animate-fade-up flex flex-col overflow-hidden rounded-sm bg-white shadow-xl shadow-brand/20 lg:h-full lg:flex-row"
+      className="animate-fade-up flex flex-col overflow-hidden rounded-xl bg-white shadow-xl shadow-brand/20 max-lg:rounded-xl lg:h-full lg:flex-row lg:rounded-sm"
     >
-      <div className="relative h-48 shrink-0 sm:h-52 lg:h-full lg:w-[46%] lg:max-w-[300px] lg:shrink-0 xl:w-[48%] xl:max-w-[320px]">
+      <div className="relative h-44 shrink-0 sm:h-48 lg:h-full lg:w-[46%] lg:max-w-[300px] lg:shrink-0 xl:w-[48%] xl:max-w-[320px]">
         {hasMediaSrc(item.image) ? (
           <img
             src={item.image}
@@ -151,7 +151,7 @@ function CompactCaseTile({ item, isActive, onSelect }) {
       type="button"
       onClick={onSelect}
       aria-current={isActive ? 'true' : undefined}
-      className={`mobile-card-scroll__item mobile-card-scroll__item--wide group relative overflow-hidden rounded-sm border text-left transition-all duration-300 lg:w-auto ${
+      className={`mobile-card-scroll__item mobile-card-scroll__item--wide group relative overflow-hidden rounded-xl border text-left transition-all duration-300 lg:w-auto ${
         isActive
           ? 'border-accent bg-white shadow-md ring-2 ring-accent/20'
           : 'border-white/20 bg-white/5 hover:border-white/35 hover:bg-white/10'
@@ -329,10 +329,10 @@ export default function ClinicalSpecializations() {
               </aside>
 
               <div className="lg:hidden">
-                <p className="mb-2.5 text-xs font-semibold tracking-[0.18em] text-white/50 uppercase">
+                <p className="mb-3 text-xs font-semibold tracking-[0.18em] text-white/50 uppercase">
                   Browse cases
                 </p>
-                <div className="mb-4 mobile-card-scroll lg:grid lg:grid-cols-2 lg:gap-2">
+                <div className="mobile-card-scroll">
                   {filtered.map((item) => (
                     <CompactCaseTile
                       key={item.id}
@@ -344,7 +344,7 @@ export default function ClinicalSpecializations() {
                 </div>
               </div>
 
-              <div className="min-w-0">
+              <div className="mt-4 min-w-0 lg:mt-0">
                 <CaseSpotlight item={activeCase} height={browseHeight} />
               </div>
             </div>

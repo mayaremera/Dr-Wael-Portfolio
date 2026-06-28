@@ -232,7 +232,7 @@ function TestimonialsShowcase({ testimonials, testimonialsSection, light = false
           &ldquo;
         </p>
 
-        <div className="relative mx-auto max-w-6xl px-6 pt-12 max-lg:pb-0 lg:px-8 lg:py-14">
+        <div className="relative mx-auto max-w-6xl px-6 pt-12 pb-12 lg:px-8 lg:py-14">
           <header className="mx-auto max-w-2xl text-center">
             <p
               className={`text-xs font-semibold tracking-[0.22em] uppercase ${
@@ -258,7 +258,99 @@ function TestimonialsShowcase({ testimonials, testimonialsSection, light = false
           </header>
 
           <div className="mt-8 lg:grid lg:grid-cols-[minmax(0,280px)_1fr] lg:items-stretch lg:gap-8 xl:grid-cols-[minmax(0,300px)_1fr] xl:gap-10">
-            <div className="grid min-w-0 grid-cols-1">
+            {/* Mobile — horizontal voice scroll + compact quote card */}
+            <div className="lg:hidden">
+              <p
+                className={`mb-3 text-xs font-semibold tracking-wide uppercase ${
+                  light ? 'text-ink-muted' : 'text-white/45'
+                }`}
+              >
+                Choose a voice
+              </p>
+              <div className="mobile-icon-scroll mobile-icon-scroll--inset -mx-1 flex gap-2 px-1 pb-1">
+                {testimonials.map((item, index) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    aria-current={index === activeIndex ? 'true' : undefined}
+                    onClick={() => handleSelectVoice(index)}
+                    className={`flex shrink-0 flex-col items-center gap-1.5 rounded-xl border px-3 py-2.5 transition-all duration-200 ${
+                      index === activeIndex
+                        ? light
+                          ? 'border-brand/30 bg-brand-muted/60 shadow-sm'
+                          : 'border-accent/50 bg-white/12'
+                        : light
+                          ? 'border-slate-200/80 bg-surface-alt'
+                          : 'border-white/15 bg-white/5'
+                    }`}
+                  >
+                    <div
+                      className={`h-10 w-10 overflow-hidden rounded-full ring-2 ${
+                        index === activeIndex
+                          ? light
+                            ? 'ring-brand'
+                            : 'ring-accent'
+                          : light
+                            ? 'ring-slate-200'
+                            : 'ring-white/25'
+                      }`}
+                    >
+                      {hasMediaSrc(item.image) ? (
+                        <img src={item.image} alt="" className="h-full w-full object-cover object-top" />
+                      ) : (
+                        <div className="h-full w-full bg-slate-200" aria-hidden="true" />
+                      )}
+                    </div>
+                    <span
+                      className={`max-w-[4.5rem] truncate text-[0.62rem] font-semibold ${
+                        index === activeIndex
+                          ? light
+                            ? 'text-brand'
+                            : 'text-white'
+                          : light
+                            ? 'text-ink-muted'
+                            : 'text-white/70'
+                      }`}
+                    >
+                      {item.name.split(' ')[0]}
+                    </span>
+                  </button>
+                ))}
+              </div>
+
+              <article
+                key={active.id}
+                className={`animate-testimonial-spotlight mt-4 overflow-hidden rounded-xl border bg-white shadow-lg ${
+                  light ? 'border-slate-200/80 shadow-brand/10' : 'shadow-black/20'
+                }`}
+              >
+                <div className="p-4">
+                  <div className="flex items-start justify-between gap-3 border-b border-slate-100 pb-3">
+                    <div className="min-w-0">
+                      <h3 className="font-serif text-lg text-ink">{active.name}</h3>
+                      {active.location ? (
+                        <p className="mt-0.5 text-xs text-ink-muted">{active.location}</p>
+                      ) : null}
+                    </div>
+                    <div className="flex shrink-0 gap-0.5" aria-label="5 out of 5 stars">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <svg key={i} viewBox="0 0 20 20" className="h-3 w-3 fill-accent" aria-hidden="true">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                      ))}
+                    </div>
+                  </div>
+                  <blockquote className="relative mt-3">
+                    <p className="text-sm leading-relaxed text-ink-muted">{active.quote}</p>
+                  </blockquote>
+                  <p className="mt-3 text-[0.62rem] font-semibold tracking-[0.14em] text-brand uppercase">
+                    {String(activeIndex + 1).padStart(2, '0')} / {String(testimonials.length).padStart(2, '0')}
+                  </p>
+                </div>
+              </article>
+            </div>
+
+            <div className="hidden min-w-0 grid-cols-1 lg:grid">
               <div
                 className="pointer-events-none invisible col-start-1 row-start-1 hidden min-w-0 lg:block"
                 aria-hidden="true"
@@ -323,7 +415,7 @@ function TestimonialsShowcase({ testimonials, testimonialsSection, light = false
               </div>
             </div>
 
-            <div className="mt-8 flex min-h-0 min-w-0 flex-col max-lg:-mx-6 lg:mt-0">
+            <div className="hidden min-h-0 min-w-0 flex-col lg:mt-0 lg:flex">
               <article
                 key={active.id}
                 className={`animate-testimonial-spotlight relative flex h-full min-h-0 flex-col overflow-hidden rounded-sm bg-white max-lg:rounded-none ${

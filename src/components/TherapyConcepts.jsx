@@ -1,4 +1,5 @@
 import { useServicesContent } from '../hooks/useServicesContent'
+import { useState } from 'react'
 import ClinicalSpecializations from './ClinicalSpecializations'
 import ContactButton from './ContactButton'
 import { hasMediaSrc } from '../lib/mediaUrl'
@@ -68,6 +69,92 @@ function ServiceCardImage({ src, alt }) {
   )
 }
 
+function MobileServiceDetailCard({ concept, index }) {
+  const accent = serviceAccents[index % serviceAccents.length]
+  const step = String(index + 1).padStart(2, '0')
+  const [expanded, setExpanded] = useState(false)
+  const hasExtra = (concept.paragraphs?.length ?? 0) > 0 || (concept.bullets?.length ?? 0) > 0
+
+  return (
+    <article
+      className="animate-fade-up overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-sm lg:hidden"
+      style={{ animationDelay: `${Math.min(index * 0.08, 0.4)}s` }}
+    >
+      <div className="relative h-40 overflow-hidden">
+        {hasMediaSrc(concept.image) ? (
+          <img
+            src={concept.image}
+            alt={`${concept.title}, ${concept.subtitle}`}
+            className="absolute inset-0 h-full w-full object-cover object-top"
+          />
+        ) : (
+          <div className="absolute inset-0 bg-slate-100" aria-hidden="true" />
+        )}
+        <div className={`pointer-events-none absolute inset-0 bg-linear-to-t ${accent.imageOverlay}`} />
+        <div className="absolute inset-x-0 bottom-0 p-4">
+          <span className={`inline-flex rounded-full border px-2.5 py-0.5 text-[0.6rem] font-semibold tracking-[0.12em] uppercase ${accent.badge}`}>
+            Step {step}
+          </span>
+          <h3 className="mt-1.5 font-serif text-lg leading-snug text-white">{concept.title}</h3>
+          <p className="mt-0.5 text-xs font-medium text-white/85">{concept.subtitle}</p>
+        </div>
+      </div>
+
+      <div className="p-4">
+        <blockquote className="relative border-l-2 border-accent/40 py-0.5 pl-3">
+          <p className={`font-serif text-sm leading-relaxed text-ink/90 italic ${expanded ? '' : 'line-clamp-3'}`}>
+            {concept.summary}
+          </p>
+        </blockquote>
+
+        {expanded ? (
+          <>
+            {concept.paragraphs?.length > 0 ? (
+              <div className="mt-3 space-y-2">
+                {concept.paragraphs.map((paragraph) => (
+                  <p key={paragraph.slice(0, 40)} className="text-sm leading-relaxed text-ink-muted">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+            ) : null}
+
+            {concept.bullets?.length > 0 ? (
+              <ul className="mt-3 space-y-2">
+                {concept.bullets.map((bullet) => (
+                  <li key={bullet} className="flex items-start gap-2 text-sm leading-snug text-ink-muted">
+                    <span className={`mt-1 flex h-4 w-4 shrink-0 items-center justify-center rounded-full ${accent.bullet}`}>
+                      <CheckIcon />
+                    </span>
+                    {bullet}
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </>
+        ) : null}
+
+        {hasExtra ? (
+          <button
+            type="button"
+            onClick={() => setExpanded((current) => !current)}
+            className="mt-2 text-[0.62rem] font-semibold tracking-wide text-brand uppercase"
+            aria-expanded={expanded}
+          >
+            {expanded ? 'Show less' : 'Read more'}
+          </button>
+        ) : null}
+
+        <div className="mt-4 border-t border-slate-100 pt-4">
+          <ContactButton href="/contact" className="w-full justify-center text-center">
+            {concept.ctaLabel || 'Contact Us Now'}
+          </ContactButton>
+        </div>
+      </div>
+    </article>
+  )
+}
+
 function ServiceDetailCard({ concept, index }) {
   const accent = serviceAccents[index % serviceAccents.length]
   const step = String(index + 1).padStart(2, '0')
@@ -81,8 +168,11 @@ function ServiceDetailCard({ concept, index }) {
     : 'relative m-5 min-h-[200px] overflow-hidden rounded-xl sm:m-6 lg:mb-6 lg:aspect-5/4 lg:min-h-[300px]'
 
   return (
-    <article
-      className="animate-fade-up group relative overflow-hidden rounded-2xl bg-white shadow-[0_8px_40px_-12px_rgba(26,77,92,0.18)] ring-1 ring-slate-200/80 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_50px_-16px_rgba(26,77,92,0.22)] hover:ring-brand/20"
+    <>
+      <MobileServiceDetailCard concept={concept} index={index} />
+
+      <article
+      className="animate-fade-up group relative hidden overflow-hidden rounded-2xl bg-white shadow-[0_8px_40px_-12px_rgba(26,77,92,0.18)] ring-1 ring-slate-200/80 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_50px_-16px_rgba(26,77,92,0.22)] hover:ring-brand/20 lg:block"
       style={{ animationDelay: `${Math.min(index * 0.08, 0.4)}s` }}
     >
       <div
@@ -112,7 +202,7 @@ function ServiceDetailCard({ concept, index }) {
               aria-hidden="true"
             />
 
-            <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6 lg:hidden">
+            <div className="absolute inset-x-0 bottom-0 hidden p-5 sm:p-6 lg:hidden">
               <span className={`inline-flex rounded-full border px-3 py-1 text-[0.65rem] font-semibold tracking-[0.14em] uppercase ${accent.badge}`}>
                 Step {step}
               </span>
@@ -188,6 +278,7 @@ function ServiceDetailCard({ concept, index }) {
         </div>
       </div>
     </article>
+    </>
   )
 }
 
@@ -289,7 +380,7 @@ export default function TherapyConcepts({ showCasesPreview = false, fullDetail =
           )}
 
           {fullDetail ? (
-            <div className="relative flex flex-col gap-6 lg:gap-8">
+            <div className="relative flex flex-col gap-4 lg:gap-8">
               {therapyConcepts.map((concept, index) => (
                 <ServiceDetailCard key={concept.id} concept={concept} index={index} />
               ))}
