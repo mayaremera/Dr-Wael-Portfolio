@@ -863,3 +863,223 @@ select {
     display: none;
   }
 }
+
+/* ── Homepage tablet layout only (768px – 1023px) ── */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .home-page-sections {
+    overflow-x: clip;
+  }
+
+  /* Replace horizontal card strips with grids — no negative margins / overflow */
+  .home-page-sections .mobile-card-scroll {
+    display: grid;
+    overflow-x: visible;
+    overscroll-behavior-x: auto;
+    scroll-snap-type: none;
+    margin-inline: 0;
+    padding-inline: 0;
+    padding-bottom: 0;
+    gap: 1rem;
+  }
+
+  .home-page-sections .mobile-card-scroll--gap-lg {
+    gap: 1.25rem;
+  }
+
+  .home-page-sections .mobile-card-scroll__item,
+  .home-page-sections .mobile-card-scroll__item--wide,
+  .home-page-sections .mobile-card-scroll__item--service {
+    width: auto;
+    flex: none;
+    scroll-snap-align: unset;
+    height: auto !important;
+    max-height: none;
+  }
+
+  /* Services — 2×2 grid */
+  .home-page-sections #approach .mt-10 > .mobile-card-scroll {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* Clinical cases preview — 2 per row */
+  .home-page-sections #approach .mt-12 .mobile-card-scroll {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* Events — 2 columns on smaller tablets, 3 on wider */
+  .home-page-sections #activity .mobile-card-scroll {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* Affiliations — 2 per row on tablet */
+  .home-page-sections .home-affiliation-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* Expertise — full-bleed two-column panel, no grey gap below */
+  .home-page-sections #expertise {
+    background-color: #ffffff;
+    padding-bottom: 0;
+  }
+
+  .home-page-sections #expertise > .mx-auto {
+    max-width: none;
+    padding-inline: 0;
+  }
+
+  .home-page-sections #expertise .expertise-mobile-banner {
+    display: none;
+  }
+
+  .home-page-sections #expertise .expertise-panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: stretch;
+    min-height: min(72vh, 520px);
+    border-radius: 0;
+    background-color: #ffffff;
+    box-shadow: none;
+    outline: none;
+  }
+
+  .home-page-sections #expertise .expertise-panel > div:first-child {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 2.5rem 2rem;
+  }
+
+  .home-page-sections #expertise .expertise-panel-image {
+    display: block;
+    position: relative;
+    min-height: 100%;
+  }
+
+  .home-page-sections #expertise .expertise-panel-image img {
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Testimonials — sidebar + quote (desktop layout at tablet width) */
+  .home-page-sections .testimonials-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 240px) minmax(0, 1fr);
+    gap: 1.5rem;
+    align-items: stretch;
+  }
+
+  .home-page-sections .testimonials-voices-mobile {
+    display: none !important;
+  }
+
+  .home-page-sections .testimonials-voices-desktop {
+    display: grid !important;
+  }
+
+  .home-page-sections .testimonials-quote-desktop {
+    display: flex !important;
+  }
+
+  /* Contact — location on top, direct + form below */
+  .home-page-sections .home-contact-layout {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+  }
+
+  .home-page-sections .home-contact-layout > .order-3 {
+    order: 1;
+    grid-column: 1 / -1;
+  }
+
+  .home-page-sections .home-contact-layout > .order-1 {
+    order: 2;
+  }
+
+  .home-page-sections .home-contact-layout > .order-2 {
+    order: 3;
+  }
+
+  .home-page-sections .home-contact-layout > .order-1 > .contact-lang-mobile {
+    display: none !important;
+  }
+
+  .home-page-sections .home-contact-layout > .order-1 > .contact-lang-desktop {
+    display: block !important;
+    margin-top: auto;
+  }
+
+  .home-page-sections .contact-schedule-mobile {
+    display: none !important;
+  }
+
+  .home-page-sections .contact-schedule-desktop {
+    display: block !important;
+  }
+}
+
+@media (min-width: 900px) and (max-width: 1023px) {
+  .home-page-sections #activity .mobile-card-scroll {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* ── Large tablet / Nest Hub / iPad Pro (1024px – 1366px) — homepage only ── */
+@media (min-width: 1024px) and (max-width: 1366px) {
+  html,
+  body {
+    overflow-x: clip;
+  }
+
+  .home-page-sections {
+    overflow-x: clip;
+    max-width: 100%;
+  }
+
+  /* Profile — 2-col + compass below (prevents 3-col squeeze / orbit overflow) */
+  .home-page-sections .home-profile-grid {
+    grid-template-columns: minmax(200px, 280px) minmax(0, 1fr);
+  }
+
+  .home-page-sections .home-profile-grid > :nth-child(3) {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    max-width: none;
+    overflow: visible;
+  }
+
+  .home-page-sections .home-credential-compass-wrap {
+    width: 100%;
+    max-width: 28rem;
+    overflow: visible;
+  }
+
+  .home-page-sections .credential-compass-root {
+    margin-inline: auto;
+    align-items: center;
+  }
+
+  .home-page-sections .credential-compass-heading,
+  .home-page-sections .credential-compass-tagline,
+  .home-page-sections .credential-compass-hint {
+    text-align: center;
+    margin-inline: auto;
+  }
+
+  .home-page-sections .credential-compass-wheel-shell {
+    overflow: visible;
+  }
+
+  .home-page-sections .home-affiliation-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .home-page-sections .home-cases-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .home-page-sections #activity .lg\:grid-cols-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

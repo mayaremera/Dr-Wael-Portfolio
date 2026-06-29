@@ -319,7 +319,7 @@ function App() {
   const pageContent = pages[pathname]
 
   return (
-    <div className="min-h-screen overflow-x-clip bg-surface lg:overflow-visible">
+    <div className="min-h-screen overflow-x-clip bg-surface">
       {isPageReady ? <Header /> : null}
       <div className={!isPageReady ? 'pointer-events-none select-none' : undefined} aria-hidden={!isPageReady}>
         <main>

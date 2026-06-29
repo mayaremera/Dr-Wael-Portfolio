@@ -341,19 +341,19 @@ export default function Header() {
       </div>
 
       <div className="hidden border-b border-slate-100 bg-white/95 backdrop-blur-sm md:block">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-6 py-2 md:gap-4 lg:px-8 lg:py-2.5">
+        <div className="mx-auto flex max-w-6xl min-w-0 items-center justify-between gap-3 px-6 py-2 md:gap-4 lg:px-8 lg:py-2.5">
           <div className="flex shrink-0 items-center gap-2">
             <SocialIcons />
           </div>
 
           <div className="flex shrink-0 items-center gap-2">
-            <div className="flex items-center gap-2 lg:hidden">
+            <div className="flex items-center gap-2 xl:hidden">
               <PhoneMailIcons />
             </div>
 
             <a
               href={`tel:${site.phone.replace(/\s/g, '')}`}
-              className="group hidden min-w-0 items-center gap-2 hover:text-brand-light lg:flex"
+              className="group hidden min-w-0 items-center gap-2 hover:text-brand-light xl:flex"
             >
               <svg
                 viewBox="0 0 24 24"
@@ -374,11 +374,11 @@ export default function Header() {
               </span>
             </a>
 
-            <span className="hidden h-4 w-px bg-slate-300 lg:inline" />
+            <span className="hidden h-4 w-px bg-slate-300 xl:inline" />
 
             <a
               href={`mailto:${site.email}`}
-              className="group hidden min-w-0 items-center gap-2 hover:text-brand-light lg:flex"
+              className="group hidden min-w-0 items-center gap-2 hover:text-brand-light xl:flex"
             >
               <svg
                 viewBox="0 0 24 24"
@@ -409,7 +409,7 @@ export default function Header() {
             : 'bg-transparent py-4 lg:py-5'
         }`}
       >
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 lg:gap-6 lg:px-8">
+        <div className="mx-auto flex max-w-6xl min-w-0 items-center justify-between gap-4 px-6 lg:gap-6 lg:px-8">
           <a
             href="/"
             aria-label="Home"
@@ -418,7 +418,7 @@ export default function Header() {
             <Logo scrolled={headerScrolled} />
           </a>
 
-          <nav className="hidden items-center gap-6 xl:gap-8 lg:flex">
+          <nav className="hidden min-w-0 items-center gap-4 lg:flex xl:gap-8">
             {navLinks.map((link) => (
               <NavLink
                 key={link.href}

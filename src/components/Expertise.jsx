@@ -13,7 +13,7 @@ export default function Expertise() {
     <section id="expertise" className="bg-surface-alt pb-12 max-lg:pt-0 lg:border-t lg:border-slate-200 lg:py-28">
       {/* Mobile: full-width image banner */}
       {hasMediaSrc(imageSrc) ? (
-        <div className="relative mb-6 aspect-[16/10] w-full overflow-hidden lg:hidden">
+        <div className="expertise-mobile-banner relative mb-6 aspect-[16/10] w-full overflow-hidden lg:hidden">
           <img
             key={imageSrc}
             src={imageSrc}
@@ -28,7 +28,7 @@ export default function Expertise() {
       ) : null}
 
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
-        <div className="overflow-hidden lg:rounded-sm lg:bg-white lg:shadow-md lg:ring-1 lg:ring-slate-200/80 lg:grid lg:grid-cols-2">
+        <div className="expertise-panel overflow-hidden lg:rounded-sm lg:bg-white lg:shadow-md lg:ring-1 lg:ring-slate-200/80 lg:grid lg:grid-cols-2">
           <div className="flex flex-col justify-center max-lg:px-0 lg:order-1 lg:px-12 lg:py-14 xl:px-14">
             <p className="text-xs font-semibold tracking-[0.22em] text-brand uppercase">
               {whyChooseUs.label}
@@ -53,13 +53,13 @@ export default function Expertise() {
 
             <ContactButton
               href="#contact"
-              className="mt-6 w-full max-lg:!min-h-10 max-lg:!justify-center max-lg:!rounded-lg max-lg:!py-2.5 max-lg:!text-xs lg:mt-10 lg:w-fit"
+              className="mt-6 w-full max-md:!min-h-10 max-md:!justify-center max-md:!rounded-lg max-md:!py-2.5 max-md:!text-xs md:max-lg:w-fit lg:mt-10 lg:w-fit"
             >
               Contact Us Now
             </ContactButton>
           </div>
 
-          <div className="relative hidden min-h-[520px] lg:order-2 lg:block">
+          <div className="expertise-panel-image relative hidden min-h-[520px] lg:order-2 lg:block">
             {hasMediaSrc(imageSrc) ? (
               <img
                 key={imageSrc}

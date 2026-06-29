@@ -96,22 +96,23 @@ export default function CredentialCompass() {
   return (
     <div
       ref={rootRef}
-      className="relative mx-auto flex w-full max-w-[345px] flex-col items-center justify-center lg:mx-0 lg:max-w-none"
+      className="credential-compass-root relative mx-auto flex w-full max-w-[min(100%,380px)] flex-col items-center justify-center xl:mx-0 xl:max-w-none xl:items-start"
       aria-label="Credentials compass"
     >
-      <p className="mb-1 text-center text-[0.65rem] font-semibold tracking-[0.2em] text-brand uppercase lg:text-left">
+      <p className="credential-compass-heading mb-1 text-center text-[0.65rem] font-semibold tracking-[0.2em] text-brand uppercase xl:text-left">
         Credentials
       </p>
       {tagline ? (
-        <p className="mb-4 max-w-[260px] text-center text-[0.58rem] leading-snug text-ink-muted lg:max-w-none lg:text-left">
+        <p className="credential-compass-tagline mb-4 max-w-[280px] text-center text-[0.58rem] leading-snug text-ink-muted sm:max-w-[320px] xl:max-w-none xl:text-left">
           {tagline}
         </p>
       ) : null}
 
-      <div
-        className="relative aspect-square w-full"
-        style={{ maxWidth: `${WHEEL_MAX_PX}px` }}
-      >
+      <div className="credential-compass-wheel-shell relative mx-auto w-full max-w-[400px] overflow-visible px-4 sm:px-5">
+        <div
+          className="credential-compass-wheel relative mx-auto aspect-square w-full overflow-visible"
+          style={{ maxWidth: `${WHEEL_MAX_PX}px` }}
+        >
         <div className="absolute inset-0 text-brand/80">
           <CompassRose />
         </div>
@@ -173,6 +174,7 @@ export default function CredentialCompass() {
           </div>
         </div>
       </div>
+      </div>
 
       <div className="mt-5 flex max-w-[240px] flex-wrap items-center justify-center gap-1.5 sm:max-w-none">
         {items.map((item, index) => (
@@ -189,7 +191,7 @@ export default function CredentialCompass() {
         ))}
       </div>
 
-      <p className="mt-3 max-w-[260px] text-center text-[0.65rem] leading-relaxed text-ink-muted lg:max-w-none lg:text-left">
+      <p className="credential-compass-hint mt-3 max-w-[280px] text-center text-[0.65rem] leading-relaxed text-ink-muted sm:max-w-[320px] xl:max-w-none xl:text-left">
         Scroll, hover, or tap a point to explore each credential
       </p>
     </div>

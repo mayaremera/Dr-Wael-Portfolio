@@ -284,7 +284,7 @@ function ServiceDetailCard({ concept, index }) {
 
 function CasesPreviewGrid({ cases }) {
   return (
-    <div className="mobile-card-scroll lg:grid lg:grid-cols-3 lg:gap-4">
+    <div className="home-cases-grid mobile-card-scroll lg:grid lg:grid-cols-3 lg:gap-4">
       {cases.map((item) => (
         <article
           key={item.id}

@@ -257,9 +257,9 @@ function TestimonialsShowcase({ testimonials, testimonialsSection, light = false
             </p>
           </header>
 
-          <div className="mt-8 lg:grid lg:grid-cols-[minmax(0,280px)_1fr] lg:items-stretch lg:gap-8 xl:grid-cols-[minmax(0,300px)_1fr] xl:gap-10">
+          <div className="testimonials-layout mt-8 lg:grid lg:grid-cols-[minmax(0,280px)_1fr] lg:items-stretch lg:gap-8 xl:grid-cols-[minmax(0,300px)_1fr] xl:gap-10">
             {/* Mobile — horizontal voice scroll + compact quote card */}
-            <div className="lg:hidden">
+            <div className="testimonials-voices-mobile lg:hidden">
               <p
                 className={`mb-3 text-xs font-semibold tracking-wide uppercase ${
                   light ? 'text-ink-muted' : 'text-white/45'
@@ -350,7 +350,7 @@ function TestimonialsShowcase({ testimonials, testimonialsSection, light = false
               </article>
             </div>
 
-            <div className="hidden min-w-0 grid-cols-1 lg:grid">
+            <div className="testimonials-voices-desktop hidden min-w-0 grid-cols-1 lg:grid">
               <div
                 className="pointer-events-none invisible col-start-1 row-start-1 hidden min-w-0 lg:block"
                 aria-hidden="true"
@@ -415,7 +415,7 @@ function TestimonialsShowcase({ testimonials, testimonialsSection, light = false
               </div>
             </div>
 
-            <div className="hidden min-h-0 min-w-0 flex-col lg:mt-0 lg:flex">
+            <div className="testimonials-quote-desktop hidden min-h-0 min-w-0 flex-col lg:mt-0 lg:flex">
               <article
                 key={active.id}
                 className={`animate-testimonial-spotlight relative flex h-full min-h-0 flex-col overflow-hidden rounded-sm bg-white max-lg:rounded-none ${

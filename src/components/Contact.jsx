@@ -283,7 +283,7 @@ export default function Contact() {
           </p>
         </header>
 
-        <div className="animate-fade-up animation-delay-300 mt-8 grid gap-4 sm:gap-5 lg:mt-16 lg:grid-cols-12 lg:gap-6">
+        <div className="home-contact-layout animate-fade-up animation-delay-300 mt-8 grid gap-4 sm:gap-5 lg:mt-16 lg:grid-cols-12 lg:gap-6">
           <div className="order-1 flex flex-col gap-3 lg:order-2 lg:col-span-3 lg:gap-4">
             <p className="text-xs font-semibold tracking-[0.18em] text-brand uppercase">Direct Contact</p>
             <div className="grid gap-2.5 sm:gap-3">
@@ -301,14 +301,14 @@ export default function Contact() {
               />
             </div>
 
-            <div className="rounded-xl border border-brand/20 bg-brand-muted/50 p-4 lg:mt-auto lg:hidden">
+            <div className="contact-lang-mobile rounded-xl border border-brand/20 bg-brand-muted/50 p-4 lg:mt-auto lg:hidden">
               <p className="font-serif text-base text-brand">English & Arabic</p>
               <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">
                 Consultations and sessions available in both languages.
               </p>
             </div>
 
-            <div className="mt-auto hidden rounded-2xl border border-dashed border-brand/20 bg-brand-muted/50 p-5 lg:block">
+            <div className="contact-lang-desktop mt-auto hidden rounded-2xl border border-dashed border-brand/20 bg-brand-muted/50 p-5 lg:block">
               <p className="font-serif text-lg text-brand">English & Arabic</p>
               <p className="mt-2 text-sm leading-relaxed text-ink-muted">
                 Consultations and sessions available in both languages.
@@ -472,10 +472,10 @@ export default function Contact() {
                   <ClockIcon />
                   Office Hours
                 </div>
-                <div className="lg:hidden">
+                <div className="contact-schedule-mobile lg:hidden">
                   <MobileWeekSchedule schedule={contactDetails.schedule} />
                 </div>
-                <div className="hidden lg:block">
+                <div className="contact-schedule-desktop hidden lg:block">
                   <WeekSchedule schedule={contactDetails.schedule} />
                 </div>
               </div>

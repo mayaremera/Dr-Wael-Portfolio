@@ -146,7 +146,7 @@ function AffiliationTile({ company, className = '' }) {
 
 function AffiliationGrid({ companies }) {
   return (
-    <div className="grid grid-cols-1 gap-3 lg:grid-cols-3 lg:gap-4">
+    <div className="home-affiliation-grid grid grid-cols-1 gap-3 lg:grid-cols-3 lg:gap-4">
       {companies.map((company) => (
         <AffiliationTile key={company.id} company={company} />
       ))}
@@ -200,7 +200,7 @@ export default function Profile({ variant = 'home' }) {
     >
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
         <div
-          className={`grid gap-8 lg:items-stretch lg:gap-10 ${
+          className={`home-profile-grid grid gap-8 lg:items-stretch lg:gap-10 ${
             isPage ? 'lg:grid-cols-[minmax(280px,380px)_1fr]' : 'lg:grid-cols-[minmax(240px,320px)_1fr_minmax(220px,280px)]'
           }`}
         >
@@ -269,7 +269,7 @@ export default function Profile({ variant = 'home' }) {
           </div>
 
           {!isPage ? (
-            <div className="flex items-center justify-center lg:justify-end">
+            <div className="home-credential-compass-wrap flex items-center justify-center xl:justify-end">
               <CredentialCompass />
             </div>
           ) : null}

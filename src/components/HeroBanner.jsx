@@ -31,18 +31,18 @@ export default function HeroBanner() {
   const { backgroundImage, subtitle, name, description, primaryCta, secondaryCta } = hero
 
   return (
-    <section className="relative overflow-hidden max-lg:min-h-[92vh] max-md:min-h-[92svh] sm:max-lg:min-h-[94vh] lg:min-h-[95vh]">
+    <section className="relative overflow-hidden max-md:min-h-[92svh] max-lg:min-h-[92vh] md:max-lg:min-h-[82vh] sm:max-lg:min-h-[94vh] md:max-lg:sm:min-h-[82vh] lg:min-h-[95vh]">
       <img
         src={images.heroMobileVertical}
         alt=""
         aria-hidden="true"
-        className="absolute inset-0 h-full w-full object-cover object-center lg:hidden"
+        className="absolute inset-0 h-full w-full object-cover object-center max-md:block md:hidden"
       />
       {hasMediaSrc(backgroundImage) ? (
         <img
           src={backgroundImage}
           alt="Dr. Wael A. Al-Dakroury, speech and language pathology"
-          className="absolute inset-0 hidden h-full w-full object-cover object-center lg:block"
+          className="absolute inset-0 hidden h-full w-full object-cover object-center md:block"
         />
       ) : null}
 
@@ -87,8 +87,8 @@ export default function HeroBanner() {
       </div>
 
       {/* Tablet / desktop content */}
-      <div className="relative mx-auto hidden max-w-6xl flex-col max-lg:min-h-[92vh] max-lg:justify-end max-lg:px-5 max-lg:pb-12 max-lg:pt-[calc(3.75rem+env(safe-area-inset-top))] sm:max-lg:px-6 sm:max-lg:pb-14 md:flex lg:min-h-[85vh] lg:justify-end lg:px-8 lg:pt-48 lg:pb-24">
-        <div className="flex max-w-xl flex-col max-lg:space-y-4 lg:max-w-none lg:space-y-0 lg:p-0">
+      <div className="relative mx-auto hidden max-w-6xl flex-col max-lg:min-h-[92vh] max-lg:justify-end max-lg:px-5 max-lg:pb-12 max-lg:pt-[calc(3.75rem+env(safe-area-inset-top))] md:max-lg:min-h-[82vh] md:max-lg:pb-14 sm:max-lg:px-6 sm:max-lg:pb-14 md:flex lg:min-h-[85vh] lg:justify-end lg:px-8 lg:pt-48 lg:pb-24">
+        <div className="flex max-w-xl flex-col max-lg:space-y-4 md:max-lg:max-w-2xl lg:max-w-none lg:space-y-0 lg:p-0">
           <h1 className="order-1 max-lg:max-w-none font-serif text-[2.375rem] leading-[1.08] font-semibold text-white drop-shadow-lg sm:text-[2.75rem] md:order-2 md:max-lg:max-w-2xl md:text-5xl lg:order-none lg:mt-4 lg:max-w-3xl lg:text-6xl lg:leading-[1.12] lg:font-medium lg:drop-shadow-md">
             <HeroName name={name} />
           </h1>
@@ -99,19 +99,19 @@ export default function HeroBanner() {
             {description}
           </p>
 
-          <MobileSocialLinks variant="hero" className="order-4 max-lg:pt-1 lg:hidden" />
+          <MobileSocialLinks variant="hero" className="order-4 max-md:pt-1 md:max-lg:hidden lg:hidden" />
 
-          <div className="order-5 flex max-lg:w-full max-lg:flex-col max-lg:gap-2.5 max-lg:pt-2 flex-wrap gap-3 md:order-4 lg:order-none lg:mt-10 lg:flex-row lg:gap-4">
+          <div className="order-5 flex max-md:w-full max-md:flex-col max-md:gap-2.5 max-md:pt-2 flex-wrap gap-3 md:order-4 md:max-lg:flex-row md:max-lg:pt-3 lg:order-none lg:mt-10 lg:flex-row lg:gap-4">
             <ContactButton
               href={primaryCta.href}
               headerState={{ active: false, scrolled: false }}
-              className={`${heroButtonClassName} max-lg:w-full max-lg:justify-center`}
+              className={`${heroButtonClassName} max-md:w-full max-md:justify-center md:max-lg:w-auto`}
             >
               {primaryCta.label}
             </ContactButton>
             <a
               href={secondaryCta.href}
-              className={`inline-flex items-center justify-center rounded-sm border border-white/40 bg-black/20 font-medium tracking-wide text-white backdrop-blur-sm transition-colors hover:border-white hover:bg-black/30 max-lg:w-full lg:!px-7 lg:!py-3 lg:!text-sm ${heroButtonClassName}`}
+              className={`inline-flex items-center justify-center rounded-sm border border-white/40 bg-black/20 font-medium tracking-wide text-white backdrop-blur-sm transition-colors hover:border-white hover:bg-black/30 max-md:w-full md:max-lg:w-auto lg:!px-7 lg:!py-3 lg:!text-sm ${heroButtonClassName}`}
             >
               {secondaryCta.label}
             </a>
