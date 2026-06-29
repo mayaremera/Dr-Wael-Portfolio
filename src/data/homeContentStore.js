@@ -82,6 +82,7 @@ export function getDefaultHomeContent() {
   return {
     hero: {
       backgroundImage: images.heroBanner,
+      backgroundImageMobile: images.heroMobileVertical,
       subtitle: site.title,
       name: profileDetails.name,
       description:

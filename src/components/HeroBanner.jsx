@@ -28,12 +28,15 @@ export default function HeroBanner() {
   if (!isReady || !content) return null
 
   const { hero } = content
-  const { backgroundImage, subtitle, name, description, primaryCta, secondaryCta } = hero
+  const { backgroundImage, backgroundImageMobile, subtitle, name, description, primaryCta, secondaryCta } = hero
+  const mobileBackground = hasMediaSrc(backgroundImageMobile)
+    ? backgroundImageMobile
+    : images.heroMobileVertical
 
   return (
     <section className="relative overflow-hidden max-md:min-h-[92svh] max-lg:min-h-[92vh] md:max-lg:min-h-[82vh] sm:max-lg:min-h-[94vh] md:max-lg:sm:min-h-[82vh] lg:min-h-[95vh]">
       <img
-        src={images.heroMobileVertical}
+        src={mobileBackground}
         alt=""
         aria-hidden="true"
         className="absolute inset-0 h-full w-full object-cover object-center max-md:block md:hidden"
