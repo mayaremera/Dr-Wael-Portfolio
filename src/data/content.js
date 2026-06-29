@@ -223,6 +223,17 @@ export const video = {
   ],
 }
 
+export const featuredVideo2 = {
+  youtubeId: 'jVDe5-8-fvs',
+  youtubeUrl: 'https://youtu.be/jVDe5-8-fvs',
+  poster: '/images/familytraining.jpg',
+  title: 'Building Communication — Early Intervention in Action',
+  paragraphs: [
+    'This session highlights how structured speech therapy supports children who struggle with expressive language — connecting words to meaning through play-based activities and parent-guided practice at home.',
+    'Dr. Wael walks through techniques used for articulation, language expansion, and social communication, showing how small, consistent steps can unlock confidence in everyday conversations.',
+  ],
+}
+
 export const profileDetails = {
   name: 'Dr. Wael A. Al-Dakroury',
   title: site.title,
@@ -948,7 +959,7 @@ export const footerServices = [
 export const footerQuickLinks = [
   { label: 'About', href: '/about-me' },
   { label: 'Services', href: '/services' },
-  { label: 'Video / Gallery', href: '/video-gallery' },
+  { label: 'Gallery', href: '/gallery' },
   { label: 'In the Field', href: '/in-the-field' },
   { label: 'Contact', href: '/contact' },
 ]

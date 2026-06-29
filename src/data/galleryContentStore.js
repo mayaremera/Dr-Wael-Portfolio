@@ -1,4 +1,9 @@
-import { mediaGallery as defaultMediaGallery, promoVideo as defaultPromoVideo, video as defaultWatchVideo } from './content'
+import {
+  featuredVideo2 as defaultFeaturedVideo2,
+  mediaGallery as defaultMediaGallery,
+  promoVideo as defaultPromoVideo,
+  video as defaultWatchVideo,
+} from './content'
 import { mergeHomeContent } from './homeContentStore'
 import {
   CONTENT_SECTIONS,
@@ -129,6 +134,7 @@ export function getDefaultGalleryContent() {
 
   return {
     watchSection: cloneContent(defaultWatchVideo),
+    featuredVideo2: cloneContent(defaultFeaturedVideo2),
     promoVideo: cloneContent(defaultPromoVideo),
     videoLibrary: {
       label: 'Key Moments',
@@ -192,6 +198,14 @@ function mergeWithDefaults(saved) {
         saved.watchSection?.paragraphs != null
           ? saved.watchSection.paragraphs
           : defaults.watchSection.paragraphs,
+    },
+    featuredVideo2: {
+      ...defaults.featuredVideo2,
+      ...saved.featuredVideo2,
+      paragraphs:
+        saved.featuredVideo2?.paragraphs != null
+          ? saved.featuredVideo2.paragraphs
+          : defaults.featuredVideo2.paragraphs,
     },
     promoVideo: migratePromoVideo(saved.promoVideo, defaults.promoVideo),
     videoLibrary: {

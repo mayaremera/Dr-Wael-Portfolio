@@ -12,7 +12,7 @@ export default function GalleryPageHeading({ eyebrow, title, galleryImages }) {
               key={src}
               src={src}
               alt=""
-              className="h-full w-full object-cover object-center"
+              className="h-full w-full object-cover object-top lg:object-center"
             />
           ))}
         </div>
@@ -31,7 +31,7 @@ export default function GalleryPageHeading({ eyebrow, title, galleryImages }) {
 
         <div className="relative z-[3] mx-auto flex min-h-[300px] max-w-6xl flex-col justify-end px-6 pb-10 sm:min-h-[340px] sm:pb-12 lg:px-8">
           <p className="text-xs font-semibold tracking-[0.24em] text-accent uppercase">{eyebrow}</p>
-          <h1 className="mt-3 max-w-3xl font-serif text-4xl leading-tight text-white md:text-5xl">{title}</h1>
+          <h1 className="mt-3 max-w-3xl font-serif text-2xl leading-tight text-white sm:text-3xl md:text-4xl lg:text-5xl">{title}</h1>
         </div>
       </div>
     </section>

@@ -165,8 +165,8 @@ const PAGE_SEO = {
       'clinical supervision SLP',
     ],
   },
-  '/video-gallery': {
-    title: 'Videos & Gallery | Dr. Wael Al-Dakroury — Lectures, Ceremonies & Clinical Highlights',
+  '/gallery': {
+    title: 'Gallery | Dr. Wael Al-Dakroury — Lectures, Ceremonies & Clinical Highlights',
     description:
       'Watch Dr. Wael Al-Dakroury in lectures, ASHA conferences, award ceremonies & clinical settings. Video library and photo gallery showcasing decades of contribution to speech-language pathology worldwide.',
     keywords: [
@@ -384,7 +384,7 @@ function buildBreadcrumbs(path) {
   const labels = {
     '/about-me': 'About Me',
     '/services': 'Services',
-    '/video-gallery': 'Video & Gallery',
+    '/gallery': 'Gallery',
     '/in-the-field': 'In the Field',
     '/contact': 'Contact',
   }

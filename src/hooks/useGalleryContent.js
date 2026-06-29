@@ -15,6 +15,7 @@ export function useGalleryContent() {
     isReady,
     content,
     watchSection: content?.watchSection,
+    featuredVideo2: content?.featuredVideo2,
     promoVideo: content?.promoVideo,
     videoLibrary: content?.videoLibrary,
     mediaGallery: content?.mediaGallery,

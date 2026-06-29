@@ -414,6 +414,16 @@ export default function GalleryPanel() {
     })
   }
 
+  const updateFeaturedVideo2 = (field, value) => {
+    setContent((current) => {
+      if (!current) return current
+      return {
+        ...current,
+        featuredVideo2: { ...current.featuredVideo2, [field]: value },
+      }
+    })
+  }
+
   const updateVideoLibraryMeta = (field, value) => {
     setContent((current) => {
       if (!current) return current
@@ -438,6 +448,19 @@ export default function GalleryPanel() {
         },
       }),
       'Watch section saved.',
+    )
+  }
+
+  const saveFeaturedVideo2 = () => {
+    persistFromCurrent(
+      (current) => ({
+        ...current,
+        featuredVideo2: {
+          ...current.featuredVideo2,
+          poster: current.featuredVideo2.poster ? withCacheBust(current.featuredVideo2.poster) : '',
+        },
+      }),
+      'Second featured video saved.',
     )
   }
 
@@ -575,15 +598,15 @@ export default function GalleryPanel() {
   return (
     <PanelShell
       eyebrow="Gallery"
-      title="Video & gallery page"
-      description="Sections are listed in the same order they appear on the live Video & Gallery page."
+      title="Gallery page"
+      description="Sections are listed in the same order they appear on the live Gallery page."
     >
       <DashboardSaveNotice message={savedMessage} error={saveError} saving={isSaving} />
       <DashboardSectionLoader loading={loading} loadError={loadError} />
       {!loading && !loadError && content ? (
         <>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <a href="/video-gallery" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-brand transition-colors hover:text-brand-light">
+        <a href="/gallery" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-brand transition-colors hover:text-brand-light">
           Preview live page →
         </a>
       </div>
@@ -639,7 +662,57 @@ export default function GalleryPanel() {
       </section>
 
       <section className="mt-6 rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
-        <p className="text-[0.65rem] font-semibold tracking-wide text-brand uppercase">2 · Key moments</p>
+        <p className="text-[0.65rem] font-semibold tracking-wide text-brand uppercase">2 · Below watch</p>
+        <h2 className="mt-1 font-serif text-xl text-ink">Second featured video</h2>
+        <p className="mt-1 text-sm text-ink-muted">Another important video block shown directly below the Watch section.</p>
+        <div className="mt-4 grid gap-4">
+          <div>
+            <label className={labelClassName}>YouTube ID or URL</label>
+            <input
+              className={fieldClassName}
+              value={content.featuredVideo2.youtubeId || content.featuredVideo2.youtubeUrl || ''}
+              onChange={(e) => {
+                const value = e.target.value
+                setContent((current) => {
+                  if (!current) return current
+                  return {
+                    ...current,
+                    featuredVideo2: {
+                      ...current.featuredVideo2,
+                      youtubeId: parseYoutubeId(value),
+                      youtubeUrl: value.includes('http') ? value : current.featuredVideo2.youtubeUrl,
+                    },
+                  }
+                })
+              }}
+            />
+          </div>
+          <div>
+            <label className={labelClassName}>Title</label>
+            <input className={fieldClassName} value={content.featuredVideo2.title} onChange={(e) => updateFeaturedVideo2('title', e.target.value)} />
+          </div>
+          <div>
+            <label className={labelClassName}>Poster image</label>
+            <MediaDropzone
+              image={content.featuredVideo2.poster}
+              video=""
+              onChange={({ image }) => updateFeaturedVideo2('poster', image)}
+              onClear={() => updateFeaturedVideo2('poster', '')}
+            />
+          </div>
+          <StringListEditor
+            label="Paragraphs"
+            items={content.featuredVideo2.paragraphs ?? []}
+            onChange={(paragraphs) => updateFeaturedVideo2('paragraphs', paragraphs)}
+          />
+        </div>
+        <button type="button" onClick={saveFeaturedVideo2} className="mt-4 rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase transition-colors hover:bg-brand-light">
+          Save second featured video
+        </button>
+      </section>
+
+      <section className="mt-6 rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
+        <p className="text-[0.65rem] font-semibold tracking-wide text-brand uppercase">3 · Key moments</p>
         <h2 className="mt-1 font-serif text-xl text-ink">Video library</h2>
         <p className="mt-1 text-sm text-ink-muted">Important video moments shown as cards below the Watch section.</p>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
@@ -688,7 +761,7 @@ export default function GalleryPanel() {
       </section>
 
       <section className="mt-6 rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
-        <p className="text-[0.65rem] font-semibold tracking-wide text-brand uppercase">3 · Featured video banner</p>
+        <p className="text-[0.65rem] font-semibold tracking-wide text-brand uppercase">4 · Featured video banner</p>
         <h2 className="mt-1 font-serif text-xl text-ink">Promo video section</h2>
         <p className="mt-1 text-sm text-ink-muted">
           The background video banner with overlay text — below Key moments on this page, and after the services preview on the home page.
@@ -747,7 +820,7 @@ export default function GalleryPanel() {
       </section>
 
       <section className="mt-6 rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
-        <p className="text-[0.65rem] font-semibold tracking-wide text-brand uppercase">4 · Bottom of page</p>
+        <p className="text-[0.65rem] font-semibold tracking-wide text-brand uppercase">5 · Bottom of page</p>
         <h2 className="mt-1 font-serif text-xl text-ink">Photo &amp; video gallery</h2>
         <p className="mt-1 text-sm text-ink-muted">Section header and paginated gallery cards at the bottom of the page.</p>
         <div className="mt-4 grid gap-4 md:grid-cols-2">

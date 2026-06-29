@@ -38,7 +38,7 @@ const mainNavItems = [
   },
   {
     id: 'gallery',
-    label: 'Video / Gallery',
+    label: 'Gallery',
     description: 'Photos & videos',
     icon: (
       <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.75">

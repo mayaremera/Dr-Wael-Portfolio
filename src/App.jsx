@@ -32,14 +32,14 @@ const PAGE_LOADER_MS = 1000
 function PageHeading({ eyebrow, title, backgroundImage, imagePosition = 'center' }) {
   const positionClass =
     imagePosition === 'top'
-      ? 'object-cover object-top'
+      ? 'object-cover object-top lg:object-center'
       : imagePosition === 'contain'
         ? 'object-contain object-center'
         : 'object-cover object-center'
 
   return (
     <section className="relative overflow-hidden">
-      <div className="relative min-h-[300px] pt-24 sm:min-h-[340px] sm:pt-28 lg:pt-36 xl:pt-40">
+      <div className="relative min-h-[260px] pt-24 sm:min-h-[300px] sm:pt-28 lg:min-h-[340px] lg:pt-36 xl:pt-40">
         {hasMediaSrc(backgroundImage) ? (
           <img
             src={backgroundImage}
@@ -50,9 +50,9 @@ function PageHeading({ eyebrow, title, backgroundImage, imagePosition = 'center'
         <div className="absolute inset-0 bg-gradient-to-r from-ink/85 via-ink/65 to-ink/40" />
         <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-ink/35 to-transparent" />
 
-        <div className="relative mx-auto flex min-h-[300px] max-w-6xl flex-col justify-end px-6 pb-10 sm:min-h-[340px] sm:pb-12 lg:px-8">
+        <div className="relative mx-auto flex min-h-[260px] max-w-6xl flex-col justify-end px-6 pb-8 sm:min-h-[300px] sm:pb-10 lg:min-h-[340px] lg:px-8 lg:pb-12">
           <p className="text-xs font-semibold tracking-[0.24em] text-accent uppercase">{eyebrow}</p>
-          <h1 className="mt-3 max-w-3xl font-serif text-4xl leading-tight text-white md:text-5xl">
+          <h1 className="mt-2 max-w-3xl font-serif text-2xl leading-tight text-white sm:mt-3 sm:text-3xl md:text-4xl lg:text-5xl">
             {title}
           </h1>
         </div>
@@ -182,7 +182,12 @@ function VibeBand({
 function App() {
   const [isPageReady, setIsPageReady] = useState(false)
   const rawPath = window.location.pathname.replace(/\/+$/, '') || HOME_PATH
-  const pathname = rawPath === '/cases' ? '/services' : rawPath
+  const pathname =
+    rawPath === '/cases'
+      ? '/services'
+      : rawPath === '/video-gallery'
+        ? '/gallery'
+        : rawPath
   const isDashboard = pathname === '/dashboard' || pathname.startsWith('/dashboard/')
 
   useSeo(pathname)
@@ -196,6 +201,9 @@ function App() {
   useEffect(() => {
     if (rawPath === '/cases') {
       window.history.replaceState(null, '', '/services#cases')
+    }
+    if (rawPath === '/video-gallery') {
+      window.history.replaceState(null, '', '/gallery')
     }
   }, [rawPath])
 
@@ -245,19 +253,26 @@ function App() {
         <Testimonials variant="light" />
       </PageLayout>
     ),
-    '/video-gallery': (
+    '/gallery': (
       <PageLayout
         hero={{
-          eyebrow: 'Video & Gallery',
+          eyebrow: 'Gallery',
           title: 'Insights and Moments from Practice',
           variant: 'gallery',
           galleryImages: images.galleryHeading,
         }}
       >
-        <VideoSection variant="light" />
-        <VideoLibrarySection />
-        <PromoVideoSection variant="light" ctaHref="/contact" secondaryHref="/services" />
-        <GalleryGrid />
+        <VideoSection variant="light" tone="white" />
+        <VideoSection
+          variant="light"
+          contentKey="featuredVideo2"
+          sectionId="featured-video-2"
+          reverse
+          tone="alt"
+        />
+        <VideoLibrarySection tone="white" />
+        <PromoVideoSection variant="light" fullBleedMobile tone="alt" ctaHref="/contact" secondaryHref="/services" />
+        <GalleryGrid tone="white" />
       </PageLayout>
     ),
     '/in-the-field': (
@@ -284,6 +299,7 @@ function App() {
           description:
             'Reach out to discuss your child’s needs and schedule an appointment in English or Arabic.',
           image: images.screening,
+          imagePosition: 'top',
         }}
       >
         <Contact />

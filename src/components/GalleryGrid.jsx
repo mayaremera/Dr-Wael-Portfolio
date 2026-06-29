@@ -280,10 +280,10 @@ function GalleryCompactCard({ item, globalIndex, onOpen, className = '' }) {
       <button
         type="button"
         onClick={() => onOpen(globalIndex)}
-        className="flex h-full w-full flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white text-left shadow-sm transition-all duration-300 hover:border-brand/25 hover:shadow-md"
+        className="flex h-full w-full flex-col overflow-hidden rounded-xl border border-slate-200/80 bg-white text-left shadow-sm transition-all duration-300 hover:border-brand/25 hover:shadow-md lg:rounded-2xl"
         aria-label={`Open ${title}`}
       >
-        <div className="relative aspect-[4/3] overflow-hidden">
+        <div className="relative aspect-[4/3] overflow-hidden max-lg:aspect-[16/10]">
           <GalleryMediaPreview item={item} />
 
           <span className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
@@ -302,9 +302,9 @@ function GalleryCompactCard({ item, globalIndex, onOpen, className = '' }) {
           </span>
         </div>
 
-        <div className="flex flex-1 flex-col p-4">
-          <h3 className="line-clamp-2 font-serif text-base leading-snug text-ink">{title}</h3>
-          <p className="mt-2 line-clamp-2 flex-1 text-sm leading-relaxed text-ink-muted">{previewText}</p>
+        <div className="flex flex-1 flex-col p-3.5 lg:p-4">
+          <h3 className="line-clamp-2 font-serif text-sm leading-snug text-ink lg:text-base">{title}</h3>
+          <p className="mt-1.5 line-clamp-2 flex-1 text-xs leading-relaxed text-ink-muted lg:mt-2 lg:text-sm">{previewText}</p>
         </div>
       </button>
     </article>
@@ -339,7 +339,7 @@ function GalleryPagination({ currentPage, totalPages, onPageChange }) {
   }, [currentPage, totalPages])
 
   return (
-    <nav className="mt-10 flex flex-col items-center gap-4" aria-label="Gallery pagination">
+    <nav className="mt-8 flex flex-col items-center gap-3 lg:mt-10 lg:gap-4" aria-label="Gallery pagination">
       <p className="text-xs font-medium tracking-wide text-ink-muted">
         Page {currentPage} of {totalPages}
       </p>
@@ -398,7 +398,7 @@ function GalleryPagination({ currentPage, totalPages, onPageChange }) {
   )
 }
 
-export default function GalleryGrid() {
+export default function GalleryGrid({ tone = 'alt' }) {
   const { isReady, mediaGallery } = useGalleryContent()
   const [activeFilter, setActiveFilter] = useState('all')
   const [currentPage, setCurrentPage] = useState(1)
@@ -441,7 +441,7 @@ export default function GalleryGrid() {
   if (sortedItems.length === 0) return null
 
   return (
-    <section id="gallery" className="border-t border-slate-200 bg-surface-alt py-16 lg:py-24">
+    <section id="gallery" className={`border-t border-slate-200 py-12 lg:py-24 ${tone === 'white' ? 'bg-white' : 'bg-surface-alt'}`}>
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
         <header className="mx-auto max-w-2xl text-center">
           <p className="text-xs font-semibold tracking-[0.22em] text-brand uppercase">{label}</p>
@@ -455,7 +455,7 @@ export default function GalleryGrid() {
           )}
         </header>
 
-        <div className="mt-10 flex flex-wrap justify-center gap-2">
+        <div className="mt-8 mobile-icon-scroll mobile-icon-scroll--inset -mx-1 flex justify-start gap-2 px-1 pb-0.5 lg:mt-10 lg:flex-wrap lg:justify-center">
           {FILTERS.map((filter) => {
             const isActive = activeFilter === filter.id
             const count =
@@ -468,7 +468,7 @@ export default function GalleryGrid() {
                 key={filter.id}
                 type="button"
                 onClick={() => handleFilterChange(filter.id)}
-                className={`rounded-full border px-4 py-2 text-xs font-semibold tracking-[0.08em] uppercase transition-all duration-200 ${
+                className={`shrink-0 rounded-full border px-3.5 py-2 text-[0.65rem] font-semibold tracking-[0.08em] uppercase transition-all duration-200 lg:px-4 lg:text-xs ${
                   isActive
                     ? 'border-brand bg-brand text-white shadow-sm'
                     : 'border-slate-200 bg-white text-ink-muted hover:border-brand/30 hover:text-brand'
@@ -489,7 +489,7 @@ export default function GalleryGrid() {
           </p>
         ) : (
           <>
-            <div className="mt-8 mobile-card-scroll mobile-card-scroll--gap-lg lg:grid lg:grid-cols-3 lg:gap-5">
+            <div className="mt-6 mobile-card-scroll mobile-card-scroll--gap-lg lg:mt-8 lg:grid lg:grid-cols-3 lg:gap-5">
               {pageItems.map((item, index) => {
                 const globalIndex = (currentPage - 1) * PAGE_SIZE + index
                 return (
@@ -498,7 +498,7 @@ export default function GalleryGrid() {
                     item={item}
                     globalIndex={globalIndex}
                     onOpen={openAt}
-                    className="mobile-card-scroll__item lg:w-auto"
+                    className="mobile-card-scroll__item mobile-card-scroll__item--wide lg:w-auto"
                   />
                 )
               })}

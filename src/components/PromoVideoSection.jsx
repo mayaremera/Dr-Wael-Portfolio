@@ -10,11 +10,13 @@ function truncatePreviewText(text, maxLength = 140) {
   return `${(lastSpace > maxLength * 0.5 ? slice.slice(0, lastSpace) : slice).trim()}…`
 }
 
-export default function PromoVideoSection({ ctaHref, secondaryHref, variant = 'alt', fullBleedMobile = false }) {
+export default function PromoVideoSection({ ctaHref, secondaryHref, variant = 'alt', fullBleedMobile = false, tone }) {
   const { isReady, promoVideo } = useGalleryContent()
   const src = promoVideo?.src ?? ''
   const videoRef = useRef(null)
   const isLight = variant === 'light'
+  const sectionTone = tone ?? (isLight ? 'white' : 'alt')
+  const useHomeMobileLayout = fullBleedMobile || !isLight
   const mobileBleed = fullBleedMobile
     ? 'max-md:py-0 max-md:border-t-0 max-md:bg-transparent'
     : ''
@@ -46,16 +48,26 @@ export default function PromoVideoSection({ ctaHref, secondaryHref, variant = 'a
   return (
     <section
       id="promo"
-      className={`border-t border-slate-200 py-16 lg:py-20 ${isLight ? 'bg-white' : 'bg-surface-alt'} ${mobileBleed}`}
+      className={`border-t border-slate-200 py-12 lg:py-20 ${sectionTone === 'white' ? 'bg-white' : 'bg-surface-alt'} ${mobileBleed}`}
       aria-labelledby="promo-heading"
     >
       <div className={`mx-auto max-w-6xl px-6 lg:px-8 ${mobileContainerBleed}`}>
-        <div className="relative overflow-hidden max-md:rounded-none md:min-h-[min(46vh,360px)] md:rounded-sm md:shadow-xl md:shadow-brand/15 lg:min-h-[min(72vh,640px)]">
-          <div className="relative aspect-video w-full md:absolute md:inset-0 md:aspect-auto">
+        <div
+          className={`relative overflow-hidden md:min-h-[min(46vh,360px)] md:rounded-sm md:shadow-xl md:shadow-brand/15 lg:min-h-[min(72vh,640px)] ${
+            fullBleedMobile
+              ? 'max-md:rounded-none'
+              : 'rounded-2xl max-md:shadow-lg max-md:shadow-brand/15'
+          }`}
+        >
+          <div
+            className={`relative w-full md:absolute md:inset-0 ${
+              useHomeMobileLayout ? 'aspect-video md:aspect-auto' : 'aspect-[4/5] md:aspect-auto'
+            }`}
+          >
             <video
               key={src}
               ref={videoRef}
-              className="absolute inset-0 h-full w-full object-cover object-center"
+              className="absolute inset-0 h-full w-full object-cover object-top md:object-center"
               autoPlay
               muted
               loop
@@ -66,7 +78,11 @@ export default function PromoVideoSection({ ctaHref, secondaryHref, variant = 'a
               <source src={src} />
             </video>
             <div
-              className="pointer-events-none absolute inset-0 bg-gradient-to-t from-brand/40 via-transparent to-brand/10 md:hidden"
+              className={`pointer-events-none absolute inset-0 md:hidden ${
+                useHomeMobileLayout
+                  ? 'bg-gradient-to-t from-brand/40 via-transparent to-brand/10'
+                  : 'bg-linear-to-t from-brand via-brand/55 to-brand/10'
+              }`}
               aria-hidden="true"
             />
           </div>
@@ -96,28 +112,53 @@ export default function PromoVideoSection({ ctaHref, secondaryHref, variant = 'a
             aria-hidden="true"
           />
 
-          <div className="relative bg-gradient-to-br from-brand via-[#1e5566] to-brand-light px-5 py-6 md:hidden">
-            <div className="mb-3 h-0.5 w-12 rounded-full bg-accent" aria-hidden="true" />
-            <p className="text-[0.625rem] font-semibold tracking-[0.2em] text-accent uppercase">{label}</p>
-            <h2 id="promo-heading" className="mt-2 font-serif text-[1.375rem] leading-[1.2] text-white">
-              {titleHighlight}
-            </h2>
-            <p className="mt-2.5 text-[0.6875rem] leading-[1.6] text-white/80">{mobileDescription}</p>
-            <div className="mt-5 flex w-full flex-col gap-2.5">
-              <a
-                href={primaryHref}
-                className="inline-flex min-h-10 w-full items-center justify-center rounded-lg bg-accent px-4 py-2.5 text-xs font-semibold tracking-wide text-white uppercase shadow-lg shadow-black/20 transition-colors hover:bg-accent-hover"
-              >
-                {cta.label}
-              </a>
-              <a
-                href={secondaryLinkHref}
-                className="inline-flex min-h-10 w-full items-center justify-center rounded-lg border border-white/50 bg-transparent px-4 py-2.5 text-xs font-medium tracking-wide text-white transition-colors hover:border-white hover:bg-white/10"
-              >
-                {secondary.label}
-              </a>
+          {useHomeMobileLayout ? (
+            <div className="relative bg-gradient-to-br from-brand via-[#1e5566] to-brand-light px-5 py-6 md:hidden">
+              <div className="mb-3 h-0.5 w-12 rounded-full bg-accent" aria-hidden="true" />
+              <p className="text-[0.625rem] font-semibold tracking-[0.2em] text-accent uppercase">{label}</p>
+              <h2 id="promo-heading" className="mt-2 font-serif text-[1.375rem] leading-[1.2] text-white">
+                {titleHighlight}
+              </h2>
+              <p className="mt-2.5 text-[0.6875rem] leading-[1.6] text-white/80">{mobileDescription}</p>
+              <div className="mt-5 flex w-full flex-col gap-2.5">
+                <a
+                  href={primaryHref}
+                  className="inline-flex min-h-10 w-full items-center justify-center rounded-lg bg-accent px-4 py-2.5 text-xs font-semibold tracking-wide text-white uppercase shadow-lg shadow-black/20 transition-colors hover:bg-accent-hover"
+                >
+                  {cta.label}
+                </a>
+                <a
+                  href={secondaryLinkHref}
+                  className="inline-flex min-h-10 w-full items-center justify-center rounded-lg border border-white/50 bg-transparent px-4 py-2.5 text-xs font-medium tracking-wide text-white transition-colors hover:border-white hover:bg-white/10"
+                >
+                  {secondary.label}
+                </a>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="absolute inset-x-0 bottom-0 p-5 md:hidden">
+              <div className="mb-2 h-0.5 w-10 rounded-full bg-accent" aria-hidden="true" />
+              <p className="text-[0.625rem] font-semibold tracking-[0.2em] text-accent uppercase">{label}</p>
+              <h2 id="promo-heading" className="mt-2 font-serif text-xl leading-[1.2] text-white">
+                {titleHighlight}
+              </h2>
+              <p className="mt-2 text-xs leading-relaxed text-white/85">{mobileDescription}</p>
+              <div className="mt-4 flex w-full flex-col gap-2">
+                <a
+                  href={primaryHref}
+                  className="inline-flex min-h-10 w-full items-center justify-center rounded-lg bg-accent px-4 py-2.5 text-xs font-semibold tracking-wide text-white uppercase shadow-lg shadow-black/20 transition-colors hover:bg-accent-hover"
+                >
+                  {cta.label}
+                </a>
+                <a
+                  href={secondaryLinkHref}
+                  className="inline-flex min-h-10 w-full items-center justify-center rounded-lg border border-white/50 bg-white/10 px-4 py-2.5 text-xs font-medium tracking-wide text-white backdrop-blur-sm transition-colors hover:border-white hover:bg-white/15"
+                >
+                  {secondary.label}
+                </a>
+              </div>
+            </div>
+          )}
 
           <div className="relative hidden min-h-[min(46vh,360px)] items-center justify-center px-4 py-8 sm:min-h-[min(50vh,400px)] sm:px-6 sm:py-10 md:flex lg:min-h-[min(72vh,640px)] lg:px-12 lg:py-16">
             <div className="mx-auto max-w-3xl text-center">

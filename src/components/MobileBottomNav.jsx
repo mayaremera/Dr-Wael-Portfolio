@@ -68,7 +68,7 @@ const mobileNavLinks = [
   { href: '/', label: 'Home', icon: 'home' },
   { href: '/about-me', label: 'About Me', icon: 'about' },
   { href: '/services', label: 'Services', icon: 'services' },
-  { href: '/video-gallery', label: 'Gallery', icon: 'gallery' },
+  { href: '/gallery', label: 'Gallery', icon: 'gallery' },
   { href: '/in-the-field', label: 'In the Field', icon: 'field' },
   { href: '/contact', label: 'Contact', icon: 'contact' },
 ]

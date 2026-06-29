@@ -99,11 +99,11 @@ function VideoCard({ item, onPlay }) {
       <button
         type="button"
         onClick={onPlay}
-        className="flex h-full w-full flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white text-left shadow-sm ring-1 ring-slate-200/70 transition-all duration-300 hover:border-brand/25 hover:shadow-md hover:ring-brand/20"
+        className="flex h-full w-full flex-col overflow-hidden rounded-xl border border-slate-200/80 bg-white text-left shadow-sm ring-1 ring-slate-200/70 transition-all duration-300 hover:border-brand/25 hover:shadow-md hover:ring-brand/20 lg:rounded-2xl"
         aria-label={`Play ${item.title}`}
         onContextMenu={blockMediaContext}
       >
-        <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
+        <div className="relative aspect-[16/9] overflow-hidden bg-slate-100 lg:aspect-[16/10]">
           {item.poster ? (
             <img
               src={item.poster}
@@ -124,15 +124,19 @@ function VideoCard({ item, onPlay }) {
           </span>
         </div>
 
-        <div className="flex flex-1 flex-col p-4 sm:p-5">
+        <div className="flex flex-1 flex-col p-3.5 sm:p-5">
           {item.subtitle ? (
-            <p className="text-[0.65rem] font-semibold tracking-[0.16em] text-brand uppercase">{item.subtitle}</p>
+            <p className="text-[0.62rem] font-semibold tracking-[0.14em] text-brand uppercase lg:text-[0.65rem] lg:tracking-[0.16em]">
+              {item.subtitle}
+            </p>
           ) : null}
-          <h3 className={`font-serif text-lg leading-snug text-ink sm:text-xl ${item.subtitle ? 'mt-1.5' : ''}`}>
+          <h3 className={`font-serif text-base leading-snug text-ink lg:text-lg lg:sm:text-xl ${item.subtitle ? 'mt-1 lg:mt-1.5' : ''}`}>
             {item.title}
           </h3>
           {description ? (
-            <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-ink-muted">{description}</p>
+            <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-ink-muted lg:mt-2 lg:text-sm">
+              {description}
+            </p>
           ) : null}
         </div>
       </button>
@@ -140,7 +144,7 @@ function VideoCard({ item, onPlay }) {
   )
 }
 
-export default function VideoLibrarySection() {
+export default function VideoLibrarySection({ tone = 'alt' }) {
   const { isReady, videoLibrary } = useGalleryContent()
   const [activeItem, setActiveItem] = useState(null)
 
@@ -167,7 +171,7 @@ export default function VideoLibrarySection() {
   return (
     <section
       id="video-library"
-      className="border-t border-slate-200 bg-surface-alt py-20 lg:py-28 select-none"
+      className={`border-t border-slate-200 py-12 select-none lg:py-28 ${tone === 'white' ? 'bg-white' : 'bg-surface-alt'}`}
       onContextMenu={blockMediaContext}
       onCopy={(event) => event.preventDefault()}
     >
@@ -180,9 +184,9 @@ export default function VideoLibrarySection() {
           ) : null}
         </header>
 
-        <div className="mt-14 mobile-card-scroll mobile-card-scroll--gap-lg lg:grid lg:grid-cols-3 lg:gap-x-6 lg:gap-y-10">
+        <div className="mt-8 mobile-card-scroll mobile-card-scroll--gap-lg lg:mt-14 lg:grid lg:grid-cols-3 lg:gap-x-6 lg:gap-y-10">
           {playableItems.map((item) => (
-            <div key={item.id} className="mobile-card-scroll__item h-full lg:w-auto">
+            <div key={item.id} className="mobile-card-scroll__item mobile-card-scroll__item--wide h-full lg:w-auto">
               <VideoCard item={item} onPlay={() => setActiveItem(item)} />
             </div>
           ))}

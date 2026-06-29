@@ -81,18 +81,61 @@ function PhoneIcon() {
   )
 }
 
-function ContactLink({ href, label, icon, external }) {
+function ContactLink({ href, label, icon, external, compact = false }) {
   return (
     <a
       href={href}
       {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-      className="group flex items-center gap-3 rounded-lg border border-slate-200/80 bg-white/70 px-4 py-3 text-sm transition-all duration-300 hover:border-brand/25 hover:bg-white hover:shadow-md hover:shadow-brand/5"
+      className={`group flex items-center gap-3 rounded-lg border border-slate-200/80 bg-white/70 text-sm transition-all duration-300 hover:border-brand/25 hover:bg-white hover:shadow-md hover:shadow-brand/5 ${
+        compact ? 'min-h-11 px-3.5 py-2.5' : 'px-4 py-3'
+      }`}
     >
-      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand/10 text-brand transition-colors group-hover:bg-brand group-hover:text-white">
+      <span
+        className={`grid shrink-0 place-items-center rounded-full bg-brand/10 text-brand transition-colors group-hover:bg-brand group-hover:text-white ${
+          compact ? 'h-8 w-8' : 'h-9 w-9'
+        }`}
+      >
         {icon}
       </span>
-      <span className="font-medium text-ink transition-colors group-hover:text-brand">{label}</span>
+      <span className="min-w-0 flex-1 font-medium text-ink transition-colors group-hover:text-brand">{label}</span>
     </a>
+  )
+}
+
+function MobileWeekSchedule({ schedule }) {
+  const weekdays = schedule.filter((entry) => !entry.weekend)
+  const weekend = schedule.filter((entry) => entry.weekend)
+
+  return (
+    <div className="mt-4 space-y-2">
+      {weekdays.map((entry) => (
+        <div
+          key={entry.day}
+          className="flex items-center justify-between gap-3 rounded-lg border border-white/15 bg-white/10 px-3 py-2"
+        >
+          <span className="text-xs font-semibold tracking-wide text-white">{dayAbbrev[entry.day]}</span>
+          <span className="text-right text-xs text-white/85">{entry.hours}</span>
+        </div>
+      ))}
+
+      <div className="flex items-center gap-2 pt-1">
+        <div className="h-px flex-1 bg-linear-to-r from-transparent via-white/20 to-transparent" aria-hidden="true" />
+        <span className="text-[0.58rem] font-semibold tracking-[0.16em] text-accent uppercase">Weekend</span>
+        <div className="h-px flex-1 bg-linear-to-r from-transparent via-white/20 to-transparent" aria-hidden="true" />
+      </div>
+
+      <div className="grid grid-cols-2 gap-2">
+        {weekend.map((entry) => (
+          <div
+            key={entry.day}
+            className="rounded-lg bg-accent/90 px-2.5 py-2 text-center text-white shadow-sm shadow-accent/20"
+          >
+            <p className="text-[0.62rem] font-bold tracking-wide uppercase">{dayAbbrev[entry.day]}</p>
+            <p className="mt-0.5 text-[0.68rem] font-semibold">{entry.hours}</p>
+          </div>
+        ))}
+      </div>
+    </div>
   )
 }
 
@@ -140,7 +183,7 @@ function WeekSchedule({ schedule }) {
 }
 
 const fieldClassName =
-  'w-full rounded-lg border border-slate-200/90 bg-white px-4 py-3 text-sm text-ink outline-none transition-all placeholder:text-ink-muted/50 focus:border-brand/40 focus:ring-2 focus:ring-brand/15'
+  'w-full rounded-lg border border-slate-200/90 bg-white px-4 py-3 text-base text-ink outline-none transition-all placeholder:text-ink-muted/50 focus:border-brand/40 focus:ring-2 focus:ring-brand/15 lg:text-sm'
 
 export default function Contact() {
   const { isReady, contactSection, contactDetails, directContact } = useContactContent()
@@ -213,7 +256,7 @@ export default function Contact() {
   }
 
   return (
-    <section id="contact" className="relative overflow-hidden border-t border-slate-200 bg-surface-alt py-20 lg:py-28">
+    <section id="contact" className="relative overflow-hidden border-t border-slate-200 bg-surface-alt py-12 lg:py-28">
       <div
         className="pointer-events-none absolute -left-28 top-20 h-72 w-72 rounded-full bg-brand/10 blur-3xl"
         aria-hidden="true"
@@ -232,53 +275,38 @@ export default function Contact() {
           <p className="animate-fade-up text-xs font-semibold tracking-[0.24em] text-brand uppercase">
             {contactSection?.label}
           </p>
-          <h2 className="animate-fade-up animation-delay-100 mt-4 font-serif text-3xl leading-tight text-ink md:text-4xl lg:text-[2.75rem]">
+          <h2 className="animate-fade-up animation-delay-100 mt-2 font-serif text-2xl leading-tight text-ink sm:mt-4 sm:text-3xl md:text-4xl lg:text-[2.75rem]">
             {contactSection?.title}
           </h2>
-          <p className="animate-fade-up animation-delay-200 mt-5 text-base leading-relaxed text-ink-muted md:text-lg">
+          <p className="animate-fade-up animation-delay-200 mt-3 text-sm leading-relaxed text-ink-muted sm:mt-5 sm:text-base md:text-lg">
             {contactSection?.intro}
           </p>
         </header>
 
-        <div className="animate-fade-up animation-delay-300 mt-12 grid gap-5 lg:mt-16 lg:grid-cols-12 lg:gap-6">
-          <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-brand via-brand-light to-brand p-6 text-white shadow-xl shadow-brand/25 lg:col-span-5 lg:p-8">
-            <div
-              className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/10 blur-2xl"
-              aria-hidden="true"
-            />
-            <div
-              className="pointer-events-none absolute -bottom-8 -left-8 h-32 w-32 rounded-full bg-accent/25 blur-2xl"
-              aria-hidden="true"
-            />
-
-            <div className="relative">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[0.65rem] font-semibold tracking-[0.18em] uppercase backdrop-blur-sm">
-                <LocationIcon />
-                Practice Location
-              </div>
-
-              <h3 className="mt-6 font-serif text-2xl leading-snug md:text-3xl">{workplace.name}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-white/85">{workplace.department}</p>
-              <p className="mt-1 text-sm font-medium text-accent">{workplace.city}</p>
-
-              <div className="mt-8 border-t border-white/15 pt-6">
-                <div className="inline-flex items-center gap-2 text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-white/70">
-                  <ClockIcon />
-                  Office Hours
-                </div>
-                <WeekSchedule schedule={contactDetails.schedule} />
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-4 lg:col-span-3">
+        <div className="animate-fade-up animation-delay-300 mt-8 grid gap-4 sm:gap-5 lg:mt-16 lg:grid-cols-12 lg:gap-6">
+          <div className="order-1 flex flex-col gap-3 lg:order-2 lg:col-span-3 lg:gap-4">
             <p className="text-xs font-semibold tracking-[0.18em] text-brand uppercase">Direct Contact</p>
-            <ContactLink href={`mailto:${directContact.email}`} label={directContact.email} icon={<MailIcon />} />
-            <ContactLink
-              href={`tel:${directContact.phone.replace(/\s/g, '')}`}
-              label={directContact.phone}
-              icon={<PhoneIcon />}
-            />
+            <div className="grid gap-2.5 sm:gap-3">
+              <ContactLink
+                href={`mailto:${directContact.email}`}
+                label={directContact.email}
+                icon={<MailIcon />}
+                compact
+              />
+              <ContactLink
+                href={`tel:${directContact.phone.replace(/\s/g, '')}`}
+                label={directContact.phone}
+                icon={<PhoneIcon />}
+                compact
+              />
+            </div>
+
+            <div className="rounded-xl border border-brand/20 bg-brand-muted/50 p-4 lg:mt-auto lg:hidden">
+              <p className="font-serif text-base text-brand">English & Arabic</p>
+              <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">
+                Consultations and sessions available in both languages.
+              </p>
+            </div>
 
             <div className="mt-auto hidden rounded-2xl border border-dashed border-brand/20 bg-brand-muted/50 p-5 lg:block">
               <p className="font-serif text-lg text-brand">English & Arabic</p>
@@ -288,13 +316,16 @@ export default function Contact() {
             </div>
           </div>
 
-          <div id="contact-form" className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-lg shadow-brand/5 lg:col-span-4 lg:p-8">
+          <div
+            id="contact-form"
+            className="order-2 rounded-xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-brand/5 sm:p-6 lg:order-3 lg:col-span-4 lg:rounded-2xl lg:p-8"
+          >
             <p className="text-xs font-semibold tracking-[0.18em] text-accent uppercase">Appointment Request</p>
-            <h3 className="mt-2 font-serif text-2xl text-ink">Send a message</h3>
-            <p className="mt-2 text-sm text-ink-muted">We&apos;ll get back to you as soon as possible.</p>
+            <h3 className="mt-1.5 font-serif text-xl text-ink sm:mt-2 sm:text-2xl">Send a message</h3>
+            <p className="mt-1.5 text-sm text-ink-muted sm:mt-2">We&apos;ll get back to you as soon as possible.</p>
 
-            <form className="mt-6 space-y-4" onSubmit={handleSubmit} noValidate>
-              <div className="grid gap-4 sm:grid-cols-2">
+            <form className="mt-5 space-y-3.5 sm:mt-6 sm:space-y-4" onSubmit={handleSubmit} noValidate>
+              <div className="grid gap-3.5 sm:grid-cols-2 sm:gap-4">
                 <div>
                   <label htmlFor="firstName" className="mb-1.5 block text-[0.65rem] font-semibold tracking-wide text-ink-muted uppercase">
                     First Name
@@ -385,9 +416,12 @@ export default function Contact() {
                 />
               </div>
 
-              <p className="rounded-lg border border-brand/15 bg-brand-muted/40 px-4 py-3 text-sm leading-relaxed text-ink-muted">
-                This message will be sent to the work mail of Dr. Wael El Dakroury ({CONTACT_RECIPIENT_EMAIL}) and you
-                will receive a response soon.
+              <p className="rounded-lg border border-brand/15 bg-brand-muted/40 px-3.5 py-2.5 text-xs leading-relaxed text-ink-muted sm:px-4 sm:py-3 sm:text-sm">
+                <span className="lg:hidden">Your message goes to Dr. Wael&apos;s work email — we&apos;ll reply soon.</span>
+                <span className="hidden lg:inline">
+                  This message will be sent to the work mail of Dr. Wael El Dakroury ({CONTACT_RECIPIENT_EMAIL}) and you
+                  will receive a response soon.
+                </span>
               </p>
 
               {status === 'success' && (
@@ -402,16 +436,52 @@ export default function Contact() {
                 </p>
               )}
 
-              <ContactButton as="button" type="submit" className="w-full disabled:cursor-not-allowed disabled:opacity-60" disabled={status === 'sending'}>
+              <ContactButton
+                as="button"
+                type="submit"
+                className="min-h-11 w-full rounded-lg disabled:cursor-not-allowed disabled:opacity-60 lg:min-h-0 lg:rounded-sm"
+                disabled={status === 'sending'}
+              >
                 {status === 'sending' ? 'Sending…' : 'Send Message'}
               </ContactButton>
             </form>
           </div>
-        </div>
 
-        <p className="animate-fade-up animation-delay-300 mt-8 text-center text-sm text-ink-muted lg:hidden">
-          Consultations available in English and Arabic.
-        </p>
+          <div className="relative order-3 overflow-hidden rounded-xl bg-linear-to-br from-brand via-brand-light to-brand p-4 text-white shadow-xl shadow-brand/25 sm:p-6 lg:order-1 lg:col-span-5 lg:rounded-2xl lg:p-8">
+            <div
+              className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/10 blur-2xl"
+              aria-hidden="true"
+            />
+            <div
+              className="pointer-events-none absolute -bottom-8 -left-8 h-32 w-32 rounded-full bg-accent/25 blur-2xl"
+              aria-hidden="true"
+            />
+
+            <div className="relative">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[0.62rem] font-semibold tracking-[0.16em] uppercase backdrop-blur-sm sm:text-[0.65rem] sm:tracking-[0.18em]">
+                <LocationIcon />
+                Practice Location
+              </div>
+
+              <h3 className="mt-4 font-serif text-xl leading-snug sm:mt-6 sm:text-2xl md:text-3xl">{workplace.name}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-white/85 sm:mt-3">{workplace.department}</p>
+              <p className="mt-1 text-sm font-medium text-accent">{workplace.city}</p>
+
+              <div className="mt-6 border-t border-white/15 pt-5 sm:mt-8 sm:pt-6">
+                <div className="inline-flex items-center gap-2 text-[0.62rem] font-semibold tracking-[0.16em] uppercase text-white/70 sm:text-[0.65rem] sm:tracking-[0.18em]">
+                  <ClockIcon />
+                  Office Hours
+                </div>
+                <div className="lg:hidden">
+                  <MobileWeekSchedule schedule={contactDetails.schedule} />
+                </div>
+                <div className="hidden lg:block">
+                  <WeekSchedule schedule={contactDetails.schedule} />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   )

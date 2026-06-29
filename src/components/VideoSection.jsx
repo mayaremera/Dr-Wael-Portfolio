@@ -3,23 +3,42 @@ import { useGalleryContent } from '../hooks/useGalleryContent'
 import { parseYoutubeId } from '../data/galleryContentStore'
 import { hasMediaSrc } from '../lib/mediaUrl'
 
-export default function VideoSection({ variant = 'default' }) {
-  const { isReady, watchSection } = useGalleryContent()
+export default function VideoSection({
+  variant = 'default',
+  contentKey = 'watchSection',
+  sectionId = 'video',
+  sectionLabel = 'Watch',
+  reverse = false,
+  tone = 'white',
+}) {
+  const { isReady, watchSection, featuredVideo2 } = useGalleryContent()
+  const sectionData = contentKey === 'featuredVideo2' ? featuredVideo2 : watchSection
   const [playing, setPlaying] = useState(false)
 
-  if (!isReady || !watchSection) return null
+  if (!isReady || !sectionData) return null
 
-  const youtubeId = parseYoutubeId(watchSection.youtubeId || watchSection.youtubeUrl || '')
+  const youtubeId = parseYoutubeId(sectionData.youtubeId || sectionData.youtubeUrl || '')
   const embedUrl = `https://www.youtube.com/embed/${youtubeId}?rel=0&autoplay=1`
   const isLight = variant === 'light'
+  const isAltTone = tone === 'alt'
 
-  if (!youtubeId && !watchSection.title) return null
+  if (!youtubeId && !sectionData.title) return null
+
+  const textOrderClass = reverse ? 'order-2 lg:order-2' : 'order-2 lg:order-1'
+  const videoOrderClass = reverse ? 'order-1 lg:order-1' : 'order-1 lg:order-2'
+  const gridColsClass = reverse
+    ? 'lg:grid-cols-[minmax(0,6fr)_minmax(0,5fr)]'
+    : 'lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]'
 
   return (
     <section
-      id="video"
-      className={`relative overflow-hidden py-20 lg:py-28 ${
-        isLight ? 'border-b border-slate-200 bg-white' : 'border-t border-slate-200 bg-surface-alt'
+      id={sectionId}
+      className={`relative overflow-hidden py-12 lg:py-28 ${
+        isLight
+          ? isAltTone
+            ? 'border-y border-slate-200 bg-surface-alt'
+            : 'border-b border-slate-200 bg-white'
+          : 'border-t border-slate-200 bg-surface-alt'
       }`}
     >
       {!isLight ? (
@@ -36,18 +55,18 @@ export default function VideoSection({ variant = 'default' }) {
       ) : null}
 
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="grid items-stretch gap-10 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:gap-12 xl:gap-14">
-          <div className="order-2 flex flex-col justify-center lg:order-1">
-            <p className="text-xs font-semibold tracking-[0.22em] text-brand uppercase">Watch</p>
-            <h2 className="mt-3 font-serif text-3xl leading-tight text-ink md:text-4xl lg:text-[2.75rem] xl:text-[3.1rem]">
-              {watchSection.title}
+        <div className={`grid items-center gap-6 ${gridColsClass} lg:gap-10 xl:gap-14`}>
+          <div className={`${textOrderClass} flex flex-col justify-center`}>
+            <p className="text-xs font-semibold tracking-[0.22em] text-brand uppercase">{sectionLabel}</p>
+            <h2 className="mt-2 font-serif text-2xl leading-tight text-ink sm:text-3xl lg:mt-3 lg:text-[2.75rem] xl:text-[3.1rem]">
+              {sectionData.title}
             </h2>
 
-            <div className="mt-8 space-y-4">
-              {(watchSection.paragraphs ?? []).map((paragraph) => (
+            <div className="mt-5 space-y-3 lg:mt-8 lg:space-y-4">
+              {(sectionData.paragraphs ?? []).map((paragraph) => (
                 <p
                   key={paragraph}
-                  className="text-base leading-relaxed text-ink-muted md:text-lg md:leading-relaxed"
+                  className="text-sm leading-relaxed text-ink-muted sm:text-base lg:text-lg lg:leading-relaxed"
                 >
                   {paragraph}
                 </p>
@@ -55,21 +74,21 @@ export default function VideoSection({ variant = 'default' }) {
             </div>
           </div>
 
-          <div className="order-1 w-full lg:order-2">
-            <div className="relative aspect-video w-full overflow-hidden rounded-sm bg-slate-900 shadow-lg">
+          <div className={`${videoOrderClass} flex w-full items-center`}>
+            <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-slate-900 shadow-lg lg:rounded-sm">
               {playing && youtubeId ? (
                 <iframe
                   src={embedUrl}
-                  title={watchSection.title}
+                  title={sectionData.title}
                   className="absolute inset-0 h-full w-full border-0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   allowFullScreen
                 />
               ) : (
                 <div className="group/poster absolute inset-0">
-                  {hasMediaSrc(watchSection.poster) ? (
+                  {hasMediaSrc(sectionData.poster) ? (
                     <img
-                      src={watchSection.poster}
+                      src={sectionData.poster}
                       alt=""
                       className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover/poster:scale-[1.03]"
                     />
@@ -86,7 +105,7 @@ export default function VideoSection({ variant = 'default' }) {
                       type="button"
                       onClick={() => setPlaying(true)}
                       className="absolute inset-0 flex items-center justify-center"
-                      aria-label={`Play video: ${watchSection.title}`}
+                      aria-label={`Play video: ${sectionData.title}`}
                     >
                       <span className="relative grid h-12 w-12 place-items-center md:h-14 md:w-14">
                         <span
