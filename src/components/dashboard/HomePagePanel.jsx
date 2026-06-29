@@ -334,6 +334,30 @@ export default function HomePagePanel() {
     )
   }
 
+  const updateHeroMobileImage = (image, message = 'Mobile hero image saved.') => {
+    persistFromCurrent(
+      (current) => ({
+        hero: {
+          ...current.hero,
+          backgroundImageMobile: image ? withCacheBust(image) : '',
+        },
+      }),
+      message,
+    )
+  }
+
+  const previewHeroMobileImage = (image) => {
+    if (!image) return
+    setContent((current) =>
+      current
+        ? {
+            ...current,
+            hero: { ...current.hero, backgroundImageMobile: image },
+          }
+        : current,
+    )
+  }
+
   const updateAffiliations = (field, value) => {
     setContent((current) => ({
       ...current,
@@ -494,13 +518,25 @@ export default function HomePagePanel() {
         <p className="mt-1 text-sm text-ink-muted">The top banner with background image, headline, and call-to-action buttons.</p>
         <div className="mt-4 grid gap-4">
           <div>
-            <label className={labelClassName}>Background image</label>
+            <label className={labelClassName}>Desktop background image</label>
+            <p className="mb-2 text-xs text-ink-muted">Shown on tablet and desktop (lg breakpoint and up).</p>
             <MediaDropzone
               image={content.hero.backgroundImage}
               video=""
               onChange={({ image }) => previewHeroImage(image)}
               onUploaded={({ image }) => updateHeroImage(image)}
-              onClear={() => updateHeroImage('', 'Hero image removed.')}
+              onClear={() => updateHeroImage('', 'Desktop hero image removed.')}
+            />
+          </div>
+          <div>
+            <label className={labelClassName}>Mobile background image</label>
+            <p className="mb-2 text-xs text-ink-muted">Shown on phones and small screens (below lg breakpoint).</p>
+            <MediaDropzone
+              image={content.hero.backgroundImageMobile}
+              video=""
+              onChange={({ image }) => previewHeroMobileImage(image)}
+              onUploaded={({ image }) => updateHeroMobileImage(image)}
+              onClear={() => updateHeroMobileImage('', 'Mobile hero image removed.')}
             />
           </div>
           <div>

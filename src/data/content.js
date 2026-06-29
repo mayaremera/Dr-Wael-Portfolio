@@ -224,14 +224,11 @@ export const video = {
 }
 
 export const featuredVideo2 = {
-  youtubeId: 'jVDe5-8-fvs',
-  youtubeUrl: 'https://youtu.be/jVDe5-8-fvs',
-  poster: '/images/familytraining.jpg',
-  title: 'Building Communication — Early Intervention in Action',
-  paragraphs: [
-    'This session highlights how structured speech therapy supports children who struggle with expressive language — connecting words to meaning through play-based activities and parent-guided practice at home.',
-    'Dr. Wael walks through techniques used for articulation, language expansion, and social communication, showing how small, consistent steps can unlock confidence in everyday conversations.',
-  ],
+  youtubeId: video.youtubeId,
+  youtubeUrl: video.youtubeUrl,
+  poster: video.poster,
+  title: video.title,
+  paragraphs: [...video.paragraphs],
 }
 
 export const profileDetails = {

@@ -460,7 +460,7 @@ export default function GalleryPanel() {
           poster: current.featuredVideo2.poster ? withCacheBust(current.featuredVideo2.poster) : '',
         },
       }),
-      'Second featured video saved.',
+      'Second video saved.',
     )
   }
 
@@ -614,105 +614,109 @@ export default function GalleryPanel() {
       <section className="rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
         <p className="text-[0.65rem] font-semibold tracking-wide text-brand uppercase">1 · Top of page</p>
         <h2 className="mt-1 font-serif text-xl text-ink">Watch section</h2>
-        <p className="mt-1 text-sm text-ink-muted">The featured YouTube block directly below the page hero.</p>
-        <div className="mt-4 grid gap-4">
-          <div>
-            <label className={labelClassName}>YouTube ID or URL</label>
-            <input
-              className={fieldClassName}
-              value={content.watchSection.youtubeId || content.watchSection.youtubeUrl || ''}
-              onChange={(e) => {
-                const value = e.target.value
-                setContent((current) => {
-                  if (!current) return current
-                  return {
-                    ...current,
-                    watchSection: {
-                      ...current.watchSection,
-                      youtubeId: parseYoutubeId(value),
-                      youtubeUrl: value.includes('http') ? value : current.watchSection.youtubeUrl,
-                    },
-                  }
-                })
-              }}
+        <p className="mt-1 text-sm text-ink-muted">Two featured YouTube blocks directly below the page hero — first with text on the left, second with video on the left.</p>
+
+        <div className="mt-6 border-t border-slate-100 pt-6">
+          <h3 className="font-serif text-lg text-ink">First video</h3>
+          <p className="mt-1 text-sm text-ink-muted">Text on the left, video on the right.</p>
+          <div className="mt-4 grid gap-4">
+            <div>
+              <label className={labelClassName}>YouTube ID or URL</label>
+              <input
+                className={fieldClassName}
+                value={content.watchSection.youtubeId || content.watchSection.youtubeUrl || ''}
+                onChange={(e) => {
+                  const value = e.target.value
+                  setContent((current) => {
+                    if (!current) return current
+                    return {
+                      ...current,
+                      watchSection: {
+                        ...current.watchSection,
+                        youtubeId: parseYoutubeId(value),
+                        youtubeUrl: value.includes('http') ? value : current.watchSection.youtubeUrl,
+                      },
+                    }
+                  })
+                }}
+              />
+            </div>
+            <div>
+              <label className={labelClassName}>Title</label>
+              <input className={fieldClassName} value={content.watchSection.title} onChange={(e) => updateWatchSection('title', e.target.value)} />
+            </div>
+            <div>
+              <label className={labelClassName}>Poster image</label>
+              <MediaDropzone
+                image={content.watchSection.poster}
+                video=""
+                onChange={({ image }) => updateWatchSection('poster', image)}
+                onClear={() => updateWatchSection('poster', '')}
+              />
+            </div>
+            <StringListEditor
+              label="Paragraphs"
+              items={content.watchSection.paragraphs ?? []}
+              onChange={(paragraphs) => updateWatchSection('paragraphs', paragraphs)}
             />
           </div>
-          <div>
-            <label className={labelClassName}>Title</label>
-            <input className={fieldClassName} value={content.watchSection.title} onChange={(e) => updateWatchSection('title', e.target.value)} />
-          </div>
-          <div>
-            <label className={labelClassName}>Poster image</label>
-            <MediaDropzone
-              image={content.watchSection.poster}
-              video=""
-              onChange={({ image }) => updateWatchSection('poster', image)}
-              onClear={() => updateWatchSection('poster', '')}
-            />
-          </div>
-          <StringListEditor
-            label="Paragraphs"
-            items={content.watchSection.paragraphs ?? []}
-            onChange={(paragraphs) => updateWatchSection('paragraphs', paragraphs)}
-          />
+          <button type="button" onClick={saveWatchSection} className="mt-4 rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase transition-colors hover:bg-brand-light">
+            Save first video
+          </button>
         </div>
-        <button type="button" onClick={saveWatchSection} className="mt-4 rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase transition-colors hover:bg-brand-light">
-          Save watch section
-        </button>
+
+        <div className="mt-8 border-t border-slate-100 pt-6">
+          <h3 className="font-serif text-lg text-ink">Second video</h3>
+          <p className="mt-1 text-sm text-ink-muted">Video on the left, text on the right — shown below the first video in the same section.</p>
+          <div className="mt-4 grid gap-4">
+            <div>
+              <label className={labelClassName}>YouTube ID or URL</label>
+              <input
+                className={fieldClassName}
+                value={content.featuredVideo2.youtubeId || content.featuredVideo2.youtubeUrl || ''}
+                onChange={(e) => {
+                  const value = e.target.value
+                  setContent((current) => {
+                    if (!current) return current
+                    return {
+                      ...current,
+                      featuredVideo2: {
+                        ...current.featuredVideo2,
+                        youtubeId: parseYoutubeId(value),
+                        youtubeUrl: value.includes('http') ? value : current.featuredVideo2.youtubeUrl,
+                      },
+                    }
+                  })
+                }}
+              />
+            </div>
+            <div>
+              <label className={labelClassName}>Title</label>
+              <input className={fieldClassName} value={content.featuredVideo2.title} onChange={(e) => updateFeaturedVideo2('title', e.target.value)} />
+            </div>
+            <div>
+              <label className={labelClassName}>Poster image</label>
+              <MediaDropzone
+                image={content.featuredVideo2.poster}
+                video=""
+                onChange={({ image }) => updateFeaturedVideo2('poster', image)}
+                onClear={() => updateFeaturedVideo2('poster', '')}
+              />
+            </div>
+            <StringListEditor
+              label="Paragraphs"
+              items={content.featuredVideo2.paragraphs ?? []}
+              onChange={(paragraphs) => updateFeaturedVideo2('paragraphs', paragraphs)}
+            />
+          </div>
+          <button type="button" onClick={saveFeaturedVideo2} className="mt-4 rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase transition-colors hover:bg-brand-light">
+            Save second video
+          </button>
+        </div>
       </section>
 
       <section className="mt-6 rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
-        <p className="text-[0.65rem] font-semibold tracking-wide text-brand uppercase">2 · Below watch</p>
-        <h2 className="mt-1 font-serif text-xl text-ink">Second featured video</h2>
-        <p className="mt-1 text-sm text-ink-muted">Another important video block shown directly below the Watch section.</p>
-        <div className="mt-4 grid gap-4">
-          <div>
-            <label className={labelClassName}>YouTube ID or URL</label>
-            <input
-              className={fieldClassName}
-              value={content.featuredVideo2.youtubeId || content.featuredVideo2.youtubeUrl || ''}
-              onChange={(e) => {
-                const value = e.target.value
-                setContent((current) => {
-                  if (!current) return current
-                  return {
-                    ...current,
-                    featuredVideo2: {
-                      ...current.featuredVideo2,
-                      youtubeId: parseYoutubeId(value),
-                      youtubeUrl: value.includes('http') ? value : current.featuredVideo2.youtubeUrl,
-                    },
-                  }
-                })
-              }}
-            />
-          </div>
-          <div>
-            <label className={labelClassName}>Title</label>
-            <input className={fieldClassName} value={content.featuredVideo2.title} onChange={(e) => updateFeaturedVideo2('title', e.target.value)} />
-          </div>
-          <div>
-            <label className={labelClassName}>Poster image</label>
-            <MediaDropzone
-              image={content.featuredVideo2.poster}
-              video=""
-              onChange={({ image }) => updateFeaturedVideo2('poster', image)}
-              onClear={() => updateFeaturedVideo2('poster', '')}
-            />
-          </div>
-          <StringListEditor
-            label="Paragraphs"
-            items={content.featuredVideo2.paragraphs ?? []}
-            onChange={(paragraphs) => updateFeaturedVideo2('paragraphs', paragraphs)}
-          />
-        </div>
-        <button type="button" onClick={saveFeaturedVideo2} className="mt-4 rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase transition-colors hover:bg-brand-light">
-          Save second featured video
-        </button>
-      </section>
-
-      <section className="mt-6 rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
-        <p className="text-[0.65rem] font-semibold tracking-wide text-brand uppercase">3 · Key moments</p>
+        <p className="text-[0.65rem] font-semibold tracking-wide text-brand uppercase">2 · Key moments</p>
         <h2 className="mt-1 font-serif text-xl text-ink">Video library</h2>
         <p className="mt-1 text-sm text-ink-muted">Important video moments shown as cards below the Watch section.</p>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
@@ -761,7 +765,7 @@ export default function GalleryPanel() {
       </section>
 
       <section className="mt-6 rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
-        <p className="text-[0.65rem] font-semibold tracking-wide text-brand uppercase">4 · Featured video banner</p>
+        <p className="text-[0.65rem] font-semibold tracking-wide text-brand uppercase">3 · Featured video banner</p>
         <h2 className="mt-1 font-serif text-xl text-ink">Promo video section</h2>
         <p className="mt-1 text-sm text-ink-muted">
           The background video banner with overlay text — below Key moments on this page, and after the services preview on the home page.
@@ -820,7 +824,7 @@ export default function GalleryPanel() {
       </section>
 
       <section className="mt-6 rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
-        <p className="text-[0.65rem] font-semibold tracking-wide text-brand uppercase">5 · Bottom of page</p>
+        <p className="text-[0.65rem] font-semibold tracking-wide text-brand uppercase">4 · Bottom of page</p>
         <h2 className="mt-1 font-serif text-xl text-ink">Photo &amp; video gallery</h2>
         <p className="mt-1 text-sm text-ink-muted">Section header and paginated gallery cards at the bottom of the page.</p>
         <div className="mt-4 grid gap-4 md:grid-cols-2">

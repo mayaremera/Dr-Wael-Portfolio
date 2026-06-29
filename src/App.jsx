@@ -263,13 +263,6 @@ function App() {
         }}
       >
         <VideoSection variant="light" tone="white" />
-        <VideoSection
-          variant="light"
-          contentKey="featuredVideo2"
-          sectionId="featured-video-2"
-          reverse
-          tone="alt"
-        />
         <VideoLibrarySection tone="white" />
         <PromoVideoSection variant="light" fullBleedMobile tone="alt" ctaHref="/contact" secondaryHref="/services" />
         <GalleryGrid tone="white" />
