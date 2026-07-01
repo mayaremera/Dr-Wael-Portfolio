@@ -39,6 +39,25 @@ function migrateImagePath(url, legacyPath, nextPath) {
   return query ? `${nextPath}?${query}` : nextPath
 }
 
+const THERAPY_CONCEPT_ORDER = [
+  'screening',
+  'counseling',
+  'assessment',
+  'treatment',
+  'family-training',
+  'professional-training',
+]
+
+function reorderTherapyConcepts(concepts) {
+  if (!concepts?.length) return concepts
+
+  const byId = new Map(concepts.map((concept) => [concept.id, concept]))
+  const ordered = THERAPY_CONCEPT_ORDER.map((id) => byId.get(id)).filter(Boolean)
+  const remainder = concepts.filter((concept) => !THERAPY_CONCEPT_ORDER.includes(concept.id))
+
+  return [...ordered, ...remainder]
+}
+
 function migrateTherapyConcept(concept) {
   if (concept.id === 'family-training') {
     return {
@@ -53,7 +72,7 @@ function migrateTherapyConcept(concept) {
 function migrateTherapyConcepts(saved, defaults) {
   if (saved == null) return defaults
   if (!saved.length) return []
-  return saved.map(migrateTherapyConcept)
+  return reorderTherapyConcepts(saved.map(migrateTherapyConcept))
 }
 
 function mergeWithDefaults(saved) {

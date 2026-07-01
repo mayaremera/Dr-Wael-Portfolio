@@ -2,9 +2,10 @@ import { useEffect, useRef, useState } from 'react'
 import { useHomeContent } from '../hooks/useHomeContent'
 
 const WHEEL_SCALE = 1.15
-const WHEEL_MAX_PX = Math.round(280 * WHEEL_SCALE)
-const LABEL_RADIUS_PX = Math.round(118 * WHEEL_SCALE)
-const HUB_SIZE_REM = 8.5 * WHEEL_SCALE
+const WHEEL_BASE_PX = 280
+const WHEEL_MAX_PX = Math.round(WHEEL_BASE_PX * WHEEL_SCALE)
+const LABEL_RADIUS_RATIO = 118 / WHEEL_BASE_PX
+const HUB_SIZE_REM_AT_MAX = 8.5 * WHEEL_SCALE
 
 function formatCredentialLabel(short = '') {
   const words = short.trim().split(/\s+/).filter(Boolean)
@@ -37,9 +38,26 @@ export default function CredentialCompass() {
   const tagline = content?.credentialWheel?.tagline ?? ''
 
   const rootRef = useRef(null)
+  const wheelRef = useRef(null)
   const [activeIndex, setActiveIndex] = useState(0)
   const [previewIndex, setPreviewIndex] = useState(null)
+  const [wheelSize, setWheelSize] = useState(WHEEL_MAX_PX)
   const lastStepRef = useRef(0)
+
+  useEffect(() => {
+    const wheel = wheelRef.current
+    if (!wheel) return
+
+    const syncWheelSize = () => {
+      setWheelSize(wheel.getBoundingClientRect().width)
+    }
+
+    syncWheelSize()
+    const observer = new ResizeObserver(syncWheelSize)
+    observer.observe(wheel)
+
+    return () => observer.disconnect()
+  }, [items.length])
 
   useEffect(() => {
     if (activeIndex >= items.length && items.length > 0) {
@@ -87,6 +105,8 @@ export default function CredentialCompass() {
 
   const ringRotation = -(safeActiveIndex * (360 / items.length))
   const angleStep = 360 / items.length
+  const labelRadiusPx = wheelSize * LABEL_RADIUS_RATIO
+  const hubSizeRem = HUB_SIZE_REM_AT_MAX * (wheelSize / WHEEL_MAX_PX)
 
   const selectItem = (index) => {
     lastStepRef.current = index
@@ -96,20 +116,23 @@ export default function CredentialCompass() {
   return (
     <div
       ref={rootRef}
-      className="credential-compass-root relative mx-auto flex w-full max-w-[min(100%,380px)] flex-col items-center justify-center xl:mx-0 xl:max-w-none xl:items-start"
+      className="credential-compass-root relative mx-auto flex w-full max-w-[min(100%,380px)] flex-col xl:mx-0 xl:max-w-none"
       aria-label="Credentials compass"
     >
-      <p className="credential-compass-heading mb-1 text-center text-[0.65rem] font-semibold tracking-[0.2em] text-brand uppercase xl:text-left">
-        Credentials
-      </p>
-      {tagline ? (
-        <p className="credential-compass-tagline mb-4 max-w-[280px] text-center text-[0.58rem] leading-snug text-ink-muted sm:max-w-[320px] xl:max-w-none xl:text-left">
-          {tagline}
+      <div className="credential-compass-header relative z-10 w-full">
+        <p className="credential-compass-heading mb-2 text-center text-[0.65rem] font-semibold tracking-[0.2em] text-brand uppercase">
+          Credentials
         </p>
-      ) : null}
+        {tagline ? (
+          <p className="credential-compass-tagline mx-auto mb-6 max-w-[280px] text-center text-[0.58rem] leading-relaxed text-balance text-ink-muted sm:max-w-[320px] xl:mb-7 xl:max-w-[340px]">
+            {tagline}
+          </p>
+        ) : null}
+      </div>
 
-      <div className="credential-compass-wheel-shell relative mx-auto w-full max-w-[400px] overflow-visible px-4 sm:px-5">
+      <div className="credential-compass-wheel-shell relative mx-auto w-full max-w-[400px] overflow-visible px-4 pt-2 sm:px-5 sm:pt-3">
         <div
+          ref={wheelRef}
           className="credential-compass-wheel relative mx-auto aspect-square w-full overflow-visible"
           style={{ maxWidth: `${WHEEL_MAX_PX}px` }}
         >
@@ -132,7 +155,7 @@ export default function CredentialCompass() {
               <div
                 key={item.id || item.short}
                 className="absolute left-1/2 top-1/2 h-0 w-0"
-                style={{ transform: `rotate(${angle}deg) translateY(-${LABEL_RADIUS_PX}px)` }}
+                style={{ transform: `rotate(${angle}deg) translateY(-${labelRadiusPx}px)` }}
               >
                 <button
                   type="button"
@@ -162,7 +185,7 @@ export default function CredentialCompass() {
           <div
             key={displayIndex}
             className="flex flex-col items-center justify-center rounded-full border border-brand/20 bg-white/95 px-3 text-center shadow-inner shadow-brand/10 backdrop-blur-sm transition-opacity duration-300"
-            style={{ width: `${HUB_SIZE_REM}rem`, height: `${HUB_SIZE_REM}rem` }}
+            style={{ width: `${hubSizeRem}rem`, height: `${hubSizeRem}rem` }}
           >
             <span className="text-[0.5rem] font-semibold tracking-[0.18em] text-brand/60 uppercase">Focus</span>
             <span className="mt-0.5 font-serif text-sm leading-tight text-brand sm:text-[0.95rem]">
@@ -176,7 +199,7 @@ export default function CredentialCompass() {
       </div>
       </div>
 
-      <div className="mt-5 flex max-w-[240px] flex-wrap items-center justify-center gap-1.5 sm:max-w-none">
+      <div className="mt-5 flex w-full flex-wrap items-center justify-center gap-1.5">
         {items.map((item, index) => (
           <button
             key={item.id || item.short}
@@ -191,7 +214,7 @@ export default function CredentialCompass() {
         ))}
       </div>
 
-      <p className="credential-compass-hint mt-3 max-w-[280px] text-center text-[0.65rem] leading-relaxed text-ink-muted sm:max-w-[320px] xl:max-w-none xl:text-left">
+      <p className="credential-compass-hint mx-auto mt-3 max-w-[280px] text-center text-[0.65rem] leading-relaxed text-ink-muted sm:max-w-[320px] xl:max-w-[340px]">
         Scroll, hover, or tap a point to explore each credential
       </p>
     </div>

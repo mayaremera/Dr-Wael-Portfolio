@@ -71,7 +71,6 @@ function ServiceCardImage({ src, alt }) {
 
 function MobileServiceDetailCard({ concept, index }) {
   const accent = serviceAccents[index % serviceAccents.length]
-  const step = String(index + 1).padStart(2, '0')
   const [expanded, setExpanded] = useState(false)
   const hasExtra = (concept.paragraphs?.length ?? 0) > 0 || (concept.bullets?.length ?? 0) > 0
 
@@ -92,10 +91,7 @@ function MobileServiceDetailCard({ concept, index }) {
         )}
         <div className={`pointer-events-none absolute inset-0 bg-linear-to-t ${accent.imageOverlay}`} />
         <div className="absolute inset-x-0 bottom-0 p-4">
-          <span className={`inline-flex rounded-full border px-2.5 py-0.5 text-[0.6rem] font-semibold tracking-[0.12em] uppercase ${accent.badge}`}>
-            Step {step}
-          </span>
-          <h3 className="mt-1.5 font-serif text-lg leading-snug text-white">{concept.title}</h3>
+          <h3 className="font-serif text-lg leading-snug text-white">{concept.title}</h3>
           <p className="mt-0.5 text-xs font-medium text-white/85">{concept.subtitle}</p>
         </div>
       </div>
@@ -157,7 +153,6 @@ function MobileServiceDetailCard({ concept, index }) {
 
 function ServiceDetailCard({ concept, index }) {
   const accent = serviceAccents[index % serviceAccents.length]
-  const step = String(index + 1).padStart(2, '0')
   const reversed = index % 2 === 1
   const hasBullets = (concept.bullets?.length ?? 0) > 0
 
@@ -203,23 +198,14 @@ function ServiceDetailCard({ concept, index }) {
             />
 
             <div className="absolute inset-x-0 bottom-0 hidden p-5 sm:p-6 lg:hidden">
-              <span className={`inline-flex rounded-full border px-3 py-1 text-[0.65rem] font-semibold tracking-[0.14em] uppercase ${accent.badge}`}>
-                Step {step}
-              </span>
-              <h3 className="mt-2 font-serif text-2xl leading-tight text-white">{concept.title}</h3>
+              <h3 className="font-serif text-2xl leading-tight text-white">{concept.title}</h3>
               <p className="mt-1 text-sm font-medium text-white/85">{concept.subtitle}</p>
             </div>
           </div>
         </div>
 
         <div className="relative flex flex-1 flex-col px-5 pb-6 sm:px-7 sm:pb-8 lg:py-8 lg:pr-8 lg:pl-6 xl:py-10 xl:pr-10">
-          <div>
-            <span className={`inline-flex rounded-full border px-3 py-1 text-[0.65rem] font-semibold tracking-[0.16em] uppercase ${accent.badge}`}>
-              Step {step}
-            </span>
-          </div>
-
-          <div className="mt-4 hidden lg:block">
+          <div className="hidden lg:block">
             <h3 className="font-serif text-3xl leading-tight text-ink xl:text-[2rem]">{concept.title}</h3>
             <p className="mt-1.5 text-base font-medium text-brand">{concept.subtitle}</p>
           </div>
@@ -352,7 +338,7 @@ export default function TherapyConcepts({ showCasesPreview = false, fullDetail =
         <header className="mx-auto max-w-3xl text-center">
           <p className="text-xs font-semibold tracking-[0.22em] text-brand uppercase">Services</p>
           <h2 className="mt-3 font-serif text-3xl leading-tight text-ink md:text-4xl">
-            {fullDetail ? speechLanguageServices.title : 'Speech-Language Pathology Services'}
+            {speechLanguageServices.title}
           </h2>
           {fullDetail ? (
             <>

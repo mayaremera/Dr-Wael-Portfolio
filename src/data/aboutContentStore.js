@@ -20,6 +20,8 @@ import { createContentId } from './servicesContentStore'
 
 export const ABOUT_STORAGE_KEY = 'drwael-about-content'
 
+export const CERTIFICATE_FEATURED_COUNT = 9
+
 const defaultCertificatesSection = {
   label: 'Highlighted Collection',
   title: 'Certificates & Training Archive',
@@ -108,6 +110,44 @@ function normalizeRefereedPublications(data) {
   }
 }
 
+function normalizeCertificatesFeaturedIds(savedIds) {
+  const source = Array.isArray(savedIds) ? savedIds : []
+  return Array.from({ length: CERTIFICATE_FEATURED_COUNT }, (_, index) =>
+    typeof source[index] === 'string' ? source[index] : '',
+  )
+}
+
+export function resolveCertificateDisplayOrder(certificates, featuredIds) {
+  const pool = certificates ?? []
+  const byId = new Map(pool.map((certificate) => [certificate.id, certificate]))
+  const selectedIds = normalizeCertificatesFeaturedIds(featuredIds)
+  const hasSelection = selectedIds.some((id) => id && byId.has(id))
+
+  if (!hasSelection) {
+    return pool
+  }
+
+  const used = new Set()
+  const featured = []
+
+  for (const id of selectedIds) {
+    if (id && byId.has(id) && !used.has(id)) {
+      featured.push(byId.get(id))
+      used.add(id)
+      continue
+    }
+
+    const fallback = pool.find((certificate) => !used.has(certificate.id))
+    if (fallback) {
+      featured.push(fallback)
+      used.add(fallback.id)
+    }
+  }
+
+  const remainder = pool.filter((certificate) => !used.has(certificate.id))
+  return [...featured, ...remainder]
+}
+
 export function getDefaultAboutContent() {
   return {
     profileDetails: cloneContent(defaultProfileDetails),
@@ -120,6 +160,7 @@ export function getDefaultAboutContent() {
       intro: internationalLeadership.intro,
     }),
     certificatesSection: cloneContent(defaultCertificatesSection),
+    certificatesFeaturedIds: Array(CERTIFICATE_FEATURED_COUNT).fill(''),
     refereedPublications: normalizeRefereedPublications(defaultRefereedPublications),
     certificates: cloneContent(getDefaultCertificates()),
     careerTimelineSection: cloneContent(defaultCareerTimelineSection),
@@ -133,6 +174,8 @@ export function getDefaultAboutContent() {
 
 function mergeWithDefaults(saved) {
   const defaults = getDefaultAboutContent()
+  const certificates = saved.certificates ?? defaults.certificates
+  const validCertificateIds = new Set(certificates.map((certificate) => certificate.id))
 
   return {
     ...defaults,
@@ -168,7 +211,10 @@ function mergeWithDefaults(saved) {
       ...saved.certificatesSection,
     },
     refereedPublications: normalizeRefereedPublications(saved.refereedPublications ?? defaults.refereedPublications),
-    certificates: saved.certificates ?? defaults.certificates,
+    certificates,
+    certificatesFeaturedIds: normalizeCertificatesFeaturedIds(saved.certificatesFeaturedIds).map((id) =>
+      id && validCertificateIds.has(id) ? id : '',
+    ),
     careerTimelineSection: {
       ...defaults.careerTimelineSection,
       ...saved.careerTimelineSection,

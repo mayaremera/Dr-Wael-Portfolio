@@ -1,9 +1,10 @@
-import { useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import DashboardItemList from './DashboardItemList'
 import DashboardSaveNotice from './DashboardSaveNotice'
 import MediaDropzone from './MediaDropzone'
 import { useConfirmDelete } from './DeleteConfirmDialog'
 import {
+  CERTIFICATE_FEATURED_COUNT,
   TIMELINE_TYPES,
   createAcademicCategoryId,
   createAcademicServiceItemId,
@@ -15,6 +16,7 @@ import {
   emptyTimelineEntry,
   getDefaultAboutContent,
   loadAboutContentRemote,
+  resolveCertificateDisplayOrder,
   saveAboutContent,
 } from '../../data/aboutContentStore'
 import { CONTENT_SECTIONS } from '../../data/contentSync'
@@ -108,6 +110,63 @@ function CareerStatsEditor({ stats, onChange }) {
           </div>
         </div>
       ))}
+    </div>
+  )
+}
+
+function toggleCertificateFeaturedSlot(selectedIds, certificateId, slotIndex) {
+  const next = Array.from({ length: CERTIFICATE_FEATURED_COUNT }, (_, index) => selectedIds?.[index] ?? '')
+
+  if (next[slotIndex] === certificateId) {
+    next[slotIndex] = ''
+    return next
+  }
+
+  for (let index = 0; index < CERTIFICATE_FEATURED_COUNT; index += 1) {
+    if (next[index] === certificateId) next[index] = ''
+  }
+
+  next[slotIndex] = certificateId
+  return next
+}
+
+function getCertificateFeaturedSlot(selectedIds, certificateId) {
+  const slotIndex = (selectedIds ?? []).findIndex((id) => id === certificateId)
+  return slotIndex >= 0 ? slotIndex + 1 : null
+}
+
+function CertificateFeaturedCheckboxes({ certificateId, selectedIds, onToggle }) {
+  const normalizedIds = Array.from({ length: CERTIFICATE_FEATURED_COUNT }, (_, index) => selectedIds?.[index] ?? '')
+
+  return (
+    <div className="mt-4 rounded-lg border border-slate-200/80 bg-white p-3">
+      <p className="text-[0.65rem] font-semibold tracking-wide text-ink-muted uppercase">
+        Show in first {CERTIFICATE_FEATURED_COUNT} on About Me
+      </p>
+      <div className="mt-2 flex flex-wrap gap-2">
+        {Array.from({ length: CERTIFICATE_FEATURED_COUNT }, (_, index) => {
+          const checked = normalizedIds[index] === certificateId
+
+          return (
+            <label
+              key={index}
+              className={`inline-flex cursor-pointer items-center gap-2 rounded-lg border px-2.5 py-2 text-xs font-medium transition-colors ${
+                checked
+                  ? 'border-brand bg-brand-muted/50 text-brand'
+                  : 'border-slate-200 bg-white text-ink-muted hover:border-brand/25 hover:text-brand'
+              }`}
+            >
+              <input
+                type="checkbox"
+                className="h-3.5 w-3.5 rounded border-slate-300 text-brand focus:ring-brand/30"
+                checked={checked}
+                onChange={() => onToggle(certificateId, index)}
+              />
+              {index + 1}
+            </label>
+          )
+        })}
+      </div>
     </div>
   )
 }
@@ -474,6 +533,7 @@ function PublicationEditor({ initialItem, onSave, onCancel }) {
 }
 
 export default function AboutMePanel() {
+  const confirmDelete = useConfirmDelete()
   const { content, setContent, loading, loadError } = useDashboardSection(
     getDefaultAboutContent,
     loadAboutContentRemote,
@@ -488,6 +548,11 @@ export default function AboutMePanel() {
   const [isSaving, setIsSaving] = useState(false)
   const contentRef = useRef(content)
   contentRef.current = content
+
+  const displayedCertificates = useMemo(
+    () => resolveCertificateDisplayOrder(content?.certificates ?? [], content?.certificatesFeaturedIds),
+    [content?.certificates, content?.certificatesFeaturedIds],
+  )
 
   const persist = (nextContent, message = 'Changes saved.', previousContent = null) => {
     void persistDashboardSection({
@@ -598,6 +663,20 @@ export default function AboutMePanel() {
     persistFromCurrent((current) => current, 'Certificates section saved.')
   }
 
+  const handleCertificateFeaturedToggle = (certificateId, slotIndex) => {
+    persistFromCurrent(
+      (current) => ({
+        ...current,
+        certificatesFeaturedIds: toggleCertificateFeaturedSlot(
+          current.certificatesFeaturedIds,
+          certificateId,
+          slotIndex,
+        ),
+      }),
+      'Certificate display order updated.',
+    )
+  }
+
   const saveCareerTimelineHeader = () => {
     persistFromCurrent((current) => current, 'Career timeline header saved.')
   }
@@ -634,6 +713,13 @@ export default function AboutMePanel() {
       (current) => ({
         ...current,
         [listKey]: (current[listKey] ?? []).filter((entry) => entry.id !== id),
+        ...(listKey === 'certificates'
+          ? {
+              certificatesFeaturedIds: (current.certificatesFeaturedIds ?? Array(CERTIFICATE_FEATURED_COUNT).fill('')).map(
+                (featuredId) => (featuredId === id ? '' : featuredId),
+              ),
+            }
+          : {}),
       }),
       'Entry deleted.',
     )
@@ -777,11 +863,16 @@ export default function AboutMePanel() {
         </div>
         <button type="button" onClick={saveCertificatesHeader} className="mt-4 rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase">Save section header</button>
 
-        <div className="mt-6">
+        <p className="mt-6 text-sm leading-relaxed text-ink-muted">
+          Pick slots 1–9 to set the first images on the About Me page. Those nine move to the top of this list and
+          appear on page 1 here. Leave all unchecked to use the nine most recently added certificates.
+        </p>
+
+        <div className="mt-4">
         <DashboardItemList
           title="Certificate cards"
-          countLabel={`${content.certificates.length} certificate${content.certificates.length === 1 ? '' : 's'}`}
-          items={content.certificates}
+          countLabel={`${content.certificates.length} certificate${content.certificates.length === 1 ? '' : 's'} · first page shows slots 1–9`}
+          items={displayedCertificates}
           editingId={editingCertId}
           onAdd={() => setEditingCertId('new')}
           onEdit={setEditingCertId}
@@ -789,24 +880,83 @@ export default function AboutMePanel() {
           getItemId={(i) => i.id}
           addLabel="Add certificate"
           addEditorPosition="top"
-          renderPreview={(item) => (
-            <div className="flex gap-3">
-              <div className="h-14 w-20 overflow-hidden rounded bg-slate-100">
-                {item.image ? (
-                  <img src={item.image} alt="" className="h-full w-full object-cover" />
+          pageSize={CERTIFICATE_FEATURED_COUNT}
+          renderItem={(item) => (
+            <article className="overflow-hidden rounded-lg border border-slate-200/80 bg-surface-alt/60">
+              <div className="h-1 bg-brand" aria-hidden="true" />
+              <div className="p-4">
+                {editingCertId === item.id ? (
+                  <CertificateEditor
+                    key={item.id}
+                    initialItem={item}
+                    onSave={(entry) => saveListItem('certificates', entry, setEditingCertId)}
+                    onCancel={() => setEditingCertId(null)}
+                  />
                 ) : (
-                  <div className="flex h-full w-full items-center justify-center text-[0.6rem] font-medium text-ink-muted uppercase">
-                    No image
-                  </div>
+                  <>
+                    <div className="flex gap-3">
+                      <div className="h-14 w-20 overflow-hidden rounded bg-slate-100">
+                        {item.image ? (
+                          <img src={item.image} alt="" className="h-full w-full object-cover" />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center text-[0.6rem] font-medium text-ink-muted uppercase">
+                            No image
+                          </div>
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="font-medium text-ink">{item.title}</p>
+                          {getCertificateFeaturedSlot(content.certificatesFeaturedIds, item.id) ? (
+                            <span className="rounded-full bg-brand-muted px-2 py-0.5 text-[0.6rem] font-semibold tracking-wide text-brand uppercase">
+                              Slot {getCertificateFeaturedSlot(content.certificatesFeaturedIds, item.id)}
+                            </span>
+                          ) : null}
+                        </div>
+                        <p className="text-xs text-ink-muted">{item.issuer} · {item.year}</p>
+                      </div>
+                    </div>
+                    <CertificateFeaturedCheckboxes
+                      certificateId={item.id}
+                      selectedIds={content.certificatesFeaturedIds}
+                      onToggle={handleCertificateFeaturedToggle}
+                    />
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setEditingCertId(item.id)}
+                        className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold tracking-wide text-brand uppercase"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          confirmDelete({
+                            title: 'Delete this certificate?',
+                            message: 'This certificate will be permanently removed.',
+                            onConfirm: () => deleteListItem('certificates', item.id, setEditingCertId, editingCertId),
+                          })
+                        }
+                        className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold tracking-wide text-accent-hover uppercase"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </>
                 )}
               </div>
-              <div>
-                <p className="font-medium text-ink">{item.title}</p>
-                <p className="text-xs text-ink-muted">{item.issuer} · {item.year}</p>
-              </div>
-            </div>
+            </article>
           )}
-          renderEditor={(item) => item === 'new' ? <CertificateEditor initialItem={emptyCertificate} onSave={(entry) => saveListItem('certificates', entry, setEditingCertId)} onCancel={() => setEditingCertId(null)} /> : <CertificateEditor key={item.id} initialItem={item} onSave={(entry) => saveListItem('certificates', entry, setEditingCertId)} onCancel={() => setEditingCertId(null)} />}
+          renderEditor={(item) =>
+            item === 'new' ? (
+              <CertificateEditor
+                initialItem={emptyCertificate}
+                onSave={(entry) => saveListItem('certificates', entry, setEditingCertId)}
+                onCancel={() => setEditingCertId(null)}
+              />
+            ) : null
+          }
         />
         </div>
       </section>

@@ -12,5 +12,5 @@
       />
     </mask>
   </defs>
-  <rect width="180" height="180" fill="#f08a5d" mask="url(#wa-mark)" />
+  <rect width="180" height="180" fill="#ffffff" mask="url(#wa-mark)" />
 </svg>

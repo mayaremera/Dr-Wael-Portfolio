@@ -302,16 +302,16 @@ export default function Contact() {
             </div>
 
             <div className="contact-lang-mobile rounded-xl border border-brand/20 bg-brand-muted/50 p-4 lg:mt-auto lg:hidden">
-              <p className="font-serif text-base text-brand">English & Arabic</p>
-              <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">
-                Consultations and sessions available in both languages.
+              <p className="font-serif text-base text-ink">Bilingual Services</p>
+              <p className="mt-1.5 text-sm leading-relaxed text-brand">
+                Arabic & English
               </p>
             </div>
 
             <div className="contact-lang-desktop mt-auto hidden rounded-2xl border border-dashed border-brand/20 bg-brand-muted/50 p-5 lg:block">
-              <p className="font-serif text-lg text-brand">English & Arabic</p>
-              <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-                Consultations and sessions available in both languages.
+              <p className="font-serif text-lg text-ink">Bilingual Services</p>
+              <p className="mt-2 text-sm leading-relaxed text-brand">
+                Arabic & English
               </p>
             </div>
           </div>

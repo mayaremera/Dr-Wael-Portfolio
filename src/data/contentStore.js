@@ -78,10 +78,66 @@ function migrateProfessionalMembership(saved, defaults) {
   }
 }
 
-function mergeWithDefaults(saved) {
-  const defaults = getDefaultDrWaelActivity()
+function migrateAcademicClinicalPresence(saved, defaults) {
+  if (!saved) return defaults
 
   return {
+    label: saved.label ?? defaults.label,
+    title: saved.title ?? defaults.title,
+    description: saved.description ?? defaults.description,
+    primaryLabel: saved.primaryLabel ?? defaults.primaryLabel,
+    secondaryLabel: saved.secondaryLabel ?? defaults.secondaryLabel,
+  }
+}
+
+function normalizeHomepageFeaturedIds(savedIds, defaults) {
+  const source = Array.isArray(savedIds) ? savedIds : defaults.homepageFeaturedIds
+  return [0, 1, 2].map((index) => (typeof source[index] === 'string' ? source[index] : ''))
+}
+
+export function buildActivityEventPool(activity) {
+  const upcoming = activity?.upcoming ?? []
+  const recent = activity?.recent ?? []
+
+  return [
+    ...upcoming.map((event) => ({ ...event, isUpcoming: true })),
+    ...recent.map((event) => ({ ...event, isUpcoming: false })),
+  ]
+}
+
+export function resolveHomepageFeaturedEvents(activity) {
+  const pool = buildActivityEventPool(activity)
+  const byId = new Map(pool.map((event) => [event.id, event]))
+  const selectedIds = normalizeHomepageFeaturedIds(activity?.homepageFeaturedIds, { homepageFeaturedIds: ['', '', ''] })
+  const hasSelection = selectedIds.some((id) => id && byId.has(id))
+
+  if (!hasSelection) {
+    return pool.slice(0, 3)
+  }
+
+  const used = new Set()
+  const featured = []
+
+  for (const id of selectedIds) {
+    if (id && byId.has(id) && !used.has(id)) {
+      featured.push(byId.get(id))
+      used.add(id)
+      continue
+    }
+
+    const fallback = pool.find((event) => !used.has(event.id))
+    if (fallback) {
+      featured.push(fallback)
+      used.add(fallback.id)
+    }
+  }
+
+  return featured.slice(0, 3)
+}
+
+function mergeWithDefaults(saved) {
+  const defaults = getDefaultDrWaelActivity()
+  const merged = {
     label: saved.label ?? defaults.label,
     title: saved.title ?? defaults.title,
     description: saved.description ?? defaults.description,
@@ -92,7 +148,23 @@ function mergeWithDefaults(saved) {
       saved.professionalMembership,
       defaults.professionalMembership,
     ),
+    academicClinicalPresence: migrateAcademicClinicalPresence(
+      saved.academicClinicalPresence,
+      defaults.academicClinicalPresence,
+    ),
   }
+
+  const validIds = new Set([
+    ...(merged.upcoming ?? []).map((event) => event.id),
+    ...(merged.recent ?? []).map((event) => event.id),
+  ])
+
+  merged.homepageFeaturedIds = normalizeHomepageFeaturedIds(
+    saved.homepageFeaturedIds,
+    defaults,
+  ).map((id) => (id && validIds.has(id) ? id : ''))
+
+  return merged
 }
 
 export function loadDrWaelActivity() {

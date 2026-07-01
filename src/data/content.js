@@ -54,6 +54,7 @@ export const drWaelActivity = {
   title: 'Dr. Wael\'s Month & Year',
   description:
     'Conferences, lectures, meetings, and professional engagements: a snapshot of where Dr. Wael is contributing now and the highlights from recent months.',
+  homepageFeaturedIds: ['', '', ''],
   upcoming: [
     {
       id: 'alfaisal-lecture',
@@ -124,6 +125,14 @@ export const drWaelActivity = {
       note: 'Presented on accurate CAS identification and evidence-based intervention approaches.',
     },
   ],
+  academicClinicalPresence: {
+    label: 'Academic & Clinical Presence',
+    title: 'Active Contributions Across Conferences and Institutions',
+    description:
+      'Regular participation in lectures, leadership forums, and international committees keeps care aligned with the latest advances in the field.',
+    primaryLabel: 'Connect with Dr. Wael',
+    secondaryLabel: 'Explore Services',
+  },
 }
 
 const gridMedia = (filename, type) => ({
@@ -544,7 +553,7 @@ export const trustedCompanies = {
 }
 
 export const speechLanguageServices = {
-  title: 'Speech & Language Services',
+  title: 'Bilingual Speech-Language Pathology Services',
   tagline: 'Every child deserves to be understood.',
   intro:
     'Our speech-language services are here to help your child express themselves clearly and confidently—at home, in school, and in everyday life.',
@@ -559,7 +568,7 @@ export const speechLanguageServices = {
 /** Fixed page hero at the top of /services — not editable in the dashboard. */
 export const servicesPageHero = {
   eyebrow: 'Services',
-  title: 'Speech & Language Services',
+  title: 'Bilingual Speech-Language Pathology Services',
 }
 
 export const therapyConcepts = [
@@ -626,25 +635,6 @@ export const therapyConcepts = [
     ctaLabel: 'Book a Session',
   },
   {
-    id: 'professional-training',
-    image: images.inTheFieldHero,
-    title: 'Professional Training',
-    subtitle: 'Workshops & Clinical Development',
-    summary:
-      'Hands-on professional development for speech-language pathologists, educators, and healthcare teams seeking evidence-based clinical growth.',
-    paragraphs: [
-      'Interactive workshops and seminars designed for clinicians, educators, and allied health professionals who want to deepen their expertise in communication sciences.',
-      'Sessions cover assessment frameworks, intervention strategies, bilingual practice, and the latest research — tailored to the needs of your team or institution.',
-    ],
-    bullets: [
-      'Clinical workshops for SLPs and educators',
-      'Evidence-based assessment and intervention training',
-      'Bilingual and culturally responsive practice',
-      'Custom programs for hospitals, schools, and universities',
-    ],
-    ctaLabel: 'Book a Session',
-  },
-  {
     id: 'family-training',
     image: images.familyTraining,
     title: 'Family Training',
@@ -660,6 +650,25 @@ export const therapyConcepts = [
       'Guidance on supporting communication in daily routines',
       'Collaboration with schools and other caregivers',
       'Ongoing coaching as your child progresses',
+    ],
+    ctaLabel: 'Book a Session',
+  },
+  {
+    id: 'professional-training',
+    image: images.inTheFieldHero,
+    title: 'Professional Training',
+    subtitle: 'Workshops & Clinical Development',
+    summary:
+      'Hands-on professional development for speech-language pathologists, educators, and healthcare teams seeking evidence-based clinical growth.',
+    paragraphs: [
+      'Interactive workshops and seminars designed for clinicians, educators, and allied health professionals who want to deepen their expertise in communication sciences.',
+      'Sessions cover assessment frameworks, intervention strategies, bilingual practice, and the latest research — tailored to the needs of your team or institution.',
+    ],
+    bullets: [
+      'Clinical workshops for SLPs and educators',
+      'Evidence-based assessment and intervention training',
+      'Bilingual and culturally responsive practice',
+      'Custom programs for hospitals, schools, and universities',
     ],
     ctaLabel: 'Book a Session',
   },

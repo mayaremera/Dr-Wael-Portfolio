@@ -318,7 +318,7 @@ export function buildJsonLd(pathname) {
   const practice = {
     '@type': 'MedicalBusiness',
     '@id': `${SITE_URL}/#practice`,
-    name: `${site.name} — Speech & Language Services`,
+    name: `${site.name} — Bilingual Speech-Language Pathology Services`,
     description: casesWeServe.intro,
     url: `${SITE_URL}/services`,
     image: seo.image,

@@ -201,7 +201,7 @@ export default function Profile({ variant = 'home' }) {
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
         <div
           className={`home-profile-grid grid gap-8 lg:items-stretch lg:gap-10 ${
-            isPage ? 'lg:grid-cols-[minmax(280px,380px)_1fr]' : 'lg:grid-cols-[minmax(240px,320px)_1fr_minmax(220px,280px)]'
+            isPage ? 'lg:grid-cols-[minmax(280px,380px)_1fr]' : 'lg:grid-cols-[minmax(240px,320px)_1fr_minmax(280px,360px)]'
           }`}
         >
           <div className="relative aspect-[3/4] w-full overflow-hidden rounded-sm lg:aspect-auto lg:h-full lg:min-h-0">

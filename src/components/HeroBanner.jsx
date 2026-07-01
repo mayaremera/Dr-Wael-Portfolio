@@ -48,11 +48,7 @@ export default function HeroBanner() {
           className="absolute inset-0 hidden h-full w-full object-cover object-center md:block"
         />
       ) : null}
-
-      {/* Hero overlay — same gradient as desktop */}
-      <div className="absolute inset-0 bg-gradient-to-r from-ink/85 via-ink/60 to-ink/30" />
-
-      {/* Tablet / desktop top fade */}
+      <div className="absolute inset-0 bg-gradient-to-t from-ink/95 via-ink/70 to-ink/35 max-md:from-ink/95 max-md:via-ink/55 max-md:to-ink/15 sm:bg-gradient-to-r sm:from-ink/85 sm:via-ink/60 sm:to-ink/30" />
       <div
         className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-ink/70 to-transparent max-md:hidden max-lg:block lg:hidden"
         aria-hidden="true"

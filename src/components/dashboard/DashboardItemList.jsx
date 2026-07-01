@@ -94,9 +94,13 @@ export default function DashboardItemList({
   renderItem,
   deleteTitle = 'Delete this item?',
   deleteMessage = 'This action cannot be undone. Are you sure you want to delete it?',
+  pageSize = DASHBOARD_PAGE_SIZE,
 }) {
   const confirmDelete = useConfirmDelete()
-  const { pageItems, page, setPage, pageCount, needsPagination, pageSize } = useDashboardPagination(items)
+  const { pageItems, page, setPage, pageCount, needsPagination, pageSize: activePageSize } = useDashboardPagination(
+    items,
+    pageSize,
+  )
 
   const handleDelete = (id) => {
     confirmDelete({
@@ -113,7 +117,7 @@ export default function DashboardItemList({
     if (index >= 0) {
       setPage(Math.floor(index / pageSize))
     }
-  }, [editingId, getItemId, items, pageSize, setPage])
+  }, [editingId, getItemId, items, activePageSize, setPage])
 
   useEffect(() => {
     if (editingId === 'new' && addEditorPosition === 'bottom' && items.length > 0) {

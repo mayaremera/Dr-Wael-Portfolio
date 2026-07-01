@@ -4,11 +4,11 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
-const ACCENT = '#f08a5d'
 const BRAND = '#1a4d5c'
+const BRAND_ON_BRAND_MARK = '#ffffff'
 const LOGO_MARK = join(process.cwd(), 'src/assets/logo-wa-mark.png')
 
-function buildOrangeFaviconSvg({ viewBox, imageBox, background = null }) {
+function buildFaviconSvg({ viewBox, imageBox, background = null, fill = BRAND }) {
   const logoBase64 = readFileSync(LOGO_MARK).toString('base64')
   const backgroundRect = background
     ? `<rect width="${viewBox}" height="${viewBox}" rx="${Math.round(viewBox * 0.2)}" fill="${background}" />`
@@ -28,17 +28,17 @@ function buildOrangeFaviconSvg({ viewBox, imageBox, background = null }) {
       />
     </mask>
   </defs>
-  <rect width="${viewBox}" height="${viewBox}" fill="${ACCENT}" mask="url(#wa-mark)" />
+  <rect width="${viewBox}" height="${viewBox}" fill="${fill}" mask="url(#wa-mark)" />
 </svg>
 `
 }
 
-function writeOrangeFavicons(targetDir) {
+function writeFavicons(targetDir) {
   if (!existsSync(LOGO_MARK)) return
 
   writeFileSync(
     join(targetDir, 'favicon.svg'),
-    buildOrangeFaviconSvg({
+    buildFaviconSvg({
       viewBox: 100,
       imageBox: { x: 3, y: 21, width: 94, height: 66 },
     }),
@@ -46,10 +46,11 @@ function writeOrangeFavicons(targetDir) {
 
   writeFileSync(
     join(targetDir, 'apple-touch-icon.svg'),
-    buildOrangeFaviconSvg({
+    buildFaviconSvg({
       viewBox: 180,
       imageBox: { x: 14, y: 38, width: 152, height: 107 },
       background: BRAND,
+      fill: BRAND_ON_BRAND_MARK,
     }),
   )
 }
@@ -58,7 +59,7 @@ function spaFallback404() {
   return {
     name: 'spa-fallback-404',
     buildStart() {
-      writeOrangeFavicons(join(process.cwd(), 'public'))
+      writeFavicons(join(process.cwd(), 'public'))
     },
     closeBundle() {
       const outDir = join(process.cwd(), 'dist')
@@ -69,7 +70,7 @@ function spaFallback404() {
         copyFileSync(indexPath, fallbackPath)
       }
 
-      writeOrangeFavicons(outDir)
+      writeFavicons(outDir)
     },
   }
 }

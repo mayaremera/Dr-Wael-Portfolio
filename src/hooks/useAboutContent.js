@@ -1,4 +1,4 @@
-import { loadAboutContent, loadAboutContentRemote } from '../data/aboutContentStore'
+import { loadAboutContent, loadAboutContentRemote, resolveCertificateDisplayOrder } from '../data/aboutContentStore'
 import { CONTENT_SECTIONS } from '../data/contentSync'
 import { useContentSection } from './useContentSection'
 
@@ -19,7 +19,10 @@ export function useAboutContent() {
     careerImpact: content?.careerImpact,
     academicServices: content?.academicServices,
     certificatesSection: content?.certificatesSection,
-    certificates: content?.certificates ?? [],
+    certificates: resolveCertificateDisplayOrder(
+      content?.certificates ?? [],
+      content?.certificatesFeaturedIds,
+    ),
     careerTimelineSection: content?.careerTimelineSection,
     careerTimeline: content?.careerTimeline ?? [],
     refereedPublications: content?.refereedPublications,

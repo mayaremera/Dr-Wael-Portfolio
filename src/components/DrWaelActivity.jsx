@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useDrWaelActivity } from '../hooks/useDrWaelActivity'
+import { resolveHomepageFeaturedEvents } from '../data/contentStore'
 import { hasMediaSrc } from '../lib/mediaUrl'
 
 const sectionLinkClassName =
@@ -153,10 +154,7 @@ export default function DrWaelActivity({ variant = 'preview' }) {
 
   const { label, title, description, upcoming, recent } = activity
 
-  const featuredEvents = [
-    ...upcoming.slice(0, 1).map((item) => ({ ...item, isUpcoming: true })),
-    ...recent.slice(0, 2).map((item) => ({ ...item, isUpcoming: false })),
-  ]
+  const featuredEvents = resolveHomepageFeaturedEvents(activity)
 
   const allEvents = [
     ...upcoming.map((item) => ({ ...item, isUpcoming: true })),

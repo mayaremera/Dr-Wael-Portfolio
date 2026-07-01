@@ -1051,18 +1051,21 @@ select {
 
   .home-page-sections .home-credential-compass-wrap {
     width: 100%;
-    max-width: 28rem;
+    max-width: 32rem;
     overflow: visible;
   }
 
   .home-page-sections .credential-compass-root {
     margin-inline: auto;
-    align-items: center;
   }
 
-  .home-page-sections .credential-compass-heading,
-  .home-page-sections .credential-compass-tagline,
+  .home-page-sections .credential-compass-header,
   .home-page-sections .credential-compass-hint {
+    text-align: center;
+    margin-inline: auto;
+  }
+
+  .home-page-sections .credential-compass-tagline {
     text-align: center;
     margin-inline: auto;
   }

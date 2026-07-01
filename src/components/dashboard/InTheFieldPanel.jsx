@@ -638,6 +638,61 @@ function MembershipOrgPreview({ org }) {
   )
 }
 
+function toggleHomepageSlot(selectedIds, eventId, slotIndex) {
+  const next = [0, 1, 2].map((index) => selectedIds?.[index] ?? '')
+
+  if (next[slotIndex] === eventId) {
+    next[slotIndex] = ''
+    return next
+  }
+
+  for (let index = 0; index < 3; index += 1) {
+    if (next[index] === eventId) next[index] = ''
+  }
+
+  next[slotIndex] = eventId
+  return next
+}
+
+function HomepageSlotCheckboxes({ eventId, selectedIds, onToggle }) {
+  const slots = [
+    { index: 0, label: 'Left' },
+    { index: 1, label: 'Middle' },
+    { index: 2, label: 'Right' },
+  ]
+  const normalizedIds = [0, 1, 2].map((index) => selectedIds?.[index] ?? '')
+
+  return (
+    <div className="mt-4 rounded-lg border border-slate-200/80 bg-white p-3">
+      <p className="text-[0.65rem] font-semibold tracking-wide text-ink-muted uppercase">Show on homepage</p>
+      <div className="mt-2 flex flex-wrap gap-2">
+        {slots.map((slot) => {
+          const checked = normalizedIds[slot.index] === eventId
+
+          return (
+            <label
+              key={slot.label}
+              className={`inline-flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
+                checked
+                  ? 'border-brand bg-brand-muted/50 text-brand'
+                  : 'border-slate-200 bg-white text-ink-muted hover:border-brand/25 hover:text-brand'
+              }`}
+            >
+              <input
+                type="checkbox"
+                className="h-3.5 w-3.5 rounded border-slate-300 text-brand focus:ring-brand/30"
+                checked={checked}
+                onChange={() => onToggle(eventId, slot.index)}
+              />
+              {slot.label}
+            </label>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 function MembershipOrgEditor({ initialOrg, onSave, onCancel }) {
   const [org, setOrg] = useState({ ...emptyMembershipOrg, ...initialOrg })
   const update = (field, value) => setOrg((current) => ({ ...current, [field]: value }))
@@ -768,6 +823,16 @@ export default function InTheFieldPanel() {
     persistFromCurrent((current) => current, 'Section header saved.')
   }
 
+  const handleHomepageSlotToggle = (eventId, slotIndex) => {
+    persistFromCurrent(
+      (current) => ({
+        ...current,
+        homepageFeaturedIds: toggleHomepageSlot(current.homepageFeaturedIds, eventId, slotIndex),
+      }),
+      'Homepage cards updated.',
+    )
+  }
+
   const updateGlobeMeta = (field, value) => {
     setActivity((current) => ({
       ...current,
@@ -851,6 +916,9 @@ export default function InTheFieldPanel() {
         ...current,
         upcoming: (current.upcoming ?? []).filter((item) => item.id !== eventId),
         recent: (current.recent ?? []).filter((item) => item.id !== eventId),
+        homepageFeaturedIds: (current.homepageFeaturedIds ?? ['', '', '']).map((id) =>
+          id === eventId ? '' : id,
+        ),
       }),
       'Event deleted.',
     )
@@ -866,6 +934,20 @@ export default function InTheFieldPanel() {
 
   const saveMembershipMeta = () => {
     persistFromCurrent((current) => current, 'Professional membership saved.')
+  }
+
+  const updateAcademicClinicalPresence = (field, value) => {
+    setActivity((current) => ({
+      ...current,
+      academicClinicalPresence: {
+        ...current.academicClinicalPresence,
+        [field]: value,
+      },
+    }))
+  }
+
+  const saveAcademicClinicalPresence = () => {
+    persistFromCurrent((current) => current, 'Academic & Clinical Presence section saved.')
   }
 
   const saveMembershipOrg = (org) => {
@@ -1027,6 +1109,10 @@ export default function InTheFieldPanel() {
       </section>
 
       <div className="mt-6">
+        <p className="mb-3 text-sm leading-relaxed text-ink-muted">
+          Use the Left, Middle, and Right checkboxes on each event to choose the three cards shown on the homepage.
+          If none are selected, the three most recently added events appear automatically.
+        </p>
         <DashboardItemList
           title="Events"
           countLabel={`${allEvents.length} event${allEvents.length === 1 ? '' : 's'} · upcoming shown in orange`}
@@ -1059,6 +1145,11 @@ export default function InTheFieldPanel() {
                   ) : (
                     <>
                       <EventPreview event={event} isUpcoming={isUpcoming} />
+                      <HomepageSlotCheckboxes
+                        eventId={event.id}
+                        selectedIds={activity.homepageFeaturedIds}
+                        onToggle={handleHomepageSlotToggle}
+                      />
                       <div className="mt-4 flex flex-wrap gap-2">
                         <button
                           type="button"
@@ -1167,6 +1258,63 @@ export default function InTheFieldPanel() {
           }
         />
       </div>
+
+      <section className="mt-6 rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
+        <p className="text-[0.65rem] font-semibold tracking-wide text-brand uppercase">4 · Closing band</p>
+        <h2 className="mt-1 font-serif text-xl text-ink">Academic &amp; Clinical Presence</h2>
+        <p className="mt-1 text-sm text-ink-muted">
+          The call-to-action band at the bottom of the In the Field page.
+        </p>
+        <div className="mt-4 grid gap-4 md:grid-cols-2">
+          <div>
+            <label className={labelClassName}>Label</label>
+            <input
+              className={fieldClassName}
+              value={activity.academicClinicalPresence?.label ?? ''}
+              onChange={(e) => updateAcademicClinicalPresence('label', e.target.value)}
+            />
+          </div>
+          <div className="md:col-span-2">
+            <label className={labelClassName}>Title</label>
+            <input
+              className={fieldClassName}
+              value={activity.academicClinicalPresence?.title ?? ''}
+              onChange={(e) => updateAcademicClinicalPresence('title', e.target.value)}
+            />
+          </div>
+          <div className="md:col-span-2">
+            <label className={labelClassName}>Description</label>
+            <textarea
+              className={`${fieldClassName} min-h-24 resize-y`}
+              value={activity.academicClinicalPresence?.description ?? ''}
+              onChange={(e) => updateAcademicClinicalPresence('description', e.target.value)}
+            />
+          </div>
+          <div>
+            <label className={labelClassName}>Primary button label</label>
+            <input
+              className={fieldClassName}
+              value={activity.academicClinicalPresence?.primaryLabel ?? ''}
+              onChange={(e) => updateAcademicClinicalPresence('primaryLabel', e.target.value)}
+            />
+          </div>
+          <div>
+            <label className={labelClassName}>Secondary button label</label>
+            <input
+              className={fieldClassName}
+              value={activity.academicClinicalPresence?.secondaryLabel ?? ''}
+              onChange={(e) => updateAcademicClinicalPresence('secondaryLabel', e.target.value)}
+            />
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={saveAcademicClinicalPresence}
+          className="mt-4 rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase transition-colors hover:bg-brand-light"
+        >
+          Save changes
+        </button>
+      </section>
         </>
       ) : null}
     </PanelShell>
