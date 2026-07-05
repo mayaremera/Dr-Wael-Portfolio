@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { sortGalleryItems, GALLERY_PAGE_SIZE } from '../data/galleryContentStore'
 import { useGalleryContent } from '../hooks/useGalleryContent'
+import { useInView } from '../hooks/useInView'
 import { protectedMediaProps, protectedShellProps, protectedVideoProps } from '../lib/mediaProtection'
 import { hasMediaSrc } from '../lib/mediaUrl'
+import { scrollPaginationSectionIntoView } from '../lib/scrollPaginationSection'
+import LazySection from './LazySection'
 
 const FILTERS = [
   { id: 'all', label: 'All' },
@@ -44,12 +47,13 @@ function VideoSoundWaves() {
 }
 
 function GalleryMediaPreview({ item }) {
+  const [ref, inView] = useInView({ rootMargin: '120px 0px' })
   const videoRef = useRef(null)
   const isVideo = item.type === 'video'
   const mediaSrc = hasMediaSrc(item.src) ? item.src.trim() : ''
 
   useEffect(() => {
-    if (!isVideo || !mediaSrc) return undefined
+    if (!inView || !isVideo || !mediaSrc) return undefined
     const video = videoRef.current
     if (!video) return undefined
 
@@ -61,7 +65,7 @@ function GalleryMediaPreview({ item }) {
     video.addEventListener('loadeddata', playVideo)
 
     return () => video.removeEventListener('loadeddata', playVideo)
-  }, [isVideo, mediaSrc])
+  }, [inView, isVideo, mediaSrc])
 
   if (!mediaSrc) {
     return (
@@ -72,8 +76,10 @@ function GalleryMediaPreview({ item }) {
   }
 
   return (
-    <div className="relative h-full w-full overflow-hidden bg-slate-900">
-      {isVideo ? (
+    <div ref={ref} className="relative h-full w-full overflow-hidden bg-slate-200">
+      {!inView ? (
+        <div className="absolute inset-0 animate-pulse bg-slate-200" aria-hidden="true" />
+      ) : isVideo ? (
         <>
           <video
             ref={videoRef}
@@ -82,7 +88,7 @@ function GalleryMediaPreview({ item }) {
             muted
             loop
             playsInline
-            preload="auto"
+            preload="metadata"
             tabIndex={-1}
             aria-hidden="true"
             {...protectedVideoProps}
@@ -97,6 +103,7 @@ function GalleryMediaPreview({ item }) {
           alt=""
           className="absolute inset-0 h-full w-full object-cover object-[center_28%] select-none"
           loading="lazy"
+          decoding="async"
           {...protectedMediaProps}
         />
       )}
@@ -311,12 +318,12 @@ function GalleryCompactCard({ item, globalIndex, onOpen, className = '' }) {
   )
 }
 
-function GalleryPagination({ currentPage, totalPages, onPageChange }) {
+function GalleryPagination({ currentPage, totalPages, onPageChange, scrollAnchorRef }) {
   if (totalPages <= 1) return null
 
   const goToPage = (page) => {
     onPageChange(page)
-    document.getElementById('gallery')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    scrollPaginationSectionIntoView(scrollAnchorRef)
   }
 
   const pageNumbers = useMemo(() => {
@@ -403,6 +410,7 @@ export default function GalleryGrid({ tone = 'alt' }) {
   const [activeFilter, setActiveFilter] = useState('all')
   const [currentPage, setCurrentPage] = useState(1)
   const [activeIndex, setActiveIndex] = useState(null)
+  const sectionRef = useRef(null)
 
   const items = mediaGallery?.items ?? []
 
@@ -441,7 +449,7 @@ export default function GalleryGrid({ tone = 'alt' }) {
   if (sortedItems.length === 0) return null
 
   return (
-    <section id="gallery" className={`border-t border-slate-200 py-12 lg:py-24 ${tone === 'white' ? 'bg-white' : 'bg-surface-alt'}`}>
+    <section ref={sectionRef} id="gallery" className={`scroll-mt-28 border-t border-slate-200 py-12 lg:py-24 ${tone === 'white' ? 'bg-white' : 'bg-surface-alt'}`}>
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
         <header className="mx-auto max-w-2xl text-center">
           <p className="text-xs font-semibold tracking-[0.22em] text-brand uppercase">{label}</p>
@@ -488,7 +496,7 @@ export default function GalleryGrid({ tone = 'alt' }) {
             No {activeFilter === 'image' ? 'photos' : 'videos'} in the gallery yet.
           </p>
         ) : (
-          <>
+          <LazySection minHeight="24rem">
             <div className="mt-6 mobile-card-scroll mobile-card-scroll--gap-lg lg:mt-8 lg:grid lg:grid-cols-3 lg:gap-5">
               {pageItems.map((item, index) => {
                 const globalIndex = (currentPage - 1) * PAGE_SIZE + index
@@ -508,8 +516,9 @@ export default function GalleryGrid({ tone = 'alt' }) {
               currentPage={currentPage}
               totalPages={totalPages}
               onPageChange={setCurrentPage}
+              scrollAnchorRef={sectionRef}
             />
-          </>
+          </LazySection>
         )}
       </div>
 

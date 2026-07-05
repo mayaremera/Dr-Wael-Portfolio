@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { scrollPaginationSectionIntoView } from '../../lib/scrollPaginationSection'
 import { useConfirmDelete } from './DeleteConfirmDialog'
 
 export const DASHBOARD_PAGE_SIZE = 5
@@ -29,15 +30,20 @@ export function useDashboardPagination(items, pageSize = DASHBOARD_PAGE_SIZE) {
   }
 }
 
-export function DashboardPagination({ page, pageCount, onPageChange }) {
+export function DashboardPagination({ page, pageCount, onPageChange, scrollAnchorRef }) {
   if (pageCount <= 1) return null
+
+  const handlePageChange = (nextPage) => {
+    onPageChange(nextPage)
+    scrollPaginationSectionIntoView(scrollAnchorRef)
+  }
 
   return (
     <div className="mt-5 border-t border-slate-200/80 pt-4">
       <div className="flex flex-wrap items-center justify-center gap-2">
         <button
           type="button"
-          onClick={() => onPageChange(page - 1)}
+          onClick={() => handlePageChange(page - 1)}
           disabled={page === 0}
           className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold tracking-wide text-ink-muted uppercase transition-colors hover:border-brand/25 hover:text-brand disabled:pointer-events-none disabled:opacity-35"
         >
@@ -48,7 +54,7 @@ export function DashboardPagination({ page, pageCount, onPageChange }) {
           <button
             key={index}
             type="button"
-            onClick={() => onPageChange(index)}
+            onClick={() => handlePageChange(index)}
             aria-current={index === page ? 'true' : undefined}
             className={`h-8 min-w-8 rounded-lg border px-2 text-xs font-semibold transition-colors ${
               index === page
@@ -62,7 +68,7 @@ export function DashboardPagination({ page, pageCount, onPageChange }) {
 
         <button
           type="button"
-          onClick={() => onPageChange(page + 1)}
+          onClick={() => handlePageChange(page + 1)}
           disabled={page >= pageCount - 1}
           className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold tracking-wide text-ink-muted uppercase transition-colors hover:border-brand/25 hover:text-brand disabled:pointer-events-none disabled:opacity-35"
         >
@@ -97,6 +103,7 @@ export default function DashboardItemList({
   pageSize = DASHBOARD_PAGE_SIZE,
 }) {
   const confirmDelete = useConfirmDelete()
+  const sectionRef = useRef(null)
   const { pageItems, page, setPage, pageCount, needsPagination, pageSize: activePageSize } = useDashboardPagination(
     items,
     pageSize,
@@ -126,7 +133,7 @@ export default function DashboardItemList({
   }, [editingId, addEditorPosition, items.length, pageCount, setPage])
 
   return (
-    <section className="rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
+    <section ref={sectionRef} className="scroll-mt-24 rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
       <div className="flex items-center justify-between gap-3">
         <div>
           <h2 className="font-serif text-xl text-ink">{title}</h2>
@@ -187,7 +194,7 @@ export default function DashboardItemList({
       </div>
 
       {needsPagination ? (
-        <DashboardPagination page={page} pageCount={pageCount} onPageChange={setPage} />
+        <DashboardPagination page={page} pageCount={pageCount} onPageChange={setPage} scrollAnchorRef={sectionRef} />
       ) : null}
 
       {editingId === 'new' && addEditorPosition === 'bottom' ? (

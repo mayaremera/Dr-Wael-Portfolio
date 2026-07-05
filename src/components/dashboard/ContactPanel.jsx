@@ -40,6 +40,7 @@ export default function ContactPanel() {
   const [isSaving, setIsSaving] = useState(false)
   const contentRef = useRef(content)
   contentRef.current = content
+  const scheduleSectionRef = useRef(null)
 
   const schedulePagination = useDashboardPagination(content?.contactDetails?.schedule ?? [])
 
@@ -232,7 +233,7 @@ export default function ContactPanel() {
               Save practice location
             </button>
 
-            <div className="mt-8 border-t border-slate-200/80 pt-6">
+            <div ref={scheduleSectionRef} className="scroll-mt-24 mt-8 border-t border-slate-200/80 pt-6">
               <h3 className="font-serif text-lg text-ink">Office hours</h3>
               <div className="mt-4 space-y-3">
                 {schedulePagination.pageItems.map((entry) => {
@@ -267,6 +268,7 @@ export default function ContactPanel() {
                   page={schedulePagination.page}
                   pageCount={schedulePagination.pageCount}
                   onPageChange={schedulePagination.setPage}
+                  scrollAnchorRef={scheduleSectionRef}
                 />
               ) : null}
               <button

@@ -1,5 +1,8 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useAboutContent } from '../hooks/useAboutContent'
+import { scrollPaginationSectionIntoView } from '../lib/scrollPaginationSection'
+import LazyImage from './LazyImage'
+import LazySection from './LazySection'
 
 const PAGE_SIZE = 12
 const MAX_VISIBLE_PAGES = 5
@@ -102,6 +105,7 @@ export default function CertificationGallery() {
   const { isReady, certificates, certificatesSection } = useAboutContent()
   const [page, setPage] = useState(0)
   const [activeCertId, setActiveCertId] = useState(null)
+  const sectionRef = useRef(null)
 
   if (!isReady || !certificatesSection) return null
 
@@ -115,6 +119,7 @@ export default function CertificationGallery() {
   const handlePageChange = (nextPage) => {
     setActiveCertId(null)
     setPage(Math.max(0, Math.min(nextPage, pageCount - 1)))
+    scrollPaginationSectionIntoView(sectionRef)
   }
 
   const toggleCertificate = (certificateId) => {
@@ -122,7 +127,7 @@ export default function CertificationGallery() {
   }
 
   return (
-    <section id="certifications" className="border-t border-slate-200 bg-surface-alt py-16 lg:py-20">
+    <section ref={sectionRef} id="certifications" className="scroll-mt-28 border-t border-slate-200 bg-surface-alt py-16 lg:py-20">
       <div className="mx-auto max-w-6xl px-6 lg:px-8">
         <div className="text-center">
           <p className="text-xs font-semibold tracking-[0.22em] text-brand uppercase">{label}</p>
@@ -139,53 +144,55 @@ export default function CertificationGallery() {
           Tap a certificate to view details
         </p>
 
-        <div className="mt-10 mobile-card-scroll lg:grid lg:grid-cols-3 lg:gap-4">
-          {pageItems.map((certificate) => {
-            const isActive = activeCertId === certificate.id
+        <LazySection minHeight="20rem">
+          <div className="mt-10 mobile-card-scroll lg:grid lg:grid-cols-3 lg:gap-4">
+            {pageItems.map((certificate) => {
+              const isActive = activeCertId === certificate.id
 
-            return (
-              <article
-                key={certificate.id}
-                role="button"
-                tabIndex={0}
-                aria-expanded={isActive}
-                onClick={() => toggleCertificate(certificate.id)}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault()
-                    toggleCertificate(certificate.id)
-                  }
-                }}
-                className="mobile-card-scroll__item group relative cursor-pointer overflow-hidden rounded-sm border border-slate-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-brand/40 hover:shadow-md hover:shadow-brand/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 lg:w-auto lg:cursor-default"
-              >
-                <div className="relative aspect-4/3 overflow-hidden bg-slate-100">
-                  {certificate.image ? (
-                    <img
-                      src={certificate.image}
-                      alt={certificate.title}
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center px-4 text-center text-xs font-medium tracking-wide text-ink-muted uppercase">
-                      Certificate image
+              return (
+                <article
+                  key={certificate.id}
+                  role="button"
+                  tabIndex={0}
+                  aria-expanded={isActive}
+                  onClick={() => toggleCertificate(certificate.id)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault()
+                      toggleCertificate(certificate.id)
+                    }
+                  }}
+                  className="mobile-card-scroll__item group relative cursor-pointer overflow-hidden rounded-sm border border-slate-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-brand/40 hover:shadow-md hover:shadow-brand/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 lg:w-auto lg:cursor-default"
+                >
+                  <div className="relative aspect-4/3 overflow-hidden bg-slate-100">
+                    {certificate.image ? (
+                      <LazyImage
+                        src={certificate.image}
+                        alt={certificate.title}
+                        className="h-full w-full"
+                        imgClassName="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center px-4 text-center text-xs font-medium tracking-wide text-ink-muted uppercase">
+                        Certificate image
+                      </div>
+                    )}
+                    <div
+                      className={`absolute inset-x-0 bottom-0 border-t border-white/25 bg-brand p-4 transition-transform duration-300 ease-out ${
+                        isActive ? 'max-lg:translate-y-0' : 'max-lg:translate-y-full'
+                      } lg:translate-y-full lg:group-hover:translate-y-0`}
+                    >
+                      <p className="text-xs font-semibold tracking-[0.14em] text-white uppercase">{certificate.title}</p>
+                      <p className="mt-1 text-xs leading-relaxed text-white/85">{certificate.description}</p>
                     </div>
-                  )}
-                  <div
-                    className={`absolute inset-x-0 bottom-0 border-t border-white/25 bg-brand p-4 transition-transform duration-300 ease-out ${
-                      isActive ? 'max-lg:translate-y-0' : 'max-lg:translate-y-full'
-                    } lg:translate-y-full lg:group-hover:translate-y-0`}
-                  >
-                    <p className="text-xs font-semibold tracking-[0.14em] text-white uppercase">{certificate.title}</p>
-                    <p className="mt-1 text-xs leading-relaxed text-white/85">{certificate.description}</p>
                   </div>
-                </div>
-              </article>
-            )
-          })}
-        </div>
+                </article>
+              )
+            })}
+          </div>
 
-        <Pagination page={safePage} pageCount={pageCount} onChange={handlePageChange} />
+          <Pagination page={safePage} pageCount={pageCount} onChange={handlePageChange} />
+        </LazySection>
       </div>
     </section>
   )

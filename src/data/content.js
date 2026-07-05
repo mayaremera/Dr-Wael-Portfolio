@@ -8,7 +8,7 @@ export const site = {
     'Consultant Bilingual Speech Language Pathologist & Associate Professor in Speech Language Pathology',
   suffix: 'SLP',
   domain: 'drwaelslp.com',
-  email: 'info@drwaelslp.com',
+  email: 'info@drwaeldk.com',
   phone: '+1 913 309 6288',
   languages: ['English', 'Arabic', 'Spanish'],
   tagline: 'Every child has something to say. We help them find the words.',

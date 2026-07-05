@@ -1,15 +1,16 @@
 import { hopeGallery } from '../data/content'
+import LazyImage from './LazyImage'
 
 function GalleryTile({ item, className = '' }) {
   return (
     <figure
       className={`group relative overflow-hidden rounded-2xl shadow-lg ring-1 ring-white/60 ${className}`}
     >
-      <img
+      <LazyImage
         src={item.src}
         alt={item.alt}
-        className="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
-        loading="lazy"
+        className="absolute inset-0 h-full w-full"
+        imgClassName="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
       />
       <div
         className="absolute inset-0 bg-gradient-to-t from-ink/50 via-ink/5 to-transparent opacity-80 transition-opacity duration-300 group-hover:opacity-90"

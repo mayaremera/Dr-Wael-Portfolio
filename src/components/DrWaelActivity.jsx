@@ -1,7 +1,9 @@
 import { useEffect, useRef } from 'react'
 import { useDrWaelActivity } from '../hooks/useDrWaelActivity'
+import { useInView } from '../hooks/useInView'
 import { resolveHomepageFeaturedEvents } from '../data/contentStore'
 import { hasMediaSrc } from '../lib/mediaUrl'
+import LazyImage from './LazyImage'
 
 const sectionLinkClassName =
   'relative inline-block w-fit pb-1 text-xs font-semibold tracking-[0.12em] text-brand uppercase transition-colors after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-brand after:transition-transform after:duration-300 after:ease-out hover:text-brand-light hover:after:scale-x-100'
@@ -30,11 +32,13 @@ function VideoSoundWaves() {
 }
 
 function ActivityCardMedia({ item }) {
+  const [ref, inView] = useInView({ rootMargin: '120px 0px' })
   const videoRef = useRef(null)
 
   useEffect(() => {
+    if (!inView) return undefined
     const video = videoRef.current
-    if (!video) return
+    if (!video) return undefined
 
     const playVideo = () => {
       video.play().catch(() => {})
@@ -44,13 +48,15 @@ function ActivityCardMedia({ item }) {
     video.addEventListener('loadeddata', playVideo)
 
     return () => video.removeEventListener('loadeddata', playVideo)
-  }, [item.video])
+  }, [inView, item.video])
 
   if (!item.video && !item.image) return null
 
   return (
-    <div className="relative aspect-[16/7] w-full overflow-hidden bg-slate-900">
-      {hasMediaSrc(item.video) ? (
+    <div ref={ref} className="relative aspect-[16/7] w-full overflow-hidden bg-slate-900">
+      {!inView ? (
+        <div className="absolute inset-0 animate-pulse bg-slate-800" aria-hidden="true" />
+      ) : hasMediaSrc(item.video) ? (
         <>
           <video
             ref={videoRef}
@@ -59,7 +65,7 @@ function ActivityCardMedia({ item }) {
             muted
             loop
             playsInline
-            preload="auto"
+            preload="metadata"
             aria-label={item.imageAlt || item.title}
           >
             <source src={item.video} type="video/mp4" />
@@ -78,11 +84,11 @@ function ActivityCardMedia({ item }) {
         </>
       ) : hasMediaSrc(item.image) ? (
         <>
-          <img
+          <LazyImage
             src={item.image}
             alt={item.imageAlt || item.title}
-            className="h-full w-full object-cover object-center"
-            loading="lazy"
+            className="h-full w-full"
+            imgClassName="h-full w-full object-cover object-center"
           />
           <div
             className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-black/20 to-transparent"

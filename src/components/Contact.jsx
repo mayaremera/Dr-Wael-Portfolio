@@ -1,10 +1,9 @@
 import { useState } from 'react'
 import { useContactContent } from '../hooks/useContactContent'
 import ContactButton from './ContactButton'
+import { CONTACT_RECIPIENT_EMAIL, submitContactForm } from '../lib/contactFormSubmit'
 
-const CONTACT_RECIPIENT_EMAIL = 'youssefashour19@gmail.com'
-
-function buildEmailBody({ firstName, lastName, email, message }) {
+function buildEmailBody({ firstName, lastName, email, message, subject }) {
   const fullName = `${firstName.trim()} ${lastName.trim()}`.trim()
 
   return [
@@ -13,6 +12,7 @@ function buildEmailBody({ firstName, lastName, email, message }) {
     '',
     `Name: ${fullName}`,
     `Email: ${email.trim()}`,
+    `Subject: ${subject}`,
     '',
     'Message:',
     message.trim(),
@@ -196,6 +196,7 @@ export default function Contact() {
   })
   const [status, setStatus] = useState('idle')
   const [errorMessage, setErrorMessage] = useState('')
+  const [botcheck, setBotcheck] = useState(false)
 
   if (!isReady || !contactDetails || !directContact) return null
 
@@ -212,12 +213,7 @@ export default function Contact() {
   const handleSubmit = async (event) => {
     event.preventDefault()
 
-    const accessKey = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY
-    if (!accessKey) {
-      setStatus('error')
-      setErrorMessage('Email delivery is not configured yet. Please try again later or email us directly.')
-      return
-    }
+    if (botcheck) return
 
     if (!form.firstName.trim() || !form.lastName.trim() || !form.email.trim() || !form.subject || !form.message.trim()) {
       setStatus('error')
@@ -229,29 +225,23 @@ export default function Contact() {
     setErrorMessage('')
 
     try {
-      const response = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({
-          access_key: accessKey,
-          subject: form.subject,
-          from_name: `${form.firstName.trim()} ${form.lastName.trim()}`,
-          email: form.email.trim(),
-          message: buildEmailBody(form),
-        }),
+      await submitContactForm({
+        firstName: form.firstName,
+        lastName: form.lastName,
+        email: form.email,
+        subject: form.subject,
+        message: buildEmailBody(form),
       })
-
-      const result = await response.json()
-
-      if (!response.ok || !result.success) {
-        throw new Error(result.message || 'Unable to send your message.')
-      }
 
       setForm({ firstName: '', lastName: '', email: '', subject: '', message: '' })
       setStatus('success')
     } catch (error) {
       setStatus('error')
-      setErrorMessage(error instanceof Error ? error.message : 'Unable to send your message. Please try again.')
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : `Unable to send your message. Please email us directly at ${CONTACT_RECIPIENT_EMAIL}.`,
+      )
     }
   }
 
@@ -325,6 +315,17 @@ export default function Contact() {
             <p className="mt-1.5 text-sm text-ink-muted sm:mt-2">We&apos;ll get back to you as soon as possible.</p>
 
             <form className="mt-5 space-y-3.5 sm:mt-6 sm:space-y-4" onSubmit={handleSubmit} noValidate>
+              <input
+                type="checkbox"
+                name="botcheck"
+                tabIndex={-1}
+                autoComplete="off"
+                checked={botcheck}
+                onChange={(event) => setBotcheck(event.target.checked)}
+                className="hidden"
+                style={{ display: 'none' }}
+                aria-hidden="true"
+              />
               <div className="grid gap-3.5 sm:grid-cols-2 sm:gap-4">
                 <div>
                   <label htmlFor="firstName" className="mb-1.5 block text-[0.65rem] font-semibold tracking-wide text-ink-muted uppercase">

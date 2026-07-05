@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useGalleryContent } from '../hooks/useGalleryContent'
 import { parseYoutubeId } from '../data/galleryContentStore'
 import { blockMediaContext, protectedMediaProps, protectedShellProps, protectedVideoProps } from '../lib/mediaProtection'
+import LazyImage from './LazyImage'
+import LazySection from './LazySection'
 
 function getItemDescription(item) {
   return item.description?.trim() || ''
@@ -105,10 +107,11 @@ function VideoCard({ item, onPlay }) {
       >
         <div className="relative aspect-[16/9] overflow-hidden bg-slate-100 lg:aspect-[16/10]">
           {item.poster ? (
-            <img
+            <LazyImage
               src={item.poster}
               alt=""
-              className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+              className="absolute inset-0 h-full w-full"
+              imgClassName="absolute inset-0 h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
               {...protectedMediaProps}
             />
           ) : (
@@ -184,13 +187,15 @@ export default function VideoLibrarySection({ tone = 'alt' }) {
           ) : null}
         </header>
 
-        <div className="mt-8 mobile-card-scroll mobile-card-scroll--gap-lg lg:mt-14 lg:grid lg:grid-cols-3 lg:gap-x-6 lg:gap-y-10">
-          {playableItems.map((item) => (
-            <div key={item.id} className="mobile-card-scroll__item mobile-card-scroll__item--wide h-full lg:w-auto">
-              <VideoCard item={item} onPlay={() => setActiveItem(item)} />
-            </div>
-          ))}
-        </div>
+        <LazySection minHeight="18rem">
+          <div className="mt-8 mobile-card-scroll mobile-card-scroll--gap-lg lg:mt-14 lg:grid lg:grid-cols-3 lg:gap-x-6 lg:gap-y-10">
+            {playableItems.map((item) => (
+              <div key={item.id} className="mobile-card-scroll__item mobile-card-scroll__item--wide h-full lg:w-auto">
+                <VideoCard item={item} onPlay={() => setActiveItem(item)} />
+              </div>
+            ))}
+          </div>
+        </LazySection>
       </div>
 
       {activeItem ? <MomentVideoModal item={activeItem} onClose={closeModal} /> : null}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useServicesContent } from '../hooks/useServicesContent'
 import { hasMediaSrc } from '../lib/mediaUrl'
+import { scrollPaginationSectionIntoView } from '../lib/scrollPaginationSection'
 
 function excerpt(quote, max = 88) {
   if (quote.length <= max) return quote
@@ -201,12 +202,13 @@ function TestimonialsShowcase({ testimonials, testimonialsSection, light = false
     if (activeIndex < pageStart || activeIndex >= pageStart + VOICES_PAGE_SIZE) {
       setActiveIndex(pageStart)
     }
+    scrollPaginationSectionIntoView(document.getElementById('testimonials'))
   }
 
   return (
     <section
       id="testimonials"
-      className={`relative overflow-hidden border-t ${
+      className={`scroll-mt-28 relative overflow-hidden border-t ${
         light ? 'border-slate-200 bg-white' : 'border-brand/15'
       }`}
     >
