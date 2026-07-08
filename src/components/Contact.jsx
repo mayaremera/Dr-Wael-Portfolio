@@ -3,25 +3,6 @@ import { useContactContent } from '../hooks/useContactContent'
 import ContactButton from './ContactButton'
 import { CONTACT_RECIPIENT_EMAIL, submitContactForm } from '../lib/contactFormSubmit'
 
-function buildEmailBody({ firstName, lastName, email, message, subject }) {
-  const fullName = `${firstName.trim()} ${lastName.trim()}`.trim()
-
-  return [
-    'New Appointment Request',
-    '—'.repeat(32),
-    '',
-    `Name: ${fullName}`,
-    `Email: ${email.trim()}`,
-    `Subject: ${subject}`,
-    '',
-    'Message:',
-    message.trim(),
-    '',
-    '—'.repeat(32),
-    'Sent via the Dr. Wael El Dakroury website contact form.',
-  ].join('\n')
-}
-
 const problemTypes = [
   'Screening inquiry',
   'Assessment request',
@@ -230,7 +211,7 @@ export default function Contact() {
         lastName: form.lastName,
         email: form.email,
         subject: form.subject,
-        message: buildEmailBody(form),
+        message: form.message,
       })
 
       setForm({ firstName: '', lastName: '', email: '', subject: '', message: '' })
