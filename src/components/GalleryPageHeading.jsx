@@ -12,6 +12,8 @@ export default function GalleryPageHeading({ eyebrow, title, galleryImages }) {
               key={src}
               src={src}
               alt=""
+              loading="lazy"
+              decoding="async"
               className="h-full w-full object-cover object-top lg:object-center"
             />
           ))}

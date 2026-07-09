@@ -140,6 +140,8 @@ export default function CvModal({ open, onClose }) {
                   <img
                     src={src}
                     alt={`CV page ${index + 1}`}
+                    loading="lazy"
+                    decoding="async"
                     draggable={false}
                     className="pointer-events-none block w-full"
                   />

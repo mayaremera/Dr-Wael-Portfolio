@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { useAboutContent } from '../hooks/useAboutContent'
 import { scrollPaginationSectionIntoView } from '../lib/scrollPaginationSection'
 import LazyImage from './LazyImage'
@@ -106,6 +106,16 @@ export default function CertificationGallery() {
   const [page, setPage] = useState(0)
   const [activeCertId, setActiveCertId] = useState(null)
   const sectionRef = useRef(null)
+  const scrollContainerRef = useRef(null)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 1023px)')
+    requestAnimationFrame(() => setIsMobile(mq.matches))
+    const handler = (event) => setIsMobile(event.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
 
   if (!isReady || !certificatesSection) return null
 
@@ -119,7 +129,18 @@ export default function CertificationGallery() {
   const handlePageChange = (nextPage) => {
     setActiveCertId(null)
     setPage(Math.max(0, Math.min(nextPage, pageCount - 1)))
-    scrollPaginationSectionIntoView(sectionRef)
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (scrollContainerRef.current) {
+          scrollContainerRef.current.scrollLeft = 0
+        }
+      })
+    })
+
+    if (!isMobile) {
+      scrollPaginationSectionIntoView(sectionRef)
+    }
   }
 
   const toggleCertificate = (certificateId) => {
@@ -145,7 +166,7 @@ export default function CertificationGallery() {
         </p>
 
         <LazySection minHeight="20rem">
-          <div className="mt-10 mobile-card-scroll lg:grid lg:grid-cols-3 lg:gap-4">
+          <div ref={scrollContainerRef} className="mt-10 mobile-card-scroll lg:grid lg:grid-cols-3 lg:gap-4">
             {pageItems.map((certificate) => {
               const isActive = activeCertId === certificate.id
 
@@ -171,6 +192,8 @@ export default function CertificationGallery() {
                         alt={certificate.title}
                         className="h-full w-full"
                         imgClassName="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                        rootMargin={isMobile ? '40px 0px' : undefined}
+                        fetchPriority={isMobile ? 'low' : undefined}
                       />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center px-4 text-center text-xs font-medium tracking-wide text-ink-muted uppercase">

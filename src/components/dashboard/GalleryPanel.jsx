@@ -114,7 +114,7 @@ function GalleryItemPreview({ item }) {
           item.type === 'video' ? (
             <video src={item.src} className="h-full w-full object-cover" muted playsInline />
           ) : (
-            <img src={item.src} alt="" className="h-full w-full object-cover" />
+            <img src={item.src} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
           )
         ) : (
           <div className="flex h-full items-center justify-center text-[0.6rem] text-ink-muted">No media</div>
@@ -222,7 +222,7 @@ function VideoLibraryItemPreview({ item }) {
     <div className="flex gap-3">
       <div className="h-16 w-28 shrink-0 overflow-hidden rounded-lg bg-slate-100 ring-1 ring-slate-200/80">
         {item.poster ? (
-          <img src={item.poster} alt="" className="h-full w-full object-cover" />
+          <img src={item.poster} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
         ) : (
           <div className="flex h-full items-center justify-center text-[0.6rem] text-ink-muted">No poster</div>
         )}

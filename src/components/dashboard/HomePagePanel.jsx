@@ -182,21 +182,21 @@ function AffiliationPreview({ item }) {
         {showSplit ? (
           <>
             <div className="flex w-[54%] items-center justify-center bg-white p-1">
-              <img src={item.badgeLogo} alt="" className="max-h-full max-w-full object-contain" />
+              <img src={item.badgeLogo} alt="" loading="lazy" decoding="async" className="max-h-full max-w-full object-contain" />
             </div>
             <div
               className="relative flex-1 overflow-hidden bg-[#1a3a7a]"
               style={{ clipPath: 'polygon(14% 0, 100% 0, 100% 100%, 0 100%)' }}
             >
               {item.logo ? (
-                <img src={item.logo} alt="" className="h-full w-full object-cover object-center" />
+                <img src={item.logo} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover object-center" />
               ) : (
                 <div className="flex h-full items-center justify-center text-[0.55rem] text-white/70">Logo</div>
               )}
             </div>
           </>
         ) : item.logo ? (
-          <img src={item.logo} alt="" className="h-full w-full object-contain p-1" />
+          <img src={item.logo} alt="" loading="lazy" decoding="async" className="h-full w-full object-contain p-1" />
         ) : (
           <div className="flex h-full items-center justify-center text-[0.6rem] text-ink-muted">No logo</div>
         )}

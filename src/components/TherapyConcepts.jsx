@@ -57,7 +57,7 @@ function ServiceCardImage({ src, alt }) {
   return (
     <div className="relative h-36 w-full shrink-0 lg:h-auto lg:min-h-full lg:w-[38%] lg:max-w-[180px] lg:self-stretch">
       {hasMediaSrc(src) ? (
-        <img src={src} alt={alt} className="absolute inset-0 h-full w-full object-cover object-top lg:object-center" />
+        <img src={src} alt={alt} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover object-top lg:object-center" />
       ) : (
         <div className="absolute inset-0 bg-slate-100" aria-hidden="true" />
       )}
@@ -84,6 +84,8 @@ function MobileServiceDetailCard({ concept, index }) {
           <img
             src={concept.image}
             alt={`${concept.title}, ${concept.subtitle}`}
+            loading="lazy"
+            decoding="async"
             className="absolute inset-0 h-full w-full object-cover object-top"
           />
         ) : (
@@ -186,6 +188,8 @@ function ServiceDetailCard({ concept, index }) {
               <img
                 src={concept.image}
                 alt={`${concept.title}, ${concept.subtitle}`}
+                loading="lazy"
+                decoding="async"
                 className="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.04]"
               />
             ) : (

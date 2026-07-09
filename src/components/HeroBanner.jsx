@@ -38,6 +38,8 @@ export default function HeroBanner() {
       <img
         src={mobileBackground}
         alt=""
+        fetchPriority="high"
+        decoding="async"
         aria-hidden="true"
         className="absolute inset-0 h-full w-full object-cover object-center max-md:block md:hidden"
       />
@@ -45,6 +47,8 @@ export default function HeroBanner() {
         <img
           src={backgroundImage}
           alt="Dr. Wael A. Al-Dakroury, speech and language pathology"
+          fetchPriority="high"
+          decoding="async"
           className="absolute inset-0 hidden h-full w-full object-cover object-center md:block"
         />
       ) : null}

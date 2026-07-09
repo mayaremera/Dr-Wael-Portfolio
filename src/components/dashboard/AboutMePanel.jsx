@@ -897,7 +897,7 @@ export default function AboutMePanel() {
                     <div className="flex gap-3">
                       <div className="h-14 w-20 overflow-hidden rounded bg-slate-100">
                         {item.image ? (
-                          <img src={item.image} alt="" className="h-full w-full object-cover" />
+                           <img src={item.image} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
                         ) : (
                           <div className="flex h-full w-full items-center justify-center text-[0.6rem] font-medium text-ink-muted uppercase">
                             No image

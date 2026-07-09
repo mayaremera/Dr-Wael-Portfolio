@@ -121,7 +121,7 @@ export default function MediaDropzone({ image, video, onChange, onUploaded, onCl
             {isVideo ? (
               <video src={mediaSrc} className="h-full w-full object-cover" muted playsInline controls />
             ) : (
-              <img key={mediaSrc} src={mediaSrc} alt="" className="h-full w-full object-cover" />
+               <img key={mediaSrc} src={mediaSrc} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
             )}
             <span className="absolute left-3 top-3 rounded-full bg-black/50 px-2.5 py-1 text-[0.65rem] font-semibold tracking-wide text-white uppercase">
               {isVideo ? 'Video' : 'Image'}

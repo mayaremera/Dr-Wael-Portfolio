@@ -56,7 +56,7 @@ function EventPreview({ event, isUpcoming }) {
           event.video ? (
             <video src={event.video} className="h-full w-full object-cover" muted playsInline />
           ) : (
-            <img src={event.image} alt="" className="h-full w-full object-cover" />
+            <img src={event.image} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
           )
         ) : (
           <div className="flex h-full items-center justify-center text-[0.6rem] text-ink-muted">No media</div>

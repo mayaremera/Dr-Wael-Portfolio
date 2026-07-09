@@ -94,7 +94,7 @@ function VoiceSelector({ item, index, isActive, onSelect, inert = false, light =
         }`}
       >
         {hasMediaSrc(item.image) ? (
-          <img src={item.image} alt="" className="h-full w-full object-cover object-top" />
+          <img src={item.image} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover object-top" />
         ) : (
           <div className="h-full w-full bg-slate-200" aria-hidden="true" />
         )}
@@ -298,7 +298,7 @@ function TestimonialsShowcase({ testimonials, testimonialsSection, light = false
                       }`}
                     >
                       {hasMediaSrc(item.image) ? (
-                        <img src={item.image} alt="" className="h-full w-full object-cover object-top" />
+                        <img src={item.image} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover object-top" />
                       ) : (
                         <div className="h-full w-full bg-slate-200" aria-hidden="true" />
                       )}
@@ -482,7 +482,7 @@ function GalleryCard({ item, index }) {
     <article className="group flex h-full min-h-[32rem] flex-col overflow-hidden rounded-sm border border-slate-100 bg-white shadow-sm transition-shadow duration-300 hover:border-brand/20 hover:shadow-lg hover:shadow-brand/10 sm:min-h-[34rem]">
       <div className="relative h-52 shrink-0 overflow-hidden sm:h-56">
         {hasMediaSrc(item.image) ? (
-          <img src={item.image} alt={item.name} className="h-full w-full object-cover object-top" />
+          <img src={item.image} alt={item.name} loading="lazy" decoding="async" className="h-full w-full object-cover object-top" />
         ) : (
           <div className="h-full w-full bg-slate-200" aria-hidden="true" />
         )}

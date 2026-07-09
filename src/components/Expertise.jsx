@@ -18,6 +18,8 @@ export default function Expertise() {
             key={imageSrc}
             src={imageSrc}
             alt="Family receiving speech-language support"
+            fetchPriority="high"
+            decoding="async"
             className="absolute inset-0 h-full w-full object-cover object-center"
           />
           <div
@@ -65,6 +67,8 @@ export default function Expertise() {
                 key={imageSrc}
                 src={imageSrc}
                 alt="Family receiving speech-language support"
+                fetchPriority="high"
+                decoding="async"
                 className="absolute inset-0 h-full w-full object-cover"
               />
             ) : null}

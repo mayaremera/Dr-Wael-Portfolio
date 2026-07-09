@@ -96,7 +96,7 @@ function TherapyConceptPreview({ concept }) {
     <div className="flex gap-3">
       <div className="h-16 w-24 shrink-0 overflow-hidden rounded-lg bg-slate-100 ring-1 ring-slate-200/80">
         {concept.image ? (
-          <img src={concept.image} alt="" className="h-full w-full object-cover" />
+          <img src={concept.image} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
         ) : (
           <div className="flex h-full items-center justify-center text-[0.6rem] text-ink-muted">No image</div>
         )}
@@ -191,7 +191,7 @@ function CasePreview({ item }) {
     <div className="flex gap-3">
       <div className="h-16 w-24 shrink-0 overflow-hidden rounded-lg bg-slate-100 ring-1 ring-slate-200/80">
         {item.image ? (
-          <img src={item.image} alt="" className="h-full w-full object-cover" />
+          <img src={item.image} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
         ) : (
           <div className="flex h-full items-center justify-center text-[0.6rem] text-ink-muted">No image</div>
         )}
@@ -313,7 +313,7 @@ function TestimonialPreview({ item }) {
     <div className="flex gap-3">
       <div className="h-16 w-16 shrink-0 overflow-hidden rounded-full bg-slate-100 ring-1 ring-slate-200/80">
         {item.image ? (
-          <img src={item.image} alt="" className="h-full w-full object-cover object-top" />
+          <img src={item.image} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover object-top" />
         ) : (
           <div className="flex h-full items-center justify-center text-[0.6rem] text-ink-muted">No photo</div>
         )}

@@ -46,6 +46,8 @@ function PageHeading({ eyebrow, title, backgroundImage, imagePosition = 'center'
           <img
             src={backgroundImage}
             alt=""
+            fetchPriority="high"
+            decoding="async"
             className={`absolute inset-0 h-full w-full ${positionClass}`}
           />
         ) : null}
@@ -237,7 +239,7 @@ function App() {
           title: 'Book a Consultation',
           description:
             'Reach out to discuss your child’s needs and schedule an appointment in English or Arabic.',
-          image: images.screening,
+          image: '/images/contactheading.jpg',
           imagePosition: 'top',
         }}
       >

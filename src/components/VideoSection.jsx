@@ -57,6 +57,8 @@ function WatchVideoBlock({ sectionData, reverse, sectionLabel, playing, onPlay }
                 <img
                   src={sectionData.poster}
                   alt=""
+                  loading="lazy"
+                  decoding="async"
                   className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover/poster:scale-[1.03]"
                 />
               ) : (

@@ -46,8 +46,8 @@ function VideoSoundWaves() {
   )
 }
 
-function GalleryMediaPreview({ item }) {
-  const [ref, inView] = useInView({ rootMargin: '120px 0px' })
+function GalleryMediaPreview({ item, isMobile }) {
+  const [ref, inView] = useInView({ rootMargin: isMobile ? '40px 0px' : '120px 0px' })
   const videoRef = useRef(null)
   const isVideo = item.type === 'video'
   const mediaSrc = hasMediaSrc(item.src) ? item.src.trim() : ''
@@ -104,6 +104,7 @@ function GalleryMediaPreview({ item }) {
           className="absolute inset-0 h-full w-full object-cover object-[center_28%] select-none"
           loading="lazy"
           decoding="async"
+          {...(isMobile ? { fetchPriority: 'low' } : {})}
           {...protectedMediaProps}
         />
       )}
@@ -276,7 +277,7 @@ function GalleryLightbox({ items, activeIndex, onClose, onNavigate }) {
   )
 }
 
-function GalleryCompactCard({ item, globalIndex, onOpen, className = '' }) {
+function GalleryCompactCard({ item, globalIndex, onOpen, className = '', isMobile }) {
   const title = getItemTitle(item)
   const description = getItemDescription(item)
   const previewText =
@@ -291,7 +292,7 @@ function GalleryCompactCard({ item, globalIndex, onOpen, className = '' }) {
         aria-label={`Open ${title}`}
       >
         <div className="relative aspect-[4/3] overflow-hidden max-lg:aspect-[16/10]">
-          <GalleryMediaPreview item={item} />
+          <GalleryMediaPreview item={item} isMobile={isMobile} />
 
           <span className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
             <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white/95 text-brand shadow-lg">
@@ -318,12 +319,11 @@ function GalleryCompactCard({ item, globalIndex, onOpen, className = '' }) {
   )
 }
 
-function GalleryPagination({ currentPage, totalPages, onPageChange, scrollAnchorRef }) {
+function GalleryPagination({ currentPage, totalPages, onPageChange }) {
   if (totalPages <= 1) return null
 
   const goToPage = (page) => {
     onPageChange(page)
-    scrollPaginationSectionIntoView(scrollAnchorRef)
   }
 
   const pageNumbers = useMemo(() => {
@@ -411,6 +411,16 @@ export default function GalleryGrid({ tone = 'alt' }) {
   const [currentPage, setCurrentPage] = useState(1)
   const [activeIndex, setActiveIndex] = useState(null)
   const sectionRef = useRef(null)
+  const scrollContainerRef = useRef(null)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 1023px)')
+    requestAnimationFrame(() => setIsMobile(mq.matches))
+    const handler = (event) => setIsMobile(event.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
 
   const items = mediaGallery?.items ?? []
 
@@ -431,6 +441,22 @@ export default function GalleryGrid({ tone = 'alt' }) {
   const handleFilterChange = (filterId) => {
     setActiveFilter(filterId)
     setCurrentPage(1)
+  }
+
+  const handlePageChange = (nextPage) => {
+    setCurrentPage(nextPage)
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (scrollContainerRef.current) {
+          scrollContainerRef.current.scrollLeft = 0
+        }
+      })
+    })
+
+    if (!isMobile) {
+      scrollPaginationSectionIntoView(sectionRef)
+    }
   }
 
   useEffect(() => {
@@ -497,7 +523,7 @@ export default function GalleryGrid({ tone = 'alt' }) {
           </p>
         ) : (
           <LazySection minHeight="24rem">
-            <div className="mt-6 mobile-card-scroll mobile-card-scroll--gap-lg lg:mt-8 lg:grid lg:grid-cols-3 lg:gap-5">
+            <div ref={scrollContainerRef} className="mt-6 mobile-card-scroll mobile-card-scroll--gap-lg lg:mt-8 lg:grid lg:grid-cols-3 lg:gap-5">
               {pageItems.map((item, index) => {
                 const globalIndex = (currentPage - 1) * PAGE_SIZE + index
                 return (
@@ -507,6 +533,7 @@ export default function GalleryGrid({ tone = 'alt' }) {
                     globalIndex={globalIndex}
                     onOpen={openAt}
                     className="mobile-card-scroll__item mobile-card-scroll__item--wide lg:w-auto"
+                    isMobile={isMobile}
                   />
                 )
               })}
@@ -515,8 +542,7 @@ export default function GalleryGrid({ tone = 'alt' }) {
             <GalleryPagination
               currentPage={currentPage}
               totalPages={totalPages}
-              onPageChange={setCurrentPage}
-              scrollAnchorRef={sectionRef}
+              onPageChange={handlePageChange}
             />
           </LazySection>
         )}

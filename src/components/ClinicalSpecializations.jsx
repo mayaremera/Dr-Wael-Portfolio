@@ -160,7 +160,7 @@ function CompactCaseTile({ item, isActive, onSelect }) {
       <div className="flex items-stretch">
         <div className="relative w-16 shrink-0 overflow-hidden sm:w-20">
           {hasMediaSrc(item.image) ? (
-            <img src={item.image} alt="" className="absolute inset-0 h-full w-full object-cover" />
+            <img src={item.image} alt="" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
           ) : (
             <div className="absolute inset-0 bg-white/10" aria-hidden="true" />
           )}

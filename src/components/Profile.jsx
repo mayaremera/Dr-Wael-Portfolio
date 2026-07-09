@@ -46,6 +46,8 @@ function AffiliationSplitLogos({ primaryLogo, secondaryLogo, primaryLabel, secon
         <img
           src={secondaryLogo}
           alt={secondaryLabel}
+          loading="lazy"
+          decoding="async"
           className="max-h-[78%] w-full max-w-full object-contain"
         />
       </div>
@@ -59,6 +61,8 @@ function AffiliationSplitLogos({ primaryLogo, secondaryLogo, primaryLabel, secon
           src={primaryLogo}
           alt={primaryLabel}
           onError={onPrimaryError}
+          loading="lazy"
+          decoding="async"
           className="h-full w-full object-cover object-center"
         />
       </div>
@@ -76,7 +80,7 @@ function AffiliationBadge({ logo, label, compact = false }) {
       className="pointer-events-none absolute right-2 bottom-2 z-[4] opacity-100 transition-opacity duration-300 group-hover:opacity-0 group-focus-within:opacity-0 lg:right-3 lg:bottom-1"
       title={label}
     >
-      <img src={logo} alt={label} className={imageClassName} />
+      <img src={logo} alt={label} loading="lazy" decoding="async" className={imageClassName} />
     </div>
   )
 }
@@ -109,6 +113,8 @@ function AffiliationTile({ company, className = '' }) {
                 src={company.logo}
                 alt={company.name}
                 onError={() => setLogoFailed(true)}
+                loading="lazy"
+                decoding="async"
                 className="h-full w-full object-cover transition-all duration-500 ease-out group-hover:opacity-25 group-focus-within:opacity-25"
               />
             </div>
@@ -118,6 +124,8 @@ function AffiliationTile({ company, className = '' }) {
                 src={company.logo}
                 alt={company.name}
                 onError={() => setLogoFailed(true)}
+                loading="lazy"
+                decoding="async"
                 className="max-h-[82%] w-auto max-w-[88%] object-contain transition-all duration-500 ease-out group-hover:scale-[0.88] group-hover:opacity-25 group-focus-within:scale-[0.88] group-focus-within:opacity-25"
               />
             </div>
@@ -208,6 +216,8 @@ export default function Profile({ variant = 'home' }) {
             <img
               src={photo}
               alt={name}
+              fetchPriority="high"
+              decoding="async"
               className="absolute inset-0 h-full w-full object-cover object-top"
             />
           </div>
