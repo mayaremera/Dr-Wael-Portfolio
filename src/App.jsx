@@ -20,6 +20,7 @@ import GalleryPageHeading from './components/GalleryPageHeading'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
 import ContactButton from './components/ContactButton'
+import NotFoundPage from './components/NotFoundPage'
 import InTheFieldPresenceBand from './components/InTheFieldPresenceBand'
 import PageLoader from './components/PageLoader'
 import VibeBand from './components/VibeBand'
@@ -264,15 +265,7 @@ function App() {
       {isPageReady ? <Header /> : null}
       <div className={!isPageReady ? 'pointer-events-none select-none' : undefined} aria-hidden={!isPageReady}>
         <main>
-          {pageContent ?? (
-            <section className="mx-auto max-w-3xl px-6 py-24 text-center">
-              <p className="text-xs font-semibold tracking-[0.22em] text-brand uppercase">Page not found</p>
-              <h1 className="mt-4 font-serif text-4xl text-ink">This page does not exist.</h1>
-              <ContactButton href="/" className="mt-8">
-                Back to Home
-              </ContactButton>
-            </section>
-          )}
+          {pageContent ?? <NotFoundPage />}
         </main>
         {isPageReady ? <Footer /> : null}
       </div>

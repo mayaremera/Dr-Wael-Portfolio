@@ -417,13 +417,15 @@ export default function TherapyConcepts({ showCasesPreview = false, fullDetail =
                 <p className="mt-3 text-sm leading-relaxed text-ink-muted">{casesWeServe.intro}</p>
               </header>
 
-              <div className="mt-8 mb-4 flex justify-end">
-                <a href="/services#cases" className={sectionLinkClassName}>
-                  View all cases
-                </a>
-              </div>
+              {(clinicalSpecializations.length > 6 ? (
+                <div className="mt-8 mb-4 flex justify-end">
+                  <a href="/services#cases" className={sectionLinkClassName}>
+                    View all cases
+                  </a>
+                </div>
+              ) : null)}
 
-              <CasesPreviewGrid cases={clinicalSpecializations} />
+              <CasesPreviewGrid cases={clinicalSpecializations.filter((caseItem) => !caseItem.pageOnly).slice(0, 6)} />
             </div>
           ) : null}
         </div>

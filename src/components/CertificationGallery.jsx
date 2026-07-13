@@ -154,7 +154,7 @@ export default function CertificationGallery() {
           <p className="text-xs font-semibold tracking-[0.22em] text-brand uppercase">{label}</p>
           <h2 className="mt-3 font-serif text-3xl text-ink md:text-4xl">{title}</h2>
           <div className="mx-auto mt-5 inline-flex items-center gap-3 rounded-full border border-slate-200/80 bg-white px-4 py-2 shadow-sm">
-            <span className="text-xs font-semibold tracking-[0.16em] text-ink-muted uppercase">Total Certificates</span>
+            <span className="text-xs font-semibold tracking-[0.16em] text-ink-muted uppercase">Featured Collection</span>
             <span className="rounded-full bg-brand px-3 py-1 text-lg leading-none font-bold text-white sm:text-xl">
               {certificates.length}
             </span>

@@ -167,6 +167,17 @@ function TherapyConceptEditor({ initialConcept, onSave, onCancel }) {
           />
         </div>
         <div className="sm:col-span-2">
+          <label className="flex items-center gap-2 text-sm text-ink">
+            <input
+              type="checkbox"
+              checked={!!concept.pageOnly}
+              onChange={(e) => updateField('pageOnly', e.target.checked)}
+              className="h-4 w-4 rounded border-slate-300 text-brand focus:ring-brand"
+            />
+            Show on Services page only (hide from homepage preview)
+          </label>
+        </div>
+        <div className="sm:col-span-2">
           <StringListEditor label="Detail paragraphs" items={concept.paragraphs} onChange={(paragraphs) => updateField('paragraphs', paragraphs)} addLabel="Add paragraph" />
         </div>
         <div className="sm:col-span-2">
@@ -293,6 +304,17 @@ function CaseEditor({ initialCase, onSave, onCancel }) {
         <div className="sm:col-span-2">
           <label className={labelClassName}>Bilingual note</label>
           <input className={fieldClassName} value={item.bilingualNote} onChange={(e) => updateField('bilingualNote', e.target.value)} />
+        </div>
+        <div className="sm:col-span-2">
+          <label className="flex items-center gap-2 text-sm text-ink">
+            <input
+              type="checkbox"
+              checked={!!item.pageOnly}
+              onChange={(e) => updateField('pageOnly', e.target.checked)}
+              className="h-4 w-4 rounded border-slate-300 text-brand focus:ring-brand"
+            />
+            Show on Services page only (hide from homepage preview)
+          </label>
         </div>
       </div>
 

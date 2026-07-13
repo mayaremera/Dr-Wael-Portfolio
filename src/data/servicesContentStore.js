@@ -149,6 +149,7 @@ export const emptyTherapyConcept = {
   paragraphs: [''],
   bullets: [],
   ctaLabel: 'Book a Session',
+  pageOnly: true,
 }
 
 export const emptyClinicalCase = {
@@ -162,6 +163,7 @@ export const emptyClinicalCase = {
   paragraphs: [''],
   therapyAreas: [''],
   bilingualNote: '',
+  pageOnly: true,
 }
 
 export const emptyTestimonial = {
