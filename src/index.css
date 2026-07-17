@@ -901,11 +901,6 @@ select {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  /* Clinical cases preview — 2 per row */
-  .home-page-sections #approach .mt-12 .mobile-card-scroll {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   /* Events — 2 columns on smaller tablets, 3 on wider */
   .home-page-sections #activity .mobile-card-scroll {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1084,5 +1079,119 @@ select {
 
   .home-page-sections #activity .lg\:grid-cols-3 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ── Clinical cases slider on desktop ── */
+@media (min-width: 1024px) {
+  .home-page-sections #approach .mt-12 .mobile-card-scroll {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 1.25rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline-start: 1.5rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin-inline: -1.5rem;
+    padding-inline-start: 1.5rem;
+    padding-inline-end: 1.5rem;
+    padding-bottom: 0.35rem;
+  }
+
+  .home-page-sections #approach .mt-12 .mobile-card-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .home-page-sections #approach .mt-12 .mobile-card-scroll__item {
+    flex: 0 0 auto;
+    width: min(22rem, 28vw);
+    scroll-snap-align: start;
+  }
+}
+
+/* ── Clinical cases slider arrows ── */
+.cases-slider {
+  position: relative;
+}
+
+.cases-slider-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 9999px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: var(--color-brand);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10;
+}
+
+.cases-slider-arrow:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: var(--color-brand-light);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  transform: translateY(-50%) scale(1.05);
+}
+
+.cases-slider-arrow:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.cases-slider-arrow--prev {
+  left: 0.25rem;
+}
+
+.cases-slider-arrow--next {
+  right: 0.25rem;
+}
+
+@media (min-width: 1024px) {
+  .cases-slider-arrow--prev {
+    left: -0.75rem;
+  }
+  .cases-slider-arrow--next {
+    right: -0.75rem;
+  }
+}
+
+@media (min-width: 1140px) {
+  .cases-slider-arrow--prev {
+    left: -1.5rem;
+  }
+  .cases-slider-arrow--next {
+    right: -1.5rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .cases-slider-arrow--prev {
+    left: -2.5rem;
+  }
+  .cases-slider-arrow--next {
+    right: -2.5rem;
+  }
+}
+
+@media (min-width: 1400px) {
+  .cases-slider-arrow--prev {
+    left: -3.5rem;
+  }
+  .cases-slider-arrow--next {
+    right: -3.5rem;
+  }
+}
+
+@media (max-width: 1023px) {
+  .cases-slider-arrow {
+    display: none;
   }
 }

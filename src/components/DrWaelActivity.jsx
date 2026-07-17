@@ -1,7 +1,7 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useDrWaelActivity } from '../hooks/useDrWaelActivity'
 import { useInView } from '../hooks/useInView'
-import { resolveHomepageFeaturedEvents } from '../data/contentStore'
+import { buildActivityEventPool, resolveHomepageFeaturedEvents } from '../data/contentStore'
 import { hasMediaSrc } from '../lib/mediaUrl'
 import LazyImage from './LazyImage'
 
@@ -153,19 +153,19 @@ function ActivityCard({ item, isUpcoming = false }) {
 }
 
 export default function DrWaelActivity({ variant = 'preview' }) {
-  const { activity, isReady } = useDrWaelActivity()
+  const { activity, isReady, resolvedInTheFieldEvents } = useDrWaelActivity()
   const isFullPage = variant === 'full'
-
-  if (!isReady || !activity) return null
-
-  const { label, title, description, upcoming, recent } = activity
 
   const featuredEvents = resolveHomepageFeaturedEvents(activity)
 
-  const allEvents = [
-    ...upcoming.map((item) => ({ ...item, isUpcoming: true })),
-    ...recent.map((item) => ({ ...item, isUpcoming: false })),
-  ]
+  const allEvents = useMemo(
+    () => (isFullPage ? resolvedInTheFieldEvents : buildActivityEventPool(activity)),
+    [isFullPage, resolvedInTheFieldEvents, activity],
+  )
+
+  if (!isReady || !activity) return null
+
+  const { label, title, description } = activity
 
   return (
     <section

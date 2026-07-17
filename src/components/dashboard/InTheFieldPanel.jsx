@@ -12,6 +12,7 @@ import {
   emptyGlobeRegion,
   emptyMembershipOrg,
   getDefaultDrWaelActivity,
+  IN_THE_FIELD_FEATURED_COUNT,
   loadDrWaelActivityRemote,
   MEMBERSHIP_SCOPES,
   saveDrWaelActivity,
@@ -46,40 +47,60 @@ function getEventStatus(activity, eventId) {
   return 'upcoming'
 }
 
-function EventPreview({ event, isUpcoming }) {
+function EventPreview({ event, isUpcoming, selectedIds, onToggle }) {
   const mediaSrc = event.video || event.image
 
   return (
-    <div className="flex gap-3">
-      <div className="h-16 w-24 shrink-0 overflow-hidden rounded-lg bg-slate-100 ring-1 ring-slate-200/80">
-        {mediaSrc ? (
-          event.video ? (
-            <video src={event.video} className="h-full w-full object-cover" muted playsInline />
+    <div>
+      <div className="flex gap-3">
+        <div className="h-16 w-24 shrink-0 overflow-hidden rounded-lg bg-slate-100 ring-1 ring-slate-200/80">
+          {mediaSrc ? (
+            event.video ? (
+              <video src={event.video} className="h-full w-full object-cover" muted playsInline />
+            ) : (
+              <img src={event.image} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
+            )
           ) : (
-            <img src={event.image} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
-          )
-        ) : (
-          <div className="flex h-full items-center justify-center text-[0.6rem] text-ink-muted">No media</div>
-        )}
-      </div>
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-full bg-brand-muted px-2 py-0.5 text-[0.6rem] font-semibold tracking-wide text-brand uppercase">
-            {event.type || 'Event'}
-          </span>
-          {isUpcoming ? (
-            <span className="rounded-full bg-accent px-2 py-0.5 text-[0.6rem] font-semibold tracking-wide text-white uppercase">
-              Upcoming
-            </span>
-          ) : null}
+            <div className="flex h-full items-center justify-center text-[0.6rem] text-ink-muted">No media</div>
+          )}
         </div>
-        <p className="mt-1 truncate font-medium text-ink">{event.title || 'Untitled event'}</p>
-        <p className="mt-1 text-xs text-ink-muted">
-          {event.date}
-          {event.period ? ` · ${event.period}` : ''}
-        </p>
-        <p className="truncate text-xs text-ink-muted">{event.location}</p>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="rounded-full bg-brand-muted px-2 py-0.5 text-[0.6rem] font-semibold tracking-wide text-brand uppercase">
+              {event.type || 'Event'}
+            </span>
+            {isUpcoming ? (
+              <span className="rounded-full bg-accent px-2 py-0.5 text-[0.6rem] font-semibold tracking-wide text-white uppercase">
+                Upcoming
+              </span>
+            ) : null}
+          </div>
+          <p className="mt-1 truncate font-medium text-ink">{event.title || 'Untitled event'}</p>
+          <p className="mt-1 text-xs text-ink-muted">
+            {event.date}
+            {event.period ? ` · ${event.period}` : ''}
+          </p>
+          <p className="truncate text-xs text-ink-muted">{event.location}</p>
+        </div>
       </div>
+      {onToggle && selectedIds ? (
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          {selectedIds.map((id, index) => (
+            <button
+              key={index}
+              type="button"
+              onClick={() => onToggle(event.id, index)}
+              className={`rounded-lg border px-2 py-1 text-[0.65rem] font-semibold transition-colors ${
+                id === event.id
+                  ? 'border-brand bg-brand-muted/50 text-brand'
+                  : 'border-slate-200 text-ink-muted hover:border-brand/25 hover:text-brand'
+              }`}
+            >
+              {index + 1}
+            </button>
+          ))}
+        </div>
+      ) : null}
     </div>
   )
 }
@@ -693,6 +714,52 @@ function HomepageSlotCheckboxes({ eventId, selectedIds, onToggle }) {
   )
 }
 
+function toggleInTheFieldSlot(selectedIds, eventId, slotIndex) {
+  const next = Array.from({ length: IN_THE_FIELD_FEATURED_COUNT }, (_, index) => selectedIds?.[index] ?? '')
+
+  if (next[slotIndex] === eventId) {
+    next[slotIndex] = ''
+    return next
+  }
+
+  for (let index = 0; index < IN_THE_FIELD_FEATURED_COUNT; index += 1) {
+    if (next[index] === eventId) next[index] = ''
+  }
+
+  next[slotIndex] = eventId
+  return next
+}
+
+function InTheFieldSlotCheckboxes({ eventId, selectedIds, onToggle }) {
+  const normalizedIds = Array.from({ length: IN_THE_FIELD_FEATURED_COUNT }, (_, index) => selectedIds?.[index] ?? '')
+
+  return (
+    <div className="mt-4 rounded-lg border border-slate-200/80 bg-white p-3">
+      <p className="text-[0.65rem] font-semibold tracking-wide text-ink-muted uppercase">Show on In the Field page</p>
+      <div className="mt-2 flex flex-wrap gap-1.5">
+        {Array.from({ length: IN_THE_FIELD_FEATURED_COUNT }, (_, index) => {
+          const checked = normalizedIds[index] === eventId
+
+          return (
+            <button
+              key={index}
+              type="button"
+              onClick={() => onToggle(eventId, index)}
+              className={`rounded-lg border px-2 py-1 text-[0.65rem] font-semibold transition-colors ${
+                checked
+                  ? 'border-brand bg-brand-muted/50 text-brand'
+                  : 'border-slate-200 text-ink-muted hover:border-brand/25 hover:text-brand'
+              }`}
+            >
+              {index + 1}
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 function MembershipOrgEditor({ initialOrg, onSave, onCancel }) {
   const [org, setOrg] = useState({ ...emptyMembershipOrg, ...initialOrg })
   const update = (field, value) => setOrg((current) => ({ ...current, [field]: value }))
@@ -833,6 +900,16 @@ export default function InTheFieldPanel() {
     )
   }
 
+  const handleInTheFieldSlotToggle = (eventId, slotIndex) => {
+    persistFromCurrent(
+      (current) => ({
+        ...current,
+        inTheFieldFeaturedIds: toggleInTheFieldSlot(current.inTheFieldFeaturedIds, eventId, slotIndex),
+      }),
+      'In the Field page cards updated.',
+    )
+  }
+
   const updateGlobeMeta = (field, value) => {
     setActivity((current) => ({
       ...current,
@@ -917,6 +994,9 @@ export default function InTheFieldPanel() {
         upcoming: (current.upcoming ?? []).filter((item) => item.id !== eventId),
         recent: (current.recent ?? []).filter((item) => item.id !== eventId),
         homepageFeaturedIds: (current.homepageFeaturedIds ?? ['', '', '']).map((id) =>
+          id === eventId ? '' : id,
+        ),
+        inTheFieldFeaturedIds: (current.inTheFieldFeaturedIds ?? Array(IN_THE_FIELD_FEATURED_COUNT).fill('')).map((id) =>
           id === eventId ? '' : id,
         ),
       }),
@@ -1144,11 +1224,21 @@ export default function InTheFieldPanel() {
                     />
                   ) : (
                     <>
-                      <EventPreview event={event} isUpcoming={isUpcoming} />
+                      <EventPreview
+                        event={event}
+                        isUpcoming={isUpcoming}
+                        selectedIds={activity.inTheFieldFeaturedIds}
+                        onToggle={handleInTheFieldSlotToggle}
+                      />
                       <HomepageSlotCheckboxes
                         eventId={event.id}
                         selectedIds={activity.homepageFeaturedIds}
                         onToggle={handleHomepageSlotToggle}
+                      />
+                      <InTheFieldSlotCheckboxes
+                        eventId={event.id}
+                        selectedIds={activity.inTheFieldFeaturedIds}
+                        onToggle={handleInTheFieldSlotToggle}
                       />
                       <div className="mt-4 flex flex-wrap gap-2">
                         <button

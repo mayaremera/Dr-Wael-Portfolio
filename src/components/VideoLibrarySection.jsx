@@ -148,10 +148,10 @@ function VideoCard({ item, onPlay }) {
 }
 
 export default function VideoLibrarySection({ tone = 'alt' }) {
-  const { isReady, videoLibrary } = useGalleryContent()
+  const { isReady, videoLibrary, resolvedVideoLibraryItems } = useGalleryContent()
   const [activeItem, setActiveItem] = useState(null)
 
-  const items = videoLibrary?.items ?? []
+  const items = resolvedVideoLibraryItems ?? []
 
   const playableItems = useMemo(
     () =>

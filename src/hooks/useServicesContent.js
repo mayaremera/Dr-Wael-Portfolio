@@ -1,5 +1,5 @@
 import { CONTENT_SECTIONS } from '../data/contentSync'
-import { loadServicesContent, loadServicesContentRemote } from '../data/servicesContentStore'
+import { loadServicesContent, loadServicesContentRemote, resolveClinicalCasesDisplayOrder } from '../data/servicesContentStore'
 import { useContentSection } from './useContentSection'
 
 export function useServicesContent() {
@@ -17,7 +17,10 @@ export function useServicesContent() {
     speechLanguageServices: content?.speechLanguageServices,
     therapyConcepts: content?.therapyConcepts ?? [],
     casesWeServe: content?.casesWeServe,
-    clinicalSpecializations: content?.clinicalSpecializations ?? [],
+    clinicalSpecializations: resolveClinicalCasesDisplayOrder(
+      content?.clinicalSpecializations ?? [],
+      content?.clinicalCasesFeaturedIds,
+    ),
     testimonialsSection: content?.testimonialsSection,
     testimonials: content?.testimonials ?? [],
   }

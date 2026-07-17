@@ -1,5 +1,10 @@
 import { CONTENT_SECTIONS } from '../data/contentSync'
-import { loadGalleryContent, loadGalleryContentRemote } from '../data/galleryContentStore'
+import {
+  loadGalleryContent,
+  loadGalleryContentRemote,
+  resolveMediaGalleryDisplayOrder,
+  resolveVideoLibraryDisplayOrder,
+} from '../data/galleryContentStore'
 import { useContentSection } from './useContentSection'
 
 export function useGalleryContent() {
@@ -19,5 +24,13 @@ export function useGalleryContent() {
     promoVideo: content?.promoVideo,
     videoLibrary: content?.videoLibrary,
     mediaGallery: content?.mediaGallery,
+    resolvedMediaGalleryItems: resolveMediaGalleryDisplayOrder(
+      content?.mediaGallery?.items ?? [],
+      content?.mediaGallery?.featuredIds,
+    ),
+    resolvedVideoLibraryItems: resolveVideoLibraryDisplayOrder(
+      content?.videoLibrary?.items ?? [],
+      content?.videoLibrary?.featuredIds,
+    ),
   }
 }

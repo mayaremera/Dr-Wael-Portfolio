@@ -55,6 +55,7 @@ export const drWaelActivity = {
   description:
     'Conferences, lectures, meetings, and professional engagements: a snapshot of where Dr. Wael is contributing now and the highlights from recent months.',
   homepageFeaturedIds: ['', '', ''],
+  inTheFieldFeaturedIds: Array(12).fill(''),
   upcoming: [
     {
       id: 'alfaisal-lecture',
@@ -148,10 +149,8 @@ export const mediaGallery = {
   label: 'Gallery',
   title: 'Snapshots from Sessions & Events',
   description:
-    'Photos and clips from clinical work, training sessions, and professional events — open any moment to view it full size.',
+    'Photos from clinical work, training sessions, and professional events — open any moment to view it full size.',
   items: [
-    gridMedia('WhatsApp Video 2026-05-27 at 62.49.01 PM.mp4', 'video'),
-    gridMedia('WhatsApp Video 2026-05-27 at 6.49.00 PM.mp4', 'video'),
     gridMedia('WhatsApp Image 2026-05-27 at 6.238.47 PM.jpeg', 'image'),
     gridMedia('WhatsApp Image 2026-05-27 at 6.49.015 PM.jpeg', 'image'),
     gridMedia('WhatsApp Image 2026-05-27 at 62.49.01 PM.jpeg', 'image'),

@@ -8,6 +8,7 @@ import {
 } from './contentSync'
 
 export const ACTIVITY_STORAGE_KEY = 'drwael-activity-content'
+export const IN_THE_FIELD_FEATURED_COUNT = 12
 
 export { CONTENT_UPDATED_EVENT } from './contentSync'
 
@@ -135,6 +136,62 @@ export function resolveHomepageFeaturedEvents(activity) {
   return featured.slice(0, 3)
 }
 
+function normalizeInTheFieldFeaturedIds(savedIds, defaults) {
+  const source = Array.isArray(savedIds) ? savedIds : defaults.inTheFieldFeaturedIds
+  return Array.from({ length: IN_THE_FIELD_FEATURED_COUNT }, (_, index) =>
+    typeof source[index] === 'string' ? source[index] : '',
+  )
+}
+
+function sortByEventDate(next, fallback) {
+  const nextTime = Date.parse(next.period || '')
+  const fallbackTime = Date.parse(fallback.period || '')
+
+  if (!Number.isNaN(nextTime) && !Number.isNaN(fallbackTime)) {
+    return nextTime - fallbackTime
+  }
+
+  const nextDate = Date.parse(next.date || '')
+  const fallbackDate = Date.parse(fallback.date || '')
+
+  if (!Number.isNaN(nextDate) && !Number.isNaN(fallbackDate)) {
+    return nextDate - fallbackDate
+  }
+
+  return 0
+}
+
+export function resolveInTheFieldDisplayOrder(activity) {
+  const pool = buildActivityEventPool(activity)
+  const byId = new Map(pool.map((event) => [event.id, event]))
+  const selectedIds = normalizeInTheFieldFeaturedIds(activity?.inTheFieldFeaturedIds, { inTheFieldFeaturedIds: Array(IN_THE_FIELD_FEATURED_COUNT).fill('') })
+  const hasSelection = selectedIds.some((id) => id && byId.has(id))
+
+  if (!hasSelection) {
+    return pool.slice(0, IN_THE_FIELD_FEATURED_COUNT)
+  }
+
+  const used = new Set()
+  const featured = []
+
+  for (const id of selectedIds) {
+    if (id && byId.has(id) && !used.has(id)) {
+      featured.push(byId.get(id))
+      used.add(id)
+      continue
+    }
+
+    const fallback = pool.find((event) => !used.has(event.id))
+    if (fallback) {
+      featured.push(fallback)
+      used.add(fallback.id)
+    }
+  }
+
+  const remainder = pool.filter((event) => !used.has(event.id))
+  return [...featured, ...remainder.sort((a, b) => sortByEventDate(b, a))]
+}
+
 function mergeWithDefaults(saved) {
   const defaults = getDefaultDrWaelActivity()
   const merged = {
@@ -161,6 +218,11 @@ function mergeWithDefaults(saved) {
 
   merged.homepageFeaturedIds = normalizeHomepageFeaturedIds(
     saved.homepageFeaturedIds,
+    defaults,
+  ).map((id) => (id && validIds.has(id) ? id : ''))
+
+  merged.inTheFieldFeaturedIds = normalizeInTheFieldFeaturedIds(
+    saved.inTheFieldFeaturedIds,
     defaults,
   ).map((id) => (id && validIds.has(id) ? id : ''))
 

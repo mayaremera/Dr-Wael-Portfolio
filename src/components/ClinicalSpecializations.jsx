@@ -115,15 +115,6 @@ function CaseSpotlight({ item, height }) {
           </div>
         ) : null}
 
-        {item.bilingualNote ? (
-          <p className="mt-4 inline-flex shrink-0 items-center gap-2 rounded-full bg-brand-muted px-3 py-1 text-[0.65rem] font-medium text-brand">
-            <svg className="h-3 w-3 shrink-0 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-8.843 4.582" />
-            </svg>
-            {item.bilingualNote}
-          </p>
-        ) : null}
-
         <div className="mt-4 flex shrink-0 flex-wrap items-center gap-3 border-t border-slate-100 pt-4">
           <div>
             <p className="text-[0.65rem] font-semibold tracking-wide text-brand uppercase">Focus area</p>

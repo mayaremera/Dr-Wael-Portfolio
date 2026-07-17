@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { useServicesContent } from '../hooks/useServicesContent'
 import { useState } from 'react'
 import ClinicalSpecializations from './ClinicalSpecializations'
@@ -214,16 +215,6 @@ function ServiceDetailCard({ concept, index }) {
             <p className="mt-1.5 text-base font-medium text-brand">{concept.subtitle}</p>
           </div>
 
-          <blockquote className="relative mt-5 border-l-[3px] border-accent/50 py-1 pl-5 sm:pl-6">
-            <span
-              className="pointer-events-none absolute -top-3 left-3 font-serif text-4xl leading-none text-accent/25 select-none"
-              aria-hidden="true"
-            >
-              &ldquo;
-            </span>
-            <p className="font-serif text-lg leading-relaxed text-ink/90 italic sm:text-xl">{concept.summary}</p>
-          </blockquote>
-
           {concept.paragraphs?.length > 0 ? (
             <div className="mt-6 space-y-3.5">
               {concept.paragraphs.map((paragraph) => (
@@ -273,48 +264,177 @@ function ServiceDetailCard({ concept, index }) {
 }
 
 function CasesPreviewGrid({ cases }) {
-  return (
-    <div className="home-cases-grid mobile-card-scroll lg:grid lg:grid-cols-3 lg:gap-4">
-      {cases.map((item) => (
-        <article
-          key={item.id}
-          className="mobile-card-scroll__item group flex h-full max-lg:h-[20rem] flex-col overflow-hidden rounded-sm border border-slate-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-brand/20 hover:shadow-md hover:shadow-brand/10 lg:h-auto lg:w-auto"
-        >
-          <div className="relative h-36 w-full shrink-0 overflow-hidden">
-            {hasMediaSrc(item.image) ? (
-              <img
-                src={item.image}
-                alt={item.title}
-                className="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-105 lg:object-center"
-              />
-            ) : (
-              <div className="absolute inset-0 bg-slate-100" aria-hidden="true" />
-            )}
-            <div
-              className="pointer-events-none absolute inset-0 bg-gradient-to-t from-brand/50 via-transparent to-transparent"
-              aria-hidden="true"
-            />
-            <span className="absolute left-3 top-3 rounded-full bg-white/95 px-2.5 py-0.5 text-[0.6rem] font-bold tracking-[0.12em] text-brand uppercase shadow-sm">
-              {item.category}
-            </span>
-          </div>
+  const scrollRef = useRef(null)
+  const isDown = useRef(false)
+  const isDragging = useRef(false)
+  const startX = useRef(0)
+  const scrollLeftStart = useRef(0)
 
-          <div className="flex min-h-0 flex-1 flex-col px-4 py-4 sm:px-5 sm:py-5">
-            <h4 className="line-clamp-2 min-h-[2.75rem] shrink-0 font-serif text-lg leading-snug text-ink">
-              {item.title}
-            </h4>
-            <p className="mt-1 line-clamp-1 min-h-[0.875rem] shrink-0 text-[0.65rem] font-semibold tracking-[0.12em] text-brand uppercase">
-              {item.abbr || '\u00A0'}
-            </p>
-            <p className="mt-2 shrink-0 text-sm leading-relaxed text-ink-muted lg:hidden">
-              {truncatePreviewText(item.excerpt, 100)}
-            </p>
-            <p className="mt-2 hidden text-sm leading-relaxed text-ink-muted lg:block line-clamp-3">
-              {item.excerpt}
-            </p>
-          </div>
-        </article>
-      ))}
+  const snapToCard = () => {
+    const container = scrollRef.current
+    if (!container) return
+    const item = container.querySelector('.mobile-card-scroll__item')
+    if (!item) return
+    const itemWidth = item.getBoundingClientRect().width
+    const style = getComputedStyle(container)
+    const gap = parseFloat(style.gap || '0')
+    const cardAndGap = itemWidth + gap
+    
+    const scrollLeft = container.scrollLeft
+    const currentIndex = Math.round(scrollLeft / cardAndGap)
+    
+    container.scrollTo({
+      left: currentIndex * cardAndGap,
+      behavior: 'smooth'
+    })
+  }
+
+  const scrollSlider = (direction) => {
+    const container = scrollRef.current
+    if (!container) return
+    const item = container.querySelector('.mobile-card-scroll__item')
+    if (!item) return
+    const itemWidth = item.getBoundingClientRect().width
+    const style = getComputedStyle(container)
+    const gap = parseFloat(style.gap || '0')
+    const cardAndGap = itemWidth + gap
+
+    const scrollLeft = container.scrollLeft
+    const currentIndex = Math.round(scrollLeft / cardAndGap)
+    const targetIndex = currentIndex + direction
+
+    container.scrollTo({
+      left: targetIndex * cardAndGap,
+      behavior: 'smooth'
+    })
+  }
+
+  const handleMouseDown = (e) => {
+    if (e.button !== 0) return // Only left-click drags
+    const container = scrollRef.current
+    if (!container) return
+    isDown.current = true
+    isDragging.current = false
+    container.style.scrollSnapType = 'none'
+    container.style.scrollBehavior = 'auto'
+    startX.current = e.pageX - container.offsetLeft
+    scrollLeftStart.current = container.scrollLeft
+  }
+
+  const handleMouseLeave = () => {
+    if (!isDown.current) return
+    isDown.current = false
+    const container = scrollRef.current
+    if (!container) return
+    container.style.scrollSnapType = ''
+    container.style.scrollBehavior = ''
+    snapToCard()
+  }
+
+  const handleMouseUp = () => {
+    if (!isDown.current) return
+    isDown.current = false
+    const container = scrollRef.current
+    if (!container) return
+    container.style.scrollSnapType = ''
+    container.style.scrollBehavior = ''
+    snapToCard()
+  }
+
+  const handleMouseMove = (e) => {
+    if (!isDown.current) return
+    isDragging.current = true
+    e.preventDefault()
+    const container = scrollRef.current
+    if (!container) return
+    const x = e.pageX - container.offsetLeft
+    const walk = (x - startX.current) * 1.5
+    container.scrollLeft = scrollLeftStart.current - walk
+  }
+
+  const handleCardClick = () => {
+    if (isDragging.current) {
+        isDragging.current = false
+        return
+    }
+    window.location.href = '/services'
+  }
+
+  return (
+    <div className="cases-slider relative">
+      <div
+        ref={scrollRef}
+        onMouseDown={handleMouseDown}
+        onMouseLeave={handleMouseLeave}
+        onMouseUp={handleMouseUp}
+        onMouseMove={handleMouseMove}
+        className="home-cases-grid mobile-card-scroll cursor-grab active:cursor-grabbing select-none"
+      >
+        {cases.map((item) => (
+          <article
+            key={item.id}
+            onClick={handleCardClick}
+            className="mobile-card-scroll__item group flex h-full max-lg:h-[20rem] flex-col overflow-hidden rounded-sm border border-slate-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-brand/20 hover:shadow-md hover:shadow-brand/10 lg:h-auto lg:w-auto cursor-pointer"
+          >
+            <div className="relative h-36 w-full shrink-0 overflow-hidden">
+              {hasMediaSrc(item.image) ? (
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  className="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-105 lg:object-center"
+                  draggable="false"
+                />
+              ) : (
+                <div className="absolute inset-0 bg-slate-100" aria-hidden="true" />
+              )}
+              <div
+                className="pointer-events-none absolute inset-0 bg-gradient-to-t from-brand/50 via-transparent to-transparent"
+                aria-hidden="true"
+              />
+              <span className="absolute left-3 top-3 rounded-full bg-white/95 px-2.5 py-0.5 text-[0.6rem] font-bold tracking-[0.12em] text-brand uppercase shadow-sm">
+                {item.category}
+              </span>
+            </div>
+
+            <div className="flex min-h-0 flex-1 flex-col px-4 py-4 sm:px-5 sm:py-5">
+              <h4 className="line-clamp-2 min-h-[2.75rem] shrink-0 font-serif text-lg leading-snug text-ink">
+                {item.title}
+              </h4>
+              <p className="mt-1 line-clamp-1 min-h-[0.875rem] shrink-0 text-[0.65rem] font-semibold tracking-[0.12em] text-brand uppercase">
+                {item.abbr || '\u00A0'}
+              </p>
+              <p className="mt-2 shrink-0 text-sm leading-relaxed text-ink-muted lg:hidden">
+                {truncatePreviewText(item.homepageExcerpt || item.excerpt, 100)}
+              </p>
+              <p className="mt-2 hidden text-sm leading-relaxed text-ink-muted lg:block line-clamp-3">
+                {item.homepageExcerpt || item.excerpt}
+              </p>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <button
+        type="button"
+        onClick={() => scrollSlider(-1)}
+        aria-label="Previous cases"
+        className="cases-slider-arrow cases-slider-arrow--prev"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-5 w-5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+        </svg>
+      </button>
+
+      <button
+        type="button"
+        onClick={() => scrollSlider(1)}
+        aria-label="Next cases"
+        className="cases-slider-arrow cases-slider-arrow--next"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-5 w-5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+        </svg>
+      </button>
     </div>
   )
 }
@@ -417,15 +537,13 @@ export default function TherapyConcepts({ showCasesPreview = false, fullDetail =
                 <p className="mt-3 text-sm leading-relaxed text-ink-muted">{casesWeServe.intro}</p>
               </header>
 
-              {(clinicalSpecializations.length > 6 ? (
-                <div className="mt-8 mb-4 flex justify-end">
-                  <a href="/services#cases" className={sectionLinkClassName}>
-                    View all cases
-                  </a>
-                </div>
-              ) : null)}
+              <div className="mt-8 mb-4 flex justify-end">
+                <a href="/services#cases" className={sectionLinkClassName}>
+                  View all cases
+                </a>
+              </div>
 
-              <CasesPreviewGrid cases={clinicalSpecializations.filter((caseItem) => !caseItem.pageOnly).slice(0, 6)} />
+              <CasesPreviewGrid cases={clinicalSpecializations.slice(0, 10)} />
             </div>
           ) : null}
         </div>

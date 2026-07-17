@@ -14,6 +14,7 @@ import {
 } from './contentSync'
 
 export const SERVICES_STORAGE_KEY = 'drwael-services-content'
+export const CLINICAL_CASES_FEATURED_COUNT = 10
 
 function cloneContent(data) {
   return JSON.parse(JSON.stringify(data))
@@ -25,6 +26,7 @@ export function getDefaultServicesContent() {
     therapyConcepts: cloneContent(defaultTherapyConcepts),
     casesWeServe: cloneContent(defaultCasesWeServe),
     clinicalSpecializations: cloneContent(defaultClinicalSpecializations),
+    clinicalCasesFeaturedIds: Array(CLINICAL_CASES_FEATURED_COUNT).fill(''),
     testimonialsSection: cloneContent(defaultTestimonialsSection),
     testimonials: cloneContent(defaultTestimonials),
   }
@@ -77,6 +79,7 @@ function migrateTherapyConcepts(saved, defaults) {
 
 function mergeWithDefaults(saved) {
   const defaults = getDefaultServicesContent()
+  const validCaseIds = new Set((saved.clinicalSpecializations ?? defaults.clinicalSpecializations).map((item) => item.id))
 
   return {
     speechLanguageServices: {
@@ -96,8 +99,50 @@ function mergeWithDefaults(saved) {
       saved.clinicalSpecializations != null
         ? saved.clinicalSpecializations
         : defaults.clinicalSpecializations,
+    clinicalCasesFeaturedIds: Array.from({ length: CLINICAL_CASES_FEATURED_COUNT }, (_, index) => {
+      const id = (saved.clinicalCasesFeaturedIds ?? [])[index]
+      return typeof id === 'string' && id && validCaseIds.has(id) ? id : ''
+    }),
     testimonials: saved.testimonials != null ? saved.testimonials : defaults.testimonials,
   }
+}
+
+function normalizeClinicalCasesFeaturedIds(savedIds) {
+  const source = Array.isArray(savedIds) ? savedIds : []
+  return Array.from({ length: CLINICAL_CASES_FEATURED_COUNT }, (_, index) =>
+    typeof source[index] === 'string' ? source[index] : '',
+  )
+}
+
+export function resolveClinicalCasesDisplayOrder(cases, featuredIds) {
+  const pool = cases ?? []
+  const byId = new Map(pool.map((item) => [item.id, item]))
+  const selectedIds = normalizeClinicalCasesFeaturedIds(featuredIds)
+  const hasSelection = selectedIds.some((id) => id && byId.has(id))
+
+  if (!hasSelection) {
+    return pool
+  }
+
+  const used = new Set()
+  const featured = []
+
+  for (const id of selectedIds) {
+    if (id && byId.has(id) && !used.has(id)) {
+      featured.push(byId.get(id))
+      used.add(id)
+      continue
+    }
+
+    const fallback = pool.find((item) => !used.has(item.id))
+    if (fallback) {
+      featured.push(fallback)
+      used.add(fallback.id)
+    }
+  }
+
+  const remainder = pool.filter((item) => !used.has(item.id))
+  return [...featured, ...remainder]
 }
 
 export function loadServicesContent() {
@@ -160,10 +205,9 @@ export const emptyClinicalCase = {
   abbr: '',
   image: '',
   excerpt: '',
+  homepageExcerpt: '',
   paragraphs: [''],
   therapyAreas: [''],
-  bilingualNote: '',
-  pageOnly: true,
 }
 
 export const emptyTestimonial = {

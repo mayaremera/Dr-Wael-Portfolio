@@ -9,11 +9,15 @@ import {
   applyGalleryPresentationOrder,
   emptyGalleryItem,
   emptyVideoLibraryItem,
+  GALLERY_FEATURED_COUNT,
   getDefaultGalleryContent,
   getNextGallerySortOrder,
   loadGalleryContentRemote,
   parseYoutubeId,
+  resolveMediaGalleryDisplayOrder,
+  resolveVideoLibraryDisplayOrder,
   saveGalleryContent,
+  VIDEO_LIBRARY_FEATURED_COUNT,
 } from '../../data/galleryContentStore'
 import { CONTENT_SECTIONS } from '../../data/contentSync'
 import { useDashboardSection } from '../../hooks/useDashboardSection'
@@ -106,47 +110,57 @@ function SaveChangesButton({ onClick, disabled = false }) {
   )
 }
 
-function GalleryItemPreview({ item }) {
+function GalleryItemPreview({ item, selectedIds, onToggle }) {
   return (
-    <div className="flex gap-3">
-      <div className="h-16 w-24 shrink-0 overflow-hidden rounded-lg bg-slate-100 ring-1 ring-slate-200/80">
-        {item.src ? (
-          item.type === 'video' ? (
-            <video src={item.src} className="h-full w-full object-cover" muted playsInline />
-          ) : (
+    <div>
+      <div className="flex gap-3">
+        <div className="h-16 w-24 shrink-0 overflow-hidden rounded-lg bg-slate-100 ring-1 ring-slate-200/80">
+          {item.src ? (
             <img src={item.src} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
-          )
-        ) : (
-          <div className="flex h-full items-center justify-center text-[0.6rem] text-ink-muted">No media</div>
-        )}
+          ) : (
+            <div className="flex h-full items-center justify-center text-[0.6rem] text-ink-muted">No media</div>
+          )}
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="font-medium text-ink">{item.title || item.alt || 'Untitled'}</p>
+          <p className="mt-1 line-clamp-2 text-sm text-ink-muted">
+            {item.description?.trim() || item.alt || 'No description'}
+          </p>
+        </div>
       </div>
-      <div className="min-w-0 flex-1">
-        <span className="rounded-full bg-brand-muted px-2 py-0.5 text-[0.6rem] font-semibold tracking-wide text-brand uppercase">
-          {item.type}
-        </span>
-        <p className="font-medium text-ink">{item.title || item.alt || 'Untitled'}</p>
-        <p className="mt-1 line-clamp-2 text-sm text-ink-muted">
-          {item.description?.trim() || item.alt || 'No description'}
-        </p>
-      </div>
+      {onToggle && selectedIds ? (
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          {selectedIds.map((id, index) => (
+            <button
+              key={index}
+              type="button"
+              onClick={() => onToggle(item.id, index)}
+              className={`rounded-lg border px-2 py-1 text-[0.65rem] font-semibold transition-colors ${
+                id === item.id
+                  ? 'border-brand bg-brand-muted/50 text-brand'
+                  : 'border-slate-200 text-ink-muted hover:border-brand/25 hover:text-brand'
+              }`}
+            >
+              {index + 1}
+            </button>
+          ))}
+        </div>
+      ) : null}
     </div>
   )
 }
 
-function GalleryItemEditor({ initialItem, onSave, onCancel }) {
+function GalleryItemEditor({ initialItem, onSave, onCancel, selectedIds, onToggle }) {
   const [item, setItem] = useState({ ...emptyGalleryItem, ...initialItem })
 
   const updateField = (field, value) => {
     setItem((current) => ({ ...current, [field]: value }))
   }
 
-  const handleMediaChange = ({ image, video }) => {
-    if (video) {
-      setItem((current) => ({ ...current, type: 'video', src: video }))
-      return
+  const handleMediaChange = ({ image }) => {
+    if (image) {
+      setItem((current) => ({ ...current, type: 'image', src: image }))
     }
-
-    setItem((current) => ({ ...current, type: 'image', src: image }))
   }
 
   const handleSubmit = (event) => {
@@ -163,7 +177,7 @@ function GalleryItemEditor({ initialItem, onSave, onCancel }) {
   return (
     <form onSubmit={handleSubmit} className="rounded-xl border border-brand/20 bg-brand-muted/30 p-5 shadow-sm">
       <div className="flex items-center justify-between gap-3">
-        <h3 className="font-serif text-xl text-ink">{item.id ? 'Edit gallery item' : 'New gallery item'}</h3>
+        <h3 className="font-serif text-xl text-ink">{item.id ? 'Edit gallery photo' : 'New gallery photo'}</h3>
         <button type="button" onClick={onCancel} className="text-xs font-semibold tracking-wide text-ink-muted uppercase hover:text-brand">
           Cancel
         </button>
@@ -171,10 +185,10 @@ function GalleryItemEditor({ initialItem, onSave, onCancel }) {
 
       <div className="mt-5 grid gap-4">
         <div>
-          <label className={labelClassName}>Photo or video</label>
+          <label className={labelClassName}>Photo</label>
           <MediaDropzone
-            image={item.type === 'image' ? item.src : ''}
-            video={item.type === 'video' ? item.src : ''}
+            image={item.src}
+            video=""
             onChange={handleMediaChange}
             onClear={() => updateField('src', '')}
           />
@@ -194,7 +208,7 @@ function GalleryItemEditor({ initialItem, onSave, onCancel }) {
             className={`${fieldClassName} min-h-24 resize-y`}
             value={item.description}
             onChange={(e) => updateField('description', e.target.value)}
-            placeholder="What is happening in this photo or video?"
+            placeholder="What is happening in this photo?"
           />
         </div>
         <div>
@@ -203,9 +217,18 @@ function GalleryItemEditor({ initialItem, onSave, onCancel }) {
         </div>
       </div>
 
+      {item.id && (
+        <FeaturedCheckboxes
+          itemId={item.id}
+          selectedIds={selectedIds}
+          count={GALLERY_FEATURED_COUNT}
+          onToggle={onToggle}
+        />
+      )}
+
       <div className="mt-5 flex flex-wrap gap-3">
         <button type="submit" className="rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase transition-colors hover:bg-brand-light">
-          Save item
+          Save photo
         </button>
         <button type="button" onClick={onCancel} className="rounded-lg border border-slate-200 px-5 py-2.5 text-xs font-semibold tracking-wide text-ink-muted uppercase transition-colors hover:border-brand/25 hover:text-brand">
           Cancel
@@ -215,28 +238,48 @@ function GalleryItemEditor({ initialItem, onSave, onCancel }) {
   )
 }
 
-function VideoLibraryItemPreview({ item }) {
+function VideoLibraryItemPreview({ item, selectedIds, onToggle }) {
   const description = item.description?.trim() || item.subtitle?.trim() || ''
 
   return (
-    <div className="flex gap-3">
-      <div className="h-16 w-28 shrink-0 overflow-hidden rounded-lg bg-slate-100 ring-1 ring-slate-200/80">
-        {item.poster ? (
-          <img src={item.poster} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
-        ) : (
-          <div className="flex h-full items-center justify-center text-[0.6rem] text-ink-muted">No poster</div>
-        )}
+    <div>
+      <div className="flex gap-3">
+        <div className="h-16 w-28 shrink-0 overflow-hidden rounded-lg bg-slate-100 ring-1 ring-slate-200/80">
+          {item.poster ? (
+            <img src={item.poster} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
+          ) : (
+            <div className="flex h-full items-center justify-center text-[0.6rem] text-ink-muted">No poster</div>
+          )}
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="font-medium text-ink">{item.title || 'Untitled video'}</p>
+          {item.subtitle ? <p className="mt-0.5 text-xs font-semibold tracking-wide text-brand uppercase">{item.subtitle}</p> : null}
+          <p className="mt-1 line-clamp-2 text-sm text-ink-muted">{description || item.youtubeId || item.videoSrc || 'No description'}</p>
+        </div>
       </div>
-      <div className="min-w-0 flex-1">
-        <p className="font-medium text-ink">{item.title || 'Untitled video'}</p>
-        {item.subtitle ? <p className="mt-0.5 text-xs font-semibold tracking-wide text-brand uppercase">{item.subtitle}</p> : null}
-        <p className="mt-1 line-clamp-2 text-sm text-ink-muted">{description || item.youtubeId || item.videoSrc || 'No description'}</p>
-      </div>
+      {onToggle && selectedIds ? (
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          {selectedIds.map((id, index) => (
+            <button
+              key={index}
+              type="button"
+              onClick={() => onToggle(item.id, index)}
+              className={`rounded-lg border px-2 py-1 text-[0.65rem] font-semibold transition-colors ${
+                id === item.id
+                  ? 'border-brand bg-brand-muted/50 text-brand'
+                  : 'border-slate-200 text-ink-muted hover:border-brand/25 hover:text-brand'
+              }`}
+            >
+              {index + 1}
+            </button>
+          ))}
+        </div>
+      ) : null}
     </div>
   )
 }
 
-function VideoLibraryItemEditor({ initialItem, onSave, onCancel }) {
+function VideoLibraryItemEditor({ initialItem, onSave, onCancel, selectedIds, onToggle }) {
   const [item, setItem] = useState({ ...emptyVideoLibraryItem, ...initialItem })
 
   const updateField = (field, value) => {
@@ -332,6 +375,15 @@ function VideoLibraryItemEditor({ initialItem, onSave, onCancel }) {
         )}
       </div>
 
+      {item.id && (
+        <FeaturedCheckboxes
+          itemId={item.id}
+          selectedIds={selectedIds}
+          count={VIDEO_LIBRARY_FEATURED_COUNT}
+          onToggle={onToggle}
+        />
+      )}
+
       <div className="mt-5 flex flex-wrap gap-3">
         <button type="submit" className="rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase transition-colors hover:bg-brand-light">
           Save video
@@ -341,6 +393,58 @@ function VideoLibraryItemEditor({ initialItem, onSave, onCancel }) {
         </button>
       </div>
     </form>
+  )
+}
+
+function toggleFeaturedSlot(selectedIds, itemId, slotIndex, count) {
+  const next = Array.from({ length: count }, (_, index) => selectedIds?.[index] ?? '')
+
+  if (next[slotIndex] === itemId) {
+    next[slotIndex] = ''
+    return next
+  }
+
+  for (let index = 0; index < count; index += 1) {
+    if (next[index] === itemId) next[index] = ''
+  }
+
+  next[slotIndex] = itemId
+  return next
+}
+
+function FeaturedCheckboxes({ itemId, selectedIds, count, onToggle }) {
+  const normalizedIds = Array.from({ length: count }, (_, index) => selectedIds?.[index] ?? '')
+
+  return (
+    <div className="mt-4 rounded-lg border border-slate-200/80 bg-white p-3">
+      <p className="text-[0.65rem] font-semibold tracking-wide text-ink-muted uppercase">
+        Show in first {count} on homepage
+      </p>
+      <div className="mt-2 flex flex-wrap gap-2">
+        {Array.from({ length: count }, (_, index) => {
+          const checked = normalizedIds[index] === itemId
+
+          return (
+            <label
+              key={index}
+              className={`inline-flex cursor-pointer items-center gap-2 rounded-lg border px-2.5 py-2 text-xs font-medium transition-colors ${
+                checked
+                  ? 'border-brand bg-brand-muted/50 text-brand'
+                  : 'border-slate-200 bg-white text-ink-muted hover:border-brand/25 hover:text-brand'
+              }`}
+            >
+              <input
+                type="checkbox"
+                className="h-3.5 w-3.5 rounded border-slate-300 text-brand focus:ring-brand/30"
+                checked={checked}
+                onChange={() => onToggle(itemId, index)}
+              />
+              {index + 1}
+            </label>
+          )
+        })}
+      </div>
+    </div>
   )
 }
 
@@ -536,6 +640,7 @@ export default function GalleryPanel() {
           mediaGallery: {
             ...current.mediaGallery,
             items: applyGalleryPresentationOrder(nextItems),
+            featuredIds: current.mediaGallery.featuredIds ?? Array(GALLERY_FEATURED_COUNT).fill(''),
           },
         }
       },
@@ -551,6 +656,9 @@ export default function GalleryPanel() {
         mediaGallery: {
           ...current.mediaGallery,
           items: current.mediaGallery.items.filter((entry) => entry.id !== id),
+          featuredIds: (current.mediaGallery.featuredIds ?? Array(GALLERY_FEATURED_COUNT).fill('')).map(
+            (featuredId) => (featuredId === id ? '' : featuredId),
+          ),
         },
       }),
       'Gallery item deleted.',
@@ -573,7 +681,11 @@ export default function GalleryPanel() {
 
         return {
           ...current,
-          videoLibrary: { ...current.videoLibrary, items: nextItems },
+          videoLibrary: {
+            ...current.videoLibrary,
+            items: nextItems,
+            featuredIds: current.videoLibrary.featuredIds ?? Array(VIDEO_LIBRARY_FEATURED_COUNT).fill(''),
+          },
         }
       },
       exists ? 'Library video updated.' : 'Library video added.',
@@ -588,11 +700,40 @@ export default function GalleryPanel() {
         videoLibrary: {
           ...current.videoLibrary,
           items: current.videoLibrary.items.filter((entry) => entry.id !== id),
+          featuredIds: (current.videoLibrary.featuredIds ?? Array(VIDEO_LIBRARY_FEATURED_COUNT).fill('')).map(
+            (featuredId) => (featuredId === id ? '' : featuredId),
+          ),
         },
       }),
       'Library video deleted.',
     )
     if (editingVideoId === id) setEditingVideoId(null)
+  }
+
+  const handleGalleryFeaturedToggle = (itemId, slotIndex) => {
+    persistFromCurrent(
+      (current) => ({
+        ...current,
+        mediaGallery: {
+          ...current.mediaGallery,
+          featuredIds: toggleFeaturedSlot(current.mediaGallery.featuredIds, itemId, slotIndex, GALLERY_FEATURED_COUNT),
+        },
+      }),
+      'Gallery homepage selection updated.',
+    )
+  }
+
+  const handleVideoFeaturedToggle = (itemId, slotIndex) => {
+    persistFromCurrent(
+      (current) => ({
+        ...current,
+        videoLibrary: {
+          ...current.videoLibrary,
+          featuredIds: toggleFeaturedSlot(current.videoLibrary.featuredIds, itemId, slotIndex, VIDEO_LIBRARY_FEATURED_COUNT),
+        },
+      }),
+      'Video library homepage selection updated.',
+    )
   }
 
   return (
@@ -745,21 +886,24 @@ export default function GalleryPanel() {
           <DashboardItemList
             title="Moment videos"
             countLabel={`${content.videoLibrary.items.length} video${content.videoLibrary.items.length === 1 ? '' : 's'}`}
-            items={content.videoLibrary.items}
+            items={resolveVideoLibraryDisplayOrder(content.videoLibrary.items, content.videoLibrary.featuredIds)}
             editingId={editingVideoId}
             onAdd={() => setEditingVideoId('new')}
             onEdit={setEditingVideoId}
             onDelete={deleteVideoItem}
             getItemId={(item) => item.id}
             addLabel="Add video"
-            renderPreview={(item) => <VideoLibraryItemPreview item={item} />}
+            renderPreview={(item) => (
+              <VideoLibraryItemPreview item={item} selectedIds={content.videoLibrary.featuredIds} onToggle={handleVideoFeaturedToggle} />
+            )}
             renderEditor={(item) =>
               item === 'new' ? (
-                <VideoLibraryItemEditor initialItem={emptyVideoLibraryItem} onSave={saveVideoItem} onCancel={() => setEditingVideoId(null)} />
+                <VideoLibraryItemEditor initialItem={emptyVideoLibraryItem} onSave={saveVideoItem} onCancel={() => setEditingVideoId(null)} selectedIds={content.videoLibrary.featuredIds} onToggle={handleVideoFeaturedToggle} />
               ) : (
-                <VideoLibraryItemEditor key={item.id} initialItem={item} onSave={saveVideoItem} onCancel={() => setEditingVideoId(null)} />
+                <VideoLibraryItemEditor key={item.id} initialItem={item} onSave={saveVideoItem} onCancel={() => setEditingVideoId(null)} selectedIds={content.videoLibrary.featuredIds} onToggle={handleVideoFeaturedToggle} />
               )
             }
+            pageSize={VIDEO_LIBRARY_FEATURED_COUNT}
           />
         </div>
       </section>
@@ -854,21 +998,24 @@ export default function GalleryPanel() {
         <DashboardItemList
           title="Gallery items"
           countLabel={`${content.mediaGallery.items.length} item${content.mediaGallery.items.length === 1 ? '' : 's'}`}
-          items={content.mediaGallery.items}
+          items={resolveMediaGalleryDisplayOrder(content.mediaGallery.items, content.mediaGallery.featuredIds)}
           editingId={editingId}
           onAdd={() => setEditingId('new')}
           onEdit={setEditingId}
           onDelete={deleteItem}
           getItemId={(item) => item.id}
           addLabel="Add item"
-          renderPreview={(item) => <GalleryItemPreview item={item} />}
+          renderPreview={(item) => (
+            <GalleryItemPreview item={item} selectedIds={content.mediaGallery.featuredIds} onToggle={handleGalleryFeaturedToggle} />
+          )}
           renderEditor={(item) =>
             item === 'new' ? (
-              <GalleryItemEditor initialItem={emptyGalleryItem} onSave={saveItem} onCancel={() => setEditingId(null)} />
+              <GalleryItemEditor initialItem={emptyGalleryItem} onSave={saveItem} onCancel={() => setEditingId(null)} selectedIds={content.mediaGallery.featuredIds} onToggle={handleGalleryFeaturedToggle} />
             ) : (
-              <GalleryItemEditor key={item.id} initialItem={item} onSave={saveItem} onCancel={() => setEditingId(null)} />
+              <GalleryItemEditor key={item.id} initialItem={item} onSave={saveItem} onCancel={() => setEditingId(null)} selectedIds={content.mediaGallery.featuredIds} onToggle={handleGalleryFeaturedToggle} />
             )
           }
+          pageSize={GALLERY_FEATURED_COUNT}
         />
       </div>
         </>

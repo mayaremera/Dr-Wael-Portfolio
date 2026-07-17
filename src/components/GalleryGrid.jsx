@@ -7,15 +7,7 @@ import { hasMediaSrc } from '../lib/mediaUrl'
 import { scrollPaginationSectionIntoView } from '../lib/scrollPaginationSection'
 import LazySection from './LazySection'
 
-const FILTERS = [
-  { id: 'all', label: 'All' },
-  { id: 'image', label: 'Photos' },
-  { id: 'video', label: 'Videos' },
-]
-
 const PAGE_SIZE = GALLERY_PAGE_SIZE
-
-const soundWaveHeights = [5, 8, 6, 10, 7, 9, 5, 8, 6, 11, 7, 9, 5, 8, 6, 10, 7, 8, 5, 9, 6, 7, 5, 8]
 
 function getItemTitle(item) {
   return item.title?.trim() || item.alt?.trim() || 'Untitled moment'
@@ -25,47 +17,9 @@ function getItemDescription(item) {
   return item.description?.trim() || ''
 }
 
-function VideoSoundWaves() {
-  return (
-    <div
-      className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-center gap-[5px] bg-gradient-to-t from-black/25 via-black/10 to-transparent px-3 pb-0.5 pt-8"
-      aria-hidden="true"
-    >
-      {soundWaveHeights.map((height, index) => (
-        <span
-          key={index}
-          className="animate-event-sound-wave w-[2px] rounded-full bg-white/40"
-          style={{
-            height: `${height}px`,
-            animationDelay: `${index * 70}ms`,
-            animationDuration: `${0.95 + (index % 4) * 0.15}s`,
-          }}
-        />
-      ))}
-    </div>
-  )
-}
-
 function GalleryMediaPreview({ item, isMobile }) {
   const [ref, inView] = useInView({ rootMargin: isMobile ? '40px 0px' : '120px 0px' })
-  const videoRef = useRef(null)
-  const isVideo = item.type === 'video'
   const mediaSrc = hasMediaSrc(item.src) ? item.src.trim() : ''
-
-  useEffect(() => {
-    if (!inView || !isVideo || !mediaSrc) return undefined
-    const video = videoRef.current
-    if (!video) return undefined
-
-    const playVideo = () => {
-      video.play().catch(() => {})
-    }
-
-    playVideo()
-    video.addEventListener('loadeddata', playVideo)
-
-    return () => video.removeEventListener('loadeddata', playVideo)
-  }, [inView, isVideo, mediaSrc])
 
   if (!mediaSrc) {
     return (
@@ -79,24 +33,6 @@ function GalleryMediaPreview({ item, isMobile }) {
     <div ref={ref} className="relative h-full w-full overflow-hidden bg-slate-200">
       {!inView ? (
         <div className="absolute inset-0 animate-pulse bg-slate-200" aria-hidden="true" />
-      ) : isVideo ? (
-        <>
-          <video
-            ref={videoRef}
-            className="absolute inset-0 h-full w-full object-cover object-[center_28%] select-none"
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="metadata"
-            tabIndex={-1}
-            aria-hidden="true"
-            {...protectedVideoProps}
-          >
-            <source src={encodeURI(mediaSrc)} type="video/mp4" />
-          </video>
-          <VideoSoundWaves />
-        </>
       ) : (
         <img
           src={encodeURI(mediaSrc)}
@@ -110,10 +46,6 @@ function GalleryMediaPreview({ item, isMobile }) {
       )}
 
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/5" />
-
-      <span className="pointer-events-none absolute left-2.5 top-2.5 rounded-full bg-white/90 px-2 py-0.5 text-[0.58rem] font-semibold tracking-[0.12em] text-brand uppercase shadow-sm">
-        {isVideo ? 'Video' : 'Photo'}
-      </span>
     </div>
   )
 }
@@ -245,7 +177,7 @@ function GalleryLightbox({ items, activeIndex, onClose, onNavigate }) {
         <div className="flex w-full flex-col justify-between border-t border-slate-200 p-5 sm:p-6 lg:max-w-[38%] lg:border-t-0 lg:border-l">
           <div>
             <p className="text-[0.65rem] font-semibold tracking-[0.16em] text-brand uppercase">
-              {item.type === 'video' ? 'Video moment' : 'Photo moment'}
+              Photo moment
               {items.length > 1 ? (
                 <span className="text-ink-muted">
                   {' '}
@@ -406,8 +338,7 @@ function GalleryPagination({ currentPage, totalPages, onPageChange }) {
 }
 
 export default function GalleryGrid({ tone = 'alt' }) {
-  const { isReady, mediaGallery } = useGalleryContent()
-  const [activeFilter, setActiveFilter] = useState('all')
+  const { isReady, mediaGallery, resolvedMediaGalleryItems } = useGalleryContent()
   const [currentPage, setCurrentPage] = useState(1)
   const [activeIndex, setActiveIndex] = useState(null)
   const sectionRef = useRef(null)
@@ -422,26 +353,14 @@ export default function GalleryGrid({ tone = 'alt' }) {
     return () => mq.removeEventListener('change', handler)
   }, [])
 
-  const items = mediaGallery?.items ?? []
+  const photoItems = useMemo(() => resolvedMediaGalleryItems ?? [], [resolvedMediaGalleryItems])
 
-  const sortedItems = useMemo(() => sortGalleryItems(items), [items])
-
-  const filteredItems = useMemo(() => {
-    if (activeFilter === 'all') return sortedItems
-    return sortedItems.filter((item) => item.type === activeFilter)
-  }, [activeFilter, sortedItems])
-
-  const totalPages = Math.max(1, Math.ceil(filteredItems.length / PAGE_SIZE))
+  const totalPages = Math.max(1, Math.ceil(photoItems.length / PAGE_SIZE))
 
   const pageItems = useMemo(() => {
     const start = (currentPage - 1) * PAGE_SIZE
-    return filteredItems.slice(start, start + PAGE_SIZE)
-  }, [filteredItems, currentPage])
-
-  const handleFilterChange = (filterId) => {
-    setActiveFilter(filterId)
-    setCurrentPage(1)
-  }
+    return photoItems.slice(start, start + PAGE_SIZE)
+  }, [photoItems, currentPage])
 
   const handlePageChange = (nextPage) => {
     setCurrentPage(nextPage)
@@ -472,7 +391,7 @@ export default function GalleryGrid({ tone = 'alt' }) {
 
   const { label, title, description } = mediaGallery
 
-  if (sortedItems.length === 0) return null
+  if (photoItems.length === 0) return null
 
   return (
     <section ref={sectionRef} id="gallery" className={`scroll-mt-28 border-t border-slate-200 py-12 lg:py-24 ${tone === 'white' ? 'bg-white' : 'bg-surface-alt'}`}>
@@ -484,42 +403,14 @@ export default function GalleryGrid({ tone = 'alt' }) {
             <p className="mt-4 text-sm leading-relaxed text-ink-muted md:text-base">{description}</p>
           ) : (
             <p className="mt-4 text-sm leading-relaxed text-ink-muted md:text-base">
-              Browse photos and clips from sessions, conferences, and everyday practice — open any moment for the full view.
+              Browse photos from sessions, conferences, and everyday practice — open any moment for the full view.
             </p>
           )}
         </header>
 
-        <div className="mt-8 mobile-icon-scroll mobile-icon-scroll--inset -mx-1 flex justify-start gap-2 px-1 pb-0.5 lg:mt-10 lg:flex-wrap lg:justify-center">
-          {FILTERS.map((filter) => {
-            const isActive = activeFilter === filter.id
-            const count =
-              filter.id === 'all'
-                ? sortedItems.length
-                : sortedItems.filter((item) => item.type === filter.id).length
-
-            return (
-              <button
-                key={filter.id}
-                type="button"
-                onClick={() => handleFilterChange(filter.id)}
-                className={`shrink-0 rounded-full border px-3.5 py-2 text-[0.65rem] font-semibold tracking-[0.08em] uppercase transition-all duration-200 lg:px-4 lg:text-xs ${
-                  isActive
-                    ? 'border-brand bg-brand text-white shadow-sm'
-                    : 'border-slate-200 bg-white text-ink-muted hover:border-brand/30 hover:text-brand'
-                }`}
-              >
-                {filter.label}
-                <span className={`ml-1.5 tabular-nums ${isActive ? 'text-white/80' : 'text-ink-muted/70'}`}>
-                  {count}
-                </span>
-              </button>
-            )
-          })}
-        </div>
-
-        {filteredItems.length === 0 ? (
+        {photoItems.length === 0 ? (
           <p className="mt-12 rounded-xl border border-dashed border-slate-200 bg-white px-6 py-12 text-center text-sm text-ink-muted">
-            No {activeFilter === 'image' ? 'photos' : 'videos'} in the gallery yet.
+            No photos in the gallery yet.
           </p>
         ) : (
           <LazySection minHeight="24rem">
@@ -548,9 +439,9 @@ export default function GalleryGrid({ tone = 'alt' }) {
         )}
       </div>
 
-      {activeIndex !== null && filteredItems[activeIndex] ? (
+      {activeIndex !== null && photoItems[activeIndex] ? (
         <GalleryLightbox
-          items={filteredItems}
+          items={photoItems}
           activeIndex={activeIndex}
           onClose={closeLightbox}
           onNavigate={setActiveIndex}

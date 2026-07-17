@@ -4,7 +4,7 @@ import { scrollPaginationSectionIntoView } from '../lib/scrollPaginationSection'
 import LazyImage from './LazyImage'
 import LazySection from './LazySection'
 
-const PAGE_SIZE = 12
+const PAGE_SIZE = 9
 const MAX_VISIBLE_PAGES = 5
 
 function getVisiblePages(currentPage, pageCount) {
@@ -155,9 +155,6 @@ export default function CertificationGallery() {
           <h2 className="mt-3 font-serif text-3xl text-ink md:text-4xl">{title}</h2>
           <div className="mx-auto mt-5 inline-flex items-center gap-3 rounded-full border border-slate-200/80 bg-white px-4 py-2 shadow-sm">
             <span className="text-xs font-semibold tracking-[0.16em] text-ink-muted uppercase">Featured Collection</span>
-            <span className="rounded-full bg-brand px-3 py-1 text-lg leading-none font-bold text-white sm:text-xl">
-              {certificates.length}
-            </span>
           </div>
         </div>
 
@@ -185,7 +182,7 @@ export default function CertificationGallery() {
                   }}
                   className="mobile-card-scroll__item group relative cursor-pointer overflow-hidden rounded-sm border border-slate-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-brand/40 hover:shadow-md hover:shadow-brand/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 lg:w-auto lg:cursor-default"
                 >
-                  <div className="relative aspect-4/3 overflow-hidden bg-slate-100">
+                  <div className="relative aspect-[3/4] overflow-hidden bg-slate-100">
                     {certificate.image ? (
                       <LazyImage
                         src={certificate.image}

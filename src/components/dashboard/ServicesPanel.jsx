@@ -5,12 +5,14 @@ import MediaDropzone from './MediaDropzone'
 import { useConfirmDelete } from './DeleteConfirmDialog'
 import {
   FILTER_GROUPS,
+  CLINICAL_CASES_FEATURED_COUNT,
   createContentId,
   emptyClinicalCase,
   emptyTestimonial,
   emptyTherapyConcept,
   getDefaultServicesContent,
   loadServicesContentRemote,
+  resolveClinicalCasesDisplayOrder,
   saveServicesContent,
 } from '../../data/servicesContentStore'
 import { CONTENT_SECTIONS } from '../../data/contentSync'
@@ -155,6 +157,7 @@ function TherapyConceptEditor({ initialConcept, onSave, onCancel }) {
         </div>
         <div className="sm:col-span-2">
           <label className={labelClassName}>Summary</label>
+          <p className="mb-1.5 text-[0.65rem] text-ink-muted">Appears only in the homepage service section, not on the Services page.</p>
           <textarea className={`${fieldClassName} min-h-20 resize-y`} value={concept.summary} onChange={(e) => updateField('summary', e.target.value)} required />
         </div>
         <div className="sm:col-span-2">
@@ -194,34 +197,6 @@ function TherapyConceptEditor({ initialConcept, onSave, onCancel }) {
         </button>
       </div>
     </form>
-  )
-}
-
-function CasePreview({ item }) {
-  return (
-    <div className="flex gap-3">
-      <div className="h-16 w-24 shrink-0 overflow-hidden rounded-lg bg-slate-100 ring-1 ring-slate-200/80">
-        {item.image ? (
-          <img src={item.image} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
-        ) : (
-          <div className="flex h-full items-center justify-center text-[0.6rem] text-ink-muted">No image</div>
-        )}
-      </div>
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-full bg-brand-muted px-2 py-0.5 text-[0.6rem] font-semibold tracking-wide text-brand uppercase">
-            {item.category || 'Case'}
-          </span>
-          {item.abbr ? (
-            <span className="rounded-full bg-accent/15 px-2 py-0.5 text-[0.6rem] font-semibold tracking-wide text-accent-hover uppercase">
-              {item.abbr}
-            </span>
-          ) : null}
-        </div>
-        <p className="mt-1 truncate font-medium text-ink">{item.title || 'Untitled case'}</p>
-        <p className="line-clamp-2 text-xs text-ink-muted">{item.excerpt}</p>
-      </div>
-    </div>
   )
 }
 
@@ -283,8 +258,13 @@ function CaseEditor({ initialCase, onSave, onCancel }) {
           </select>
         </div>
         <div className="sm:col-span-2">
-          <label className={labelClassName}>Short excerpt</label>
+          <label className={labelClassName}>Short excerpt (Services page)</label>
           <textarea className={`${fieldClassName} min-h-20 resize-y`} value={item.excerpt} onChange={(e) => updateField('excerpt', e.target.value)} required />
+        </div>
+        <div className="sm:col-span-2">
+          <label className={labelClassName}>Homepage preview excerpt</label>
+          <p className="mb-1.5 text-[0.65rem] text-ink-muted">Shown in the cases preview grid on the homepage service section.</p>
+          <textarea className={`${fieldClassName} min-h-20 resize-y`} value={item.homepageExcerpt} onChange={(e) => updateField('homepageExcerpt', e.target.value)} />
         </div>
         <div className="sm:col-span-2">
           <label className={labelClassName}>Cover image</label>
@@ -300,21 +280,6 @@ function CaseEditor({ initialCase, onSave, onCancel }) {
         </div>
         <div className="sm:col-span-2">
           <StringListEditor label="Therapy areas" items={item.therapyAreas} onChange={(therapyAreas) => updateField('therapyAreas', therapyAreas)} addLabel="Add therapy area" />
-        </div>
-        <div className="sm:col-span-2">
-          <label className={labelClassName}>Bilingual note</label>
-          <input className={fieldClassName} value={item.bilingualNote} onChange={(e) => updateField('bilingualNote', e.target.value)} />
-        </div>
-        <div className="sm:col-span-2">
-          <label className="flex items-center gap-2 text-sm text-ink">
-            <input
-              type="checkbox"
-              checked={!!item.pageOnly}
-              onChange={(e) => updateField('pageOnly', e.target.checked)}
-              className="h-4 w-4 rounded border-slate-300 text-brand focus:ring-brand"
-            />
-            Show on Services page only (hide from homepage preview)
-          </label>
         </div>
       </div>
 
@@ -478,6 +443,63 @@ export default function ServicesPanel() {
     image: item.image ? withCacheBust(item.image) : '',
   })
 
+  function toggleClinicalCaseFeaturedSlot(selectedIds, caseId, slotIndex) {
+    const next = Array.from({ length: CLINICAL_CASES_FEATURED_COUNT }, (_, index) => selectedIds?.[index] ?? '')
+
+    if (next[slotIndex] === caseId) {
+      next[slotIndex] = ''
+      return next
+    }
+
+    for (let index = 0; index < CLINICAL_CASES_FEATURED_COUNT; index += 1) {
+      if (next[index] === caseId) next[index] = ''
+    }
+
+    next[slotIndex] = caseId
+    return next
+  }
+
+  function getClinicalCaseFeaturedSlot(selectedIds, caseId) {
+    const slotIndex = (selectedIds ?? []).findIndex((id) => id === caseId)
+    return slotIndex >= 0 ? slotIndex + 1 : null
+  }
+
+  function ClinicalCaseFeaturedCheckboxes({ caseId, selectedIds, onToggle }) {
+    const normalizedIds = Array.from({ length: CLINICAL_CASES_FEATURED_COUNT }, (_, index) => selectedIds?.[index] ?? '')
+
+    return (
+      <div className="mt-3 rounded-lg border border-slate-200/80 bg-white p-3">
+        <p className="text-[0.65rem] font-semibold tracking-wide text-ink-muted uppercase">
+          Show in first {CLINICAL_CASES_FEATURED_COUNT} on homepage
+        </p>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {Array.from({ length: CLINICAL_CASES_FEATURED_COUNT }, (_, index) => {
+            const checked = normalizedIds[index] === caseId
+
+            return (
+              <label
+                key={index}
+                className={`inline-flex cursor-pointer items-center gap-2 rounded-lg border px-2.5 py-2 text-xs font-medium transition-colors ${
+                  checked
+                    ? 'border-brand bg-brand-muted/50 text-brand'
+                    : 'border-slate-200 bg-white text-ink-muted hover:border-brand/25 hover:text-brand'
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  className="h-3.5 w-3.5 rounded border-slate-300 text-brand focus:ring-brand/30"
+                  checked={checked}
+                  onChange={() => onToggle(caseId, index)}
+                />
+                {index + 1}
+              </label>
+            )
+          })}
+        </div>
+      </div>
+    )
+  }
+
   const updateServicesHeader = (field, value) => {
     setContent((current) => {
       if (!current) return current
@@ -567,11 +589,28 @@ export default function ServicesPanel() {
     setEditingCaseId(null)
   }
 
+  const handleClinicalCaseFeaturedToggle = (caseId, slotIndex) => {
+    persistFromCurrent(
+      (current) => ({
+        ...current,
+        clinicalCasesFeaturedIds: toggleClinicalCaseFeaturedSlot(
+          current.clinicalCasesFeaturedIds,
+          caseId,
+          slotIndex,
+        ),
+      }),
+      'Case homepage selection updated.',
+    )
+  }
+
   const deleteCase = (id) => {
     persistFromCurrent(
       (current) => ({
         ...current,
         clinicalSpecializations: current.clinicalSpecializations.filter((entry) => entry.id !== id),
+        clinicalCasesFeaturedIds: (current.clinicalCasesFeaturedIds ?? Array(CLINICAL_CASES_FEATURED_COUNT).fill('')).map(
+          (featuredId) => (featuredId === id ? '' : featuredId),
+        ),
       }),
       'Case deleted.',
     )
@@ -689,20 +728,77 @@ export default function ServicesPanel() {
         <DashboardItemList
           title="Clinical cases"
           countLabel={`${content.clinicalSpecializations.length} case${content.clinicalSpecializations.length === 1 ? '' : 's'}`}
-          items={content.clinicalSpecializations}
+          items={resolveClinicalCasesDisplayOrder(content.clinicalSpecializations, content.clinicalCasesFeaturedIds)}
           editingId={editingCaseId}
           onAdd={() => setEditingCaseId('new')}
           onEdit={setEditingCaseId}
           onDelete={deleteCase}
           getItemId={(item) => item.id}
-          renderPreview={(item) => <CasePreview item={item} />}
-          renderEditor={(item) =>
-            item === 'new' ? (
-              <CaseEditor initialCase={emptyClinicalCase} onSave={saveCase} onCancel={() => setEditingCaseId(null)} />
-            ) : (
-              <CaseEditor key={item.id} initialCase={item} onSave={saveCase} onCancel={() => setEditingCaseId(null)} />
-            )
-          }
+          renderItem={(item) => (
+            <article className="overflow-hidden rounded-lg border border-slate-200/80 bg-surface-alt/60">
+              <div className="h-1 bg-brand" aria-hidden="true" />
+              <div className="p-4">
+                {editingCaseId === item.id ? (
+                  <CaseEditor key={item.id} initialCase={item} onSave={saveCase} onCancel={() => setEditingCaseId(null)} />
+                ) : (
+                  <>
+                    <div className="flex gap-3">
+                      <div className="h-16 w-24 shrink-0 overflow-hidden rounded-lg bg-slate-100 ring-1 ring-slate-200/80">
+                        {item.image ? (
+                          <img src={item.image} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
+                        ) : (
+                          <div className="flex h-full items-center justify-center text-[0.6rem] text-ink-muted">No image</div>
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="rounded-full bg-brand-muted px-2 py-0.5 text-[0.6rem] font-semibold tracking-wide text-brand uppercase">
+                            {item.category || 'Case'}
+                          </span>
+                          {item.abbr ? (
+                            <span className="rounded-full bg-accent/15 px-2 py-0.5 text-[0.6rem] font-semibold tracking-wide text-accent-hover uppercase">
+                              {item.abbr}
+                            </span>
+                          ) : null}
+                          {getClinicalCaseFeaturedSlot(content.clinicalCasesFeaturedIds, item.id) ? (
+                            <span className="rounded-full bg-brand/10 px-2 py-0.5 text-[0.6rem] font-semibold tracking-wide text-brand uppercase border border-brand/20">
+                              Slot {getClinicalCaseFeaturedSlot(content.clinicalCasesFeaturedIds, item.id)}
+                            </span>
+                          ) : null}
+                        </div>
+                        <p className="mt-1 truncate font-medium text-ink">{item.title || 'Untitled case'}</p>
+                        <p className="line-clamp-2 text-xs text-ink-muted">{item.excerpt}</p>
+                      </div>
+                    </div>
+                    {item.id && (
+                      <ClinicalCaseFeaturedCheckboxes
+                        caseId={item.id}
+                        selectedIds={content.clinicalCasesFeaturedIds}
+                        onToggle={handleClinicalCaseFeaturedToggle}
+                      />
+                    )}
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setEditingCaseId(item.id)}
+                        className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold tracking-wide text-brand uppercase transition-colors hover:border-brand/25"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => deleteCase(item.id)}
+                        className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold tracking-wide text-accent-hover uppercase transition-colors hover:border-accent/30"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </article>
+          )}
+          pageSize={CLINICAL_CASES_FEATURED_COUNT}
         />
       </div>
 

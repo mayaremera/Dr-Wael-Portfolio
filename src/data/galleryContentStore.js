@@ -20,6 +20,8 @@ import { getSupabaseSession, isSupabaseConfigured } from '../lib/supabase'
 
 export const GALLERY_STORAGE_KEY = 'drwael-gallery-content'
 export const GALLERY_PAGE_SIZE = 15
+export const GALLERY_FEATURED_COUNT = 12
+export const VIDEO_LIBRARY_FEATURED_COUNT = 12
 
 /** First index on page 5 when using GALLERY_PAGE_SIZE (0-based). */
 export const GALLERY_BACKSEAT_POSITION = (5 - 1) * GALLERY_PAGE_SIZE
@@ -142,10 +144,12 @@ export function getDefaultGalleryContent() {
       description:
         'Highlights from lectures, ceremonies, and clinical work — each clip captures a meaningful moment in Dr. Wael’s journey.',
       items: [],
+      featuredIds: Array(VIDEO_LIBRARY_FEATURED_COUNT).fill(''),
     },
     mediaGallery: {
       ...cloneContent(defaultMediaGallery),
       items: applyGalleryPresentationOrder(defaultItems),
+      featuredIds: Array(GALLERY_FEATURED_COUNT).fill(''),
     },
   }
 }
@@ -174,12 +178,83 @@ function migratePromoVideo(saved, defaults) {
   }
 }
 
+function normalizeFeaturedIds(savedIds, count) {
+  const source = Array.isArray(savedIds) ? savedIds : []
+  return Array.from({ length: count }, (_, index) =>
+    typeof source[index] === 'string' ? source[index] : '',
+  )
+}
+
+export function resolveMediaGalleryDisplayOrder(items, featuredIds) {
+  const pool = items ?? []
+  const byId = new Map(pool.map((item) => [item.id, item]))
+  const selectedIds = normalizeFeaturedIds(featuredIds, GALLERY_FEATURED_COUNT)
+  const hasSelection = selectedIds.some((id) => id && byId.has(id))
+
+  if (!hasSelection) {
+    return pool
+  }
+
+  const used = new Set()
+  const featured = []
+
+  for (const id of selectedIds) {
+    if (id && byId.has(id) && !used.has(id)) {
+      featured.push(byId.get(id))
+      used.add(id)
+      continue
+    }
+
+    const fallback = pool.find((item) => !used.has(item.id))
+    if (fallback) {
+      featured.push(fallback)
+      used.add(fallback.id)
+    }
+  }
+
+  const remainder = pool.filter((item) => !used.has(item.id))
+  return [...featured, ...remainder]
+}
+
+export function resolveVideoLibraryDisplayOrder(items, featuredIds) {
+  const pool = items ?? []
+  const byId = new Map(pool.map((item) => [item.id, item]))
+  const selectedIds = normalizeFeaturedIds(featuredIds, VIDEO_LIBRARY_FEATURED_COUNT)
+  const hasSelection = selectedIds.some((id) => id && byId.has(id))
+
+  if (!hasSelection) {
+    return pool
+  }
+
+  const used = new Set()
+  const featured = []
+
+  for (const id of selectedIds) {
+    if (id && byId.has(id) && !used.has(id)) {
+      featured.push(byId.get(id))
+      used.add(id)
+      continue
+    }
+
+    const fallback = pool.find((item) => !used.has(item.id))
+    if (fallback) {
+      featured.push(fallback)
+      used.add(fallback.id)
+    }
+  }
+
+  const remainder = pool.filter((item) => !used.has(item.id))
+  return [...featured, ...remainder]
+}
+
 function mergeWithDefaults(saved) {
   const defaults = getDefaultGalleryContent()
 
   const mergedItems =
     saved.mediaGallery?.items != null
-      ? saved.mediaGallery.items.map((item, index) => withGalleryItemDefaults(item, index))
+      ? saved.mediaGallery.items
+          .map((item, index) => withGalleryItemDefaults(item, index))
+          .filter((item) => item.type === 'image')
       : defaults.mediaGallery.items
 
   const mergedVideoItems =
@@ -189,6 +264,9 @@ function mergeWithDefaults(saved) {
           ...item,
         }))
       : defaults.videoLibrary.items
+
+  const validGalleryIds = new Set((saved.mediaGallery?.items ?? mergedItems).map((item) => item.id))
+  const validVideoIds = new Set((saved.videoLibrary?.items ?? mergedVideoItems).map((item) => item.id))
 
   return {
     watchSection: {
@@ -213,12 +291,20 @@ function mergeWithDefaults(saved) {
       title: saved.videoLibrary?.title ?? defaults.videoLibrary.title,
       description: saved.videoLibrary?.description ?? defaults.videoLibrary.description,
       items: mergedVideoItems,
+      featuredIds: Array.from({ length: VIDEO_LIBRARY_FEATURED_COUNT }, (_, index) => {
+        const id = (saved.videoLibrary?.featuredIds ?? [])[index]
+        return typeof id === 'string' && id && validVideoIds.has(id) ? id : ''
+      }),
     },
     mediaGallery: {
       label: saved.mediaGallery?.label ?? defaults.mediaGallery.label,
       title: saved.mediaGallery?.title ?? defaults.mediaGallery.title,
       description: saved.mediaGallery?.description ?? defaults.mediaGallery.description,
       items: applyGalleryPresentationOrder(mergedItems),
+      featuredIds: Array.from({ length: GALLERY_FEATURED_COUNT }, (_, index) => {
+        const id = (saved.mediaGallery?.featuredIds ?? [])[index]
+        return typeof id === 'string' && id && validGalleryIds.has(id) ? id : ''
+      }),
     },
   }
 }
@@ -233,6 +319,10 @@ function buildGallerySavePayload(data) {
     mediaGallery: {
       ...data.mediaGallery,
       items: applyGalleryPresentationOrder(data.mediaGallery?.items ?? []),
+    },
+    videoLibrary: {
+      ...data.videoLibrary,
+      featuredIds: data.videoLibrary?.featuredIds ?? [],
     },
   }
 }
