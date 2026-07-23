@@ -174,7 +174,7 @@ export function getDefaultAboutContent() {
 
 function mergeWithDefaults(saved) {
   const defaults = getDefaultAboutContent()
-  const certificates = saved.certificates ?? defaults.certificates
+  const certificates = (saved.certificates ?? defaults.certificates).map(migrateCertificate)
   const validCertificateIds = new Set(certificates.map((certificate) => certificate.id))
 
   return {
@@ -269,7 +269,46 @@ export const emptyCertificate = {
   year: '',
   description: '',
   image: '',
+  imageSource: '',
+  imageCrop: null,
   featured: false,
+}
+
+export function normalizeCertificateImageCrop(crop) {
+  if (!crop || typeof crop !== 'object') return null
+
+  const x = Number(crop.x)
+  const y = Number(crop.y)
+  const width = Number(crop.width)
+  const height = Number(crop.height)
+
+  if (![x, y, width, height].every((value) => Number.isFinite(value) && value >= 0)) return null
+  if (width <= 0 || height <= 0) return null
+
+  return {
+    unit: '%',
+    x,
+    y,
+    width,
+    height,
+  }
+}
+
+export function migrateCertificate(certificate) {
+  return {
+    ...certificate,
+    image: typeof certificate.image === 'string' ? certificate.image : '',
+    imageSource: typeof certificate.imageSource === 'string' ? certificate.imageSource : '',
+    imageCrop: normalizeCertificateImageCrop(certificate.imageCrop),
+  }
+}
+
+export function getCertificateDisplayImage(certificate) {
+  if (typeof certificate?.image === 'string' && certificate.image.trim()) return certificate.image.trim()
+  if (typeof certificate?.imageSource === 'string' && certificate.imageSource.trim()) {
+    return certificate.imageSource.trim()
+  }
+  return ''
 }
 
 export const emptyTimelineEntry = {

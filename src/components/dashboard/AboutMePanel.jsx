@@ -2,6 +2,7 @@ import { useMemo, useRef, useState } from 'react'
 import DashboardItemList from './DashboardItemList'
 import DashboardSaveNotice from './DashboardSaveNotice'
 import MediaDropzone from './MediaDropzone'
+import CertificateImageField from './CertificateImageField'
 import { useConfirmDelete } from './DeleteConfirmDialog'
 import {
   CERTIFICATE_FEATURED_COUNT,
@@ -14,6 +15,7 @@ import {
   emptyCertificate,
   emptyPublication,
   emptyTimelineEntry,
+  getCertificateDisplayImage,
   getDefaultAboutContent,
   loadAboutContentRemote,
   resolveCertificateDisplayOrder,
@@ -183,7 +185,25 @@ function CertificateEditor({ initialItem, onSave, onCancel }) {
         <div><label className={labelClassName}>Year</label><input className={fieldClassName} value={item.year} onChange={(e) => update('year', e.target.value)} required /></div>
         <div className="sm:col-span-2"><label className={labelClassName}>Issuer</label><input className={fieldClassName} value={item.issuer} onChange={(e) => update('issuer', e.target.value)} required /></div>
         <div className="sm:col-span-2"><label className={labelClassName}>Description</label><textarea className={`${fieldClassName} min-h-24 resize-y`} value={item.description} onChange={(e) => update('description', e.target.value)} required /></div>
-        <div className="sm:col-span-2"><label className={labelClassName}>Certificate image</label><MediaDropzone image={item.image} video="" onChange={({ image }) => update('image', image)} onClear={() => update('image', '')} /></div>
+        <div className="sm:col-span-2">
+          <label className={labelClassName}>Certificate image</label>
+          <p className="mb-2 text-xs text-ink-muted">
+            The original image is kept so you can re-adjust the crop anytime. Last crop framing is remembered.
+          </p>
+          <CertificateImageField
+            image={item.image}
+            imageSource={item.imageSource}
+            imageCrop={item.imageCrop}
+            onChange={({ image, imageSource, imageCrop }) =>
+              setItem((current) => ({
+                ...current,
+                image,
+                imageSource,
+                imageCrop,
+              }))
+            }
+          />
+        </div>
       </div>
       <div className="mt-4 flex gap-3">
         <button type="submit" className="rounded-lg bg-brand px-5 py-2.5 text-xs font-semibold tracking-wide text-white uppercase">Save</button>
@@ -697,7 +717,12 @@ export default function AboutMePanel() {
       const currentList = current[listKey] ?? []
       const normalizedItem =
         listKey === 'certificates'
-          ? { ...item, image: item.image ? withCacheBust(item.image) : '' }
+          ? {
+              ...item,
+              image: item.image ? withCacheBust(item.image) : '',
+              imageSource: item.imageSource ? withCacheBust(item.imageSource) : '',
+              imageCrop: item.imageCrop ?? null,
+            }
           : item
       const nextList = exists
         ? currentList.map((entry) => (entry.id === normalizedItem.id ? normalizedItem : entry))
@@ -896,8 +921,8 @@ export default function AboutMePanel() {
                   <>
                     <div className="flex gap-3">
                       <div className="h-14 w-20 overflow-hidden rounded bg-slate-100">
-                        {item.image ? (
-                           <img src={item.image} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
+                        {getCertificateDisplayImage(item) ? (
+                           <img src={getCertificateDisplayImage(item)} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
                         ) : (
                           <div className="flex h-full w-full items-center justify-center text-[0.6rem] font-medium text-ink-muted uppercase">
                             No image

@@ -61,14 +61,19 @@ function reorderTherapyConcepts(concepts) {
 }
 
 function migrateTherapyConcept(concept) {
-  if (concept.id === 'family-training') {
+  const withHomepageImage = {
+    ...concept,
+    homepageImage: typeof concept.homepageImage === 'string' ? concept.homepageImage : '',
+  }
+
+  if (withHomepageImage.id === 'family-training') {
     return {
-      ...concept,
-      image: migrateImagePath(concept.image, '/images/family.jpg', '/images/familytraining.jpg'),
+      ...withHomepageImage,
+      image: migrateImagePath(withHomepageImage.image, '/images/family.jpg', '/images/familytraining.jpg'),
     }
   }
 
-  return concept
+  return withHomepageImage
 }
 
 function migrateTherapyConcepts(saved, defaults) {
@@ -188,6 +193,7 @@ export const FILTER_GROUPS = ['Neurodevelopmental', 'Learning', 'Developmental',
 export const emptyTherapyConcept = {
   id: '',
   image: '',
+  homepageImage: '',
   title: '',
   subtitle: '',
   summary: '',

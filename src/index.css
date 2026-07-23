@@ -11,7 +11,7 @@
   --color-accent-hover: #e07a4d;
   --color-ink: #1c2833;
   --color-ink-muted: #5c6b73;
-  /* Section backgrounds — clear contrast between bands */
+  /* Section backgrounds â clear contrast between bands */
   --color-surface: #ffffff;
   --color-surface-alt: #f0f4f6;
   --color-surface-tint: #e2eaee;
@@ -47,7 +47,7 @@ select {
   font-family: inherit;
 }
 
-/* ── Page loader ── */
+/* ââ Page loader ââ */
 @keyframes page-loader-logo-shimmer {
   0% {
     background-position: 200% center;
@@ -308,7 +308,7 @@ select {
   opacity: 0;
 }
 
-/* ── Global presence section (avoid "globe-section" — blocked by some browsers/extensions) ── */
+/* ââ Global presence section (avoid "globe-section" â blocked by some browsers/extensions) ââ */
 .global-presence-section {
   --globe-accent: #f08a5d;
   --globe-brand: #2d6a7a;
@@ -787,7 +787,7 @@ select {
   opacity: 0;
 }
 
-/* ── Mobile-only layout helpers (max-width: 1023px) ── */
+/* ââ Mobile-only layout helpers (max-width: 1023px) ââ */
 @media (max-width: 1023px) {
   html,
   body {
@@ -836,7 +836,7 @@ select {
     width: min(72vw, 16rem);
   }
 
-  /* Homepage — stronger section dividers on mobile/tablet only */
+  /* Homepage â stronger section dividers on mobile/tablet only */
   .home-page-sections > * + * {
     border-top-width: 2px !important;
     border-top-style: solid !important;
@@ -864,13 +864,13 @@ select {
   }
 }
 
-/* ── Homepage tablet layout only (768px – 1023px) ── */
+/* ââ Homepage tablet layout only (768px â 1023px) ââ */
 @media (min-width: 768px) and (max-width: 1023px) {
   .home-page-sections {
     overflow-x: clip;
   }
 
-  /* Replace horizontal card strips with grids — no negative margins / overflow */
+  /* Replace horizontal card strips with grids â no negative margins / overflow */
   .home-page-sections .mobile-card-scroll {
     display: grid;
     overflow-x: visible;
@@ -896,22 +896,22 @@ select {
     max-height: none;
   }
 
-  /* Services — 2×2 grid */
+  /* Services â 2Ã2 grid */
   .home-page-sections #approach .mt-10 > .mobile-card-scroll {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  /* Events — 2 columns on smaller tablets, 3 on wider */
+  /* Events â 2 columns on smaller tablets, 3 on wider */
   .home-page-sections #activity .mobile-card-scroll {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  /* Affiliations — 2 per row on tablet */
+  /* Affiliations â 2 per row on tablet */
   .home-page-sections .home-affiliation-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  /* Expertise — full-bleed two-column panel, no grey gap below */
+  /* Expertise â full-bleed two-column panel, no grey gap below */
   .home-page-sections #expertise {
     background-color: #ffffff;
     padding-bottom: 0;
@@ -955,7 +955,7 @@ select {
     object-fit: cover;
   }
 
-  /* Testimonials — sidebar + quote (desktop layout at tablet width) */
+  /* Testimonials â sidebar + quote (desktop layout at tablet width) */
   .home-page-sections .testimonials-layout {
     display: grid;
     grid-template-columns: minmax(0, 240px) minmax(0, 1fr);
@@ -975,7 +975,7 @@ select {
     display: flex !important;
   }
 
-  /* Contact — location on top, direct + form below */
+  /* Contact â location on top, direct + form below */
   .home-page-sections .home-contact-layout {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1.25rem;
@@ -1018,7 +1018,7 @@ select {
   }
 }
 
-/* ── Large tablet / Nest Hub / iPad Pro (1024px – 1366px) — homepage only ── */
+/* ââ Large tablet / Nest Hub / iPad Pro (1024px â 1366px) â homepage only ââ */
 @media (min-width: 1024px) and (max-width: 1366px) {
   html,
   body {
@@ -1030,7 +1030,7 @@ select {
     max-width: 100%;
   }
 
-  /* Profile — 2-col + compass below (prevents 3-col squeeze / orbit overflow) */
+  /* Profile â 2-col + compass below (prevents 3-col squeeze / orbit overflow) */
   .home-page-sections .home-profile-grid {
     grid-template-columns: minmax(200px, 280px) minmax(0, 1fr);
   }
@@ -1082,7 +1082,7 @@ select {
   }
 }
 
-/* ── Clinical cases slider on desktop ── */
+/* ââ Clinical cases slider on desktop ââ */
 @media (min-width: 1024px) {
   .home-page-sections #approach .mt-12 .mobile-card-scroll {
     display: flex;
@@ -1111,7 +1111,7 @@ select {
   }
 }
 
-/* ── Clinical cases slider arrows ── */
+/* ââ Clinical cases slider arrows ââ */
 .cases-slider {
   position: relative;
 }
@@ -1194,4 +1194,24 @@ select {
   .cases-slider-arrow {
     display: none;
   }
+}
+
+
+/* Image crop dialog - larger side + corner handles */
+.image-crop-stage {
+  --rc-drag-handle-size: 16px;
+  --rc-drag-handle-mobile-size: 28px;
+  --rc-drag-bar-size: 10px;
+  --rc-drag-handle-bg-colour: #1a4d5c;
+  --rc-border-color: #ffffff;
+  --rc-focus-color: #f08a5d;
+}
+
+.image-crop-stage .ReactCrop__drag-handle {
+  border-width: 2px;
+  border-radius: 2px;
+}
+
+.image-crop-stage .ReactCrop__drag-bar {
+  z-index: 1;
 }

@@ -503,7 +503,7 @@ export default function TherapyConcepts({ showCasesPreview = false, fullDetail =
                   className="mobile-card-scroll__item mobile-card-scroll__item--service group flex max-lg:h-[20rem] h-full flex-col overflow-hidden rounded-sm border border-slate-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-brand/20 hover:shadow-md lg:h-auto lg:w-auto lg:flex-row"
                 >
                   <ServiceCardImage
-                    src={concept.image}
+                    src={concept.homepageImage || concept.image}
                     alt={`${concept.title}, ${concept.subtitle}`}
                   />
 
@@ -530,11 +530,15 @@ export default function TherapyConcepts({ showCasesPreview = false, fullDetail =
           {showCasesPreview ? (
             <div className="mt-12 border-t border-slate-100 pt-10 max-lg:mt-14 max-lg:border-slate-300 max-lg:border-t-2 lg:mt-12 lg:border-t lg:border-slate-100">
               <header className="mx-auto max-w-3xl text-center">
-                <p className="text-xs font-semibold tracking-[0.22em] text-brand uppercase">Clinical cases</p>
-                <h3 className="mt-3 font-serif text-2xl leading-tight text-ink md:text-3xl">
+                <p className="whitespace-nowrap text-xs font-semibold tracking-[0.18em] text-brand uppercase sm:tracking-[0.22em]">
+                  Clinical Expertise
+                </p>
+                <h3 className="mt-3 text-balance font-serif text-2xl leading-tight text-ink md:text-3xl">
                   {casesWeServe.title}
                 </h3>
-                <p className="mt-3 text-sm leading-relaxed text-ink-muted">{casesWeServe.intro}</p>
+                <p className="mt-3 text-pretty text-sm leading-relaxed text-ink-muted">
+                  {casesWeServe.intro?.replace(/\s+([^\s]+)\s*$/, '\u00A0$1')}
+                </p>
               </header>
 
               <div className="mt-8 mb-4 flex justify-end">

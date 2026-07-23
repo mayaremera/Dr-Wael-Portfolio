@@ -1,22 +1,129 @@
-import { useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { isMediaStorageAvailable, uploadMediaToStorage } from '../../lib/mediaUpload'
 import { isImageFile, isVideoFile } from '../../lib/mediaFileTypes'
 import { hasMediaSrc } from '../../lib/mediaUrl'
 import { isSupabaseConfigured } from '../../lib/supabase'
 import { useConfirmDelete } from './DeleteConfirmDialog'
+import ImageCropDialog from './ImageCropDialog'
 
 const MAX_FILE_SIZE_MB = 12
 
-export default function MediaDropzone({ image, video, onChange, onUploaded, onClear }) {
+export default function MediaDropzone({
+  image,
+  video,
+  onChange,
+  onUploaded,
+  onClear,
+  cropAspect,
+  cropTitle = 'Crop image to card',
+  cropHint = 'Drag any side or corner to resize · drag inside the box to move it · the selected area fills the card.',
+  previewAspectClassName = 'aspect-video',
+  accept = 'image/*,video/*',
+  emptyLabel = 'Drag & drop image or video',
+}) {
   const confirmDelete = useConfirmDelete()
   const inputRef = useRef(null)
   const [dragging, setDragging] = useState(false)
   const [error, setError] = useState('')
   const [uploading, setUploading] = useState(false)
   const [uploadStatus, setUploadStatus] = useState('')
+  const [cropSrc, setCropSrc] = useState('')
+  const [cropOpen, setCropOpen] = useState(false)
 
   const mediaSrc = hasMediaSrc(video) ? video.trim() : hasMediaSrc(image) ? image.trim() : ''
   const isVideo = hasMediaSrc(video)
+  const cropEnabled = typeof cropAspect === 'number' && cropAspect > 0
+
+  const revokeCropSrc = (src) => {
+    if (src?.startsWith('blob:')) URL.revokeObjectURL(src)
+  }
+
+  const closeCrop = useCallback(() => {
+    setCropOpen(false)
+    setCropSrc((current) => {
+      revokeCropSrc(current)
+      return ''
+    })
+  }, [])
+
+  const openCropWithSrc = useCallback((src) => {
+    if (!src) return
+    setError('')
+    setCropSrc((current) => {
+      if (current && current !== src) revokeCropSrc(current)
+      return src
+    })
+    setCropOpen(true)
+  }, [])
+
+  const uploadPreparedFile = useCallback(
+    (file) => {
+      const isImage = isImageFile(file)
+      const isVideoFileType = isVideoFile(file)
+
+      setError('')
+      setUploadStatus('')
+      setUploading(true)
+
+      const applyLocalFallback = () => {
+        const reader = new FileReader()
+        reader.onload = () => {
+          const payload = {
+            image: isImage ? reader.result : '',
+            video: isVideoFileType ? reader.result : '',
+          }
+          onChange(payload)
+          setUploadStatus('Saved locally only.')
+          setUploading(false)
+        }
+        reader.onerror = () => {
+          setError('Could not read that file. Try another one.')
+          setUploading(false)
+        }
+        reader.readAsDataURL(file)
+      }
+
+      return isMediaStorageAvailable()
+        .then((canUpload) => {
+          if (isSupabaseConfigured && !canUpload) {
+            setError('Sign in to Supabase before uploading media.')
+            setUploading(false)
+            return
+          }
+
+          if (!canUpload) {
+            applyLocalFallback()
+            return
+          }
+
+          return uploadMediaToStorage(file)
+            .then((result) => {
+              const payload = {
+                image: result.isVideo ? '' : result.url,
+                video: result.isVideo ? result.url : '',
+              }
+              onChange(payload)
+              onUploaded?.(payload)
+              setUploadStatus('Uploaded to Supabase storage.')
+              setUploading(false)
+            })
+            .catch((uploadError) => {
+              setError(uploadError?.message || 'Upload failed. Please try again.')
+              setUploading(false)
+            })
+        })
+        .catch(() => {
+          if (isSupabaseConfigured) {
+            setError('Could not verify your Supabase session. Try signing in again.')
+            setUploading(false)
+            return
+          }
+
+          applyLocalFallback()
+        })
+    },
+    [onChange, onUploaded],
+  )
 
   const handleFile = (file) => {
     if (!file) return
@@ -29,71 +136,37 @@ export default function MediaDropzone({ image, video, onChange, onUploaded, onCl
       return
     }
 
+    if (cropEnabled && isVideoFileType) {
+      setError('Videos are not supported for this field. Choose an image instead.')
+      return
+    }
+
     if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
       setError(`File is too large. Maximum size is ${MAX_FILE_SIZE_MB} MB.`)
       return
     }
 
-    setError('')
-    setUploadStatus('')
-    setUploading(true)
-
-    const applyLocalFallback = () => {
-      const reader = new FileReader()
-      reader.onload = () => {
-        const payload = {
-          image: isImage ? reader.result : '',
-          video: isVideoFileType ? reader.result : '',
-        }
-        onChange(payload)
-        setUploadStatus('Saved locally only.')
-        setUploading(false)
-      }
-      reader.onerror = () => {
-        setError('Could not read that file. Try another one.')
-        setUploading(false)
-      }
-      reader.readAsDataURL(file)
+    if (cropEnabled && isImage) {
+      openCropWithSrc(URL.createObjectURL(file))
+      return
     }
 
-    isMediaStorageAvailable()
-      .then((canUpload) => {
-        if (isSupabaseConfigured && !canUpload) {
-          setError('Sign in to Supabase before uploading media.')
-          setUploading(false)
-          return
-        }
+    uploadPreparedFile(file)
+  }
 
-        if (!canUpload) {
-          applyLocalFallback()
-          return
-        }
+  const handleCropConfirm = useCallback(
+    async (croppedFile) => {
+      closeCrop()
+      await uploadPreparedFile(croppedFile)
+    },
+    [closeCrop, uploadPreparedFile],
+  )
 
-        return uploadMediaToStorage(file)
-          .then((result) => {
-            const payload = {
-              image: result.isVideo ? '' : result.url,
-              video: result.isVideo ? result.url : '',
-            }
-            onChange(payload)
-            onUploaded?.(payload)
-            setUploadStatus('Uploaded to Supabase storage.')
-            setUploading(false)
-          })
-          .catch((uploadError) => {
-            setError(uploadError?.message || 'Upload failed. Please try again.')
-            setUploading(false)
-          })
-      })
-      .catch(() => {
-        if (isSupabaseConfigured) {
-          setError('Could not verify your Supabase session. Try signing in again.')
-          setUploading(false)
-          return
-        }
-
-        applyLocalFallback()
-      })
+  const handleAdjustImage = (event) => {
+    event.preventDefault()
+    event.stopPropagation()
+    if (!mediaSrc || isVideo || !cropEnabled || uploading) return
+    openCropWithSrc(mediaSrc)
   }
 
   const onDrop = (dropEvent) => {
@@ -107,7 +180,7 @@ export default function MediaDropzone({ image, video, onChange, onUploaded, onCl
       <input
         ref={inputRef}
         type="file"
-        accept="image/*,video/*"
+        accept={accept}
         className="hidden"
         onChange={(changeEvent) => {
           handleFile(changeEvent.target.files?.[0])
@@ -117,11 +190,18 @@ export default function MediaDropzone({ image, video, onChange, onUploaded, onCl
 
       {mediaSrc ? (
         <div className="overflow-hidden rounded-xl border border-slate-200/80 bg-white">
-          <div className="relative aspect-video w-full bg-slate-900">
+          <div className={`relative w-full bg-slate-900 ${previewAspectClassName}`}>
             {isVideo ? (
               <video src={mediaSrc} className="h-full w-full object-cover" muted playsInline controls />
             ) : (
-               <img key={mediaSrc} src={mediaSrc} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
+              <img
+                key={mediaSrc}
+                src={mediaSrc}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                className="h-full w-full object-cover"
+              />
             )}
             <span className="absolute left-3 top-3 rounded-full bg-black/50 px-2.5 py-1 text-[0.65rem] font-semibold tracking-wide text-white uppercase">
               {isVideo ? 'Video' : 'Image'}
@@ -136,6 +216,16 @@ export default function MediaDropzone({ image, video, onChange, onUploaded, onCl
             >
               {uploading ? 'Uploading…' : 'Replace'}
             </button>
+            {cropEnabled && !isVideo ? (
+              <button
+                type="button"
+                onClick={handleAdjustImage}
+                disabled={uploading}
+                className="rounded-lg border border-brand/30 bg-brand-muted/40 px-3 py-1.5 text-xs font-semibold tracking-wide text-brand uppercase transition-colors hover:border-brand/50 hover:bg-brand-muted disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                Adjust fit
+              </button>
+            ) : null}
             <button
               type="button"
               onClick={() =>
@@ -183,14 +273,30 @@ export default function MediaDropzone({ image, video, onChange, onUploaded, onCl
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 16V4m0 0l-4 4m4-4l4 4M4 20h16" />
           </svg>
           <span className="text-sm font-medium text-ink">
-            {uploading ? 'Uploading…' : 'Drag & drop image or video'}
+            {uploading ? 'Uploading…' : emptyLabel}
           </span>
-          <span className="mt-1 text-xs text-ink-muted">or click to browse · max {MAX_FILE_SIZE_MB} MB</span>
+          <span className="mt-1 text-xs text-ink-muted">
+            {cropEnabled
+              ? `or click to browse · crop to card · max ${MAX_FILE_SIZE_MB} MB`
+              : `or click to browse · max ${MAX_FILE_SIZE_MB} MB`}
+          </span>
         </button>
       )}
 
       {uploadStatus ? <p className="mt-2 text-xs text-brand">{uploadStatus}</p> : null}
       {error ? <p className="mt-2 text-xs text-accent-hover">{error}</p> : null}
+
+      {cropEnabled ? (
+        <ImageCropDialog
+          open={cropOpen}
+          imageSrc={cropSrc}
+          aspect={cropAspect}
+          title={cropTitle}
+          hint={cropHint}
+          onCancel={closeCrop}
+          onConfirm={handleCropConfirm}
+        />
+      ) : null}
     </div>
   )
 }

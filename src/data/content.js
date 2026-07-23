@@ -737,7 +737,7 @@ export const leadershipRoles = [
 export const casesWeServe = {
   title: 'Conditions We Understand & Treat',
   intro:
-    'Every child communicates differently. At our practice, assessments and therapy are grounded in the most current evidence, delivered with deep cultural and linguistic awareness, and tailored to the individual—not the diagnosis. We work with children and families across a spectrum of communication and language disorders, offering services in both English and Arabic.',
+    "Evidence-based assessment and intervention, informed by cultural and linguistic awareness and tailored to each child's individual communication needs. We provide comprehensive speech-language pathology services for children with a wide range of communication disorders in both English and Arabic.",
 }
 
 export const clinicalSpecializations = [

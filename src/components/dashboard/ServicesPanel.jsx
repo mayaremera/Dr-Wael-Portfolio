@@ -162,12 +162,47 @@ function TherapyConceptEditor({ initialConcept, onSave, onCancel }) {
         </div>
         <div className="sm:col-span-2">
           <label className={labelClassName}>Cover image</label>
-          <MediaDropzone
-            image={concept.image}
-            video=""
-            onChange={({ image }) => updateField('image', image)}
-            onClear={() => updateField('image', '')}
-          />
+          <p className="mb-2 text-xs text-ink-muted">
+            Crop separately for each place the card appears. Clinical expertise cards are not included here.
+          </p>
+          <div className="grid gap-4 lg:grid-cols-2">
+            <div>
+              <p className="mb-1.5 text-[0.65rem] font-semibold tracking-wide text-ink-muted uppercase">
+                Services page card
+              </p>
+              <p className="mb-2 text-[0.65rem] text-ink-muted">Used on /services detail cards (5:4). Drag any side or corner to frame the photo.</p>
+              <MediaDropzone
+                image={concept.image}
+                video=""
+                accept="image/*"
+                emptyLabel="Drag & drop services image"
+                cropAspect={5 / 4}
+                cropTitle="Crop services page card"
+                cropHint="Drag any side or corner to resize · drag inside to move · the selected area fills the card."
+                previewAspectClassName="aspect-[5/4]"
+                onChange={({ image }) => updateField('image', image)}
+                onClear={() => updateField('image', '')}
+              />
+            </div>
+            <div>
+              <p className="mb-1.5 text-[0.65rem] font-semibold tracking-wide text-ink-muted uppercase">
+                Homepage service card
+              </p>
+              <p className="mb-2 text-[0.65rem] text-ink-muted">Used in the homepage side image (3:4). Drag any side or corner to frame the photo.</p>
+              <MediaDropzone
+                image={concept.homepageImage || ''}
+                video=""
+                accept="image/*"
+                emptyLabel="Drag & drop homepage image"
+                cropAspect={3 / 4}
+                cropTitle="Crop homepage service card"
+                cropHint="Drag any side or corner to resize · drag inside to move · the selected area fills the card."
+                previewAspectClassName="aspect-[3/4]"
+                onChange={({ image }) => updateField('homepageImage', image)}
+                onClear={() => updateField('homepageImage', '')}
+              />
+            </div>
+          </div>
         </div>
         <div className="sm:col-span-2">
           <label className="flex items-center gap-2 text-sm text-ink">
@@ -431,6 +466,7 @@ export default function ServicesPanel() {
   const normalizeTherapyConcept = (concept) => ({
     ...concept,
     image: concept.image ? withCacheBust(concept.image) : '',
+    homepageImage: concept.homepageImage ? withCacheBust(concept.homepageImage) : '',
   })
 
   const normalizeClinicalCase = (item) => ({
@@ -708,7 +744,7 @@ export default function ServicesPanel() {
       </div>
 
       <section className="mt-6 rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
-        <h2 className="font-serif text-xl text-ink">Cases section header</h2>
+        <h2 className="font-serif text-xl text-ink">Clinical Expertise section header</h2>
         <div className="mt-4 grid gap-4">
           <div>
             <label className={labelClassName}>Title</label>
@@ -726,7 +762,7 @@ export default function ServicesPanel() {
 
       <div className="mt-6">
         <DashboardItemList
-          title="Clinical cases"
+          title="Clinical Expertise"
           countLabel={`${content.clinicalSpecializations.length} case${content.clinicalSpecializations.length === 1 ? '' : 's'}`}
           items={resolveClinicalCasesDisplayOrder(content.clinicalSpecializations, content.clinicalCasesFeaturedIds)}
           editingId={editingCaseId}

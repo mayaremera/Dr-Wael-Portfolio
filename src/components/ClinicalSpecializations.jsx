@@ -248,13 +248,15 @@ export default function ClinicalSpecializations() {
         />
 
         <div className="relative mx-auto max-w-6xl px-6 py-16 lg:px-8 lg:py-24">
-          <header className="mx-auto max-w-3xl text-center">
-            <p className="text-xs font-semibold tracking-[0.22em] text-accent uppercase">Clinical Cases</p>
-            <h2 className="mt-3 font-serif text-3xl leading-tight text-white md:text-4xl">
+          <header className="mx-auto max-w-5xl text-center">
+            <p className="whitespace-nowrap text-xs font-semibold tracking-[0.18em] text-accent uppercase sm:tracking-[0.22em]">
+              Clinical Expertise
+            </p>
+            <h2 className="mt-3 text-balance font-serif text-3xl leading-tight text-white md:text-4xl">
               {casesWeServe.title}
             </h2>
-            <p className="mt-4 text-base leading-relaxed text-white/70 md:text-lg">
-              {casesWeServe.intro}
+            <p className="mx-auto mt-4 max-w-[46rem] text-pretty text-base leading-relaxed text-white/70 md:text-[1.05rem] md:leading-[1.7]">
+              {casesWeServe.intro?.replace(/\s+([^\s]+)\s*$/, '\u00A0$1')}
             </p>
           </header>
 
@@ -305,7 +307,7 @@ export default function ClinicalSpecializations() {
                   <p className="mb-2.5 text-xs font-semibold tracking-[0.18em] text-white/50 uppercase">
                     Browse cases
                   </p>
-                  <nav className="space-y-0.5" aria-label="Clinical cases">
+                  <nav className="space-y-0.5" aria-label="Clinical expertise">
                     {filtered.map((item, index) => (
                       <CaseNavItem
                         key={item.id}
