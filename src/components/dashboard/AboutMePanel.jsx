@@ -188,18 +188,19 @@ function CertificateEditor({ initialItem, onSave, onCancel }) {
         <div className="sm:col-span-2">
           <label className={labelClassName}>Certificate image</label>
           <p className="mb-2 text-xs text-ink-muted">
-            The original image is kept so you can re-adjust the crop anytime. Last crop framing is remembered.
+            Upload any phone photo — AI removes the background and rebuilds it on a clean black or white studio card. Original is kept for re-opening.
           </p>
           <CertificateImageField
             image={item.image}
             imageSource={item.imageSource}
-            imageCrop={item.imageCrop}
-            onChange={({ image, imageSource, imageCrop }) =>
+            imageFrame={item.imageFrame}
+            onChange={({ image, imageSource, imageCrop, imageFrame }) =>
               setItem((current) => ({
                 ...current,
                 image,
                 imageSource,
-                imageCrop,
+                imageCrop: imageCrop ?? null,
+                imageFrame: imageFrame ?? null,
               }))
             }
           />
@@ -722,6 +723,7 @@ export default function AboutMePanel() {
               image: item.image ? withCacheBust(item.image) : '',
               imageSource: item.imageSource ? withCacheBust(item.imageSource) : '',
               imageCrop: item.imageCrop ?? null,
+              imageFrame: item.imageFrame ?? null,
             }
           : item
       const nextList = exists

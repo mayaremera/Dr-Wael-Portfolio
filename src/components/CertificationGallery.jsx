@@ -183,7 +183,7 @@ export default function CertificationGallery() {
                   }}
                   className="mobile-card-scroll__item group relative cursor-pointer overflow-hidden rounded-sm bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:shadow-brand/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 lg:w-auto lg:cursor-default"
                 >
-                  <div className="relative aspect-[4/3] overflow-hidden bg-surface-alt">
+                  <div className="relative aspect-[4/3] overflow-hidden bg-[linear-gradient(160deg,#f0f4f6_0%,#e8f1f3_55%,#dce8ec_100%)]">
                     {getCertificateDisplayImage(certificate) ? (
                       <LazyImage
                         src={getCertificateDisplayImage(certificate)}

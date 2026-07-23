@@ -271,11 +271,15 @@ export const emptyCertificate = {
   image: '',
   imageSource: '',
   imageCrop: null,
+  imageFrame: null,
   featured: false,
 }
 
 export function normalizeCertificateImageCrop(crop) {
   if (!crop || typeof crop !== 'object') return null
+
+  // Legacy crop shape — keep for older saved certificates
+  if (crop.mode === 'magic') return null
 
   const x = Number(crop.x)
   const y = Number(crop.y)
@@ -294,12 +298,41 @@ export function normalizeCertificateImageCrop(crop) {
   }
 }
 
+function normalizeCertificateImageFrame(frame) {
+  if (!frame || typeof frame !== 'object') return null
+
+  const zoom = Number(frame.zoom ?? frame.fill ?? frame.scale)
+  let studio = 'auto'
+  if (frame.studio === 'black' || frame.studio === 'white' || frame.studio === 'auto') {
+    studio = frame.studio
+  } else if (frame.studio === 'brand' || frame.backdrop === 'brand' || frame.backdrop === 'ink') {
+    studio = 'black'
+  } else if (frame.studio === 'cream' || frame.studio === 'soft' || frame.backdrop === 'paper') {
+    studio = 'white'
+  }
+
+  return {
+    mode: 'remaster',
+    removeBg: frame.removeBg === true,
+    horizontalFit: frame.horizontalFit === true,
+    zoom: Number.isFinite(zoom) ? zoom : 1,
+    studio,
+    region: normalizeCertificateImageCrop(frame.region),
+  }
+}
+
 export function migrateCertificate(certificate) {
+  const legacyCrop = certificate?.imageCrop
+  const migratedFrame =
+    normalizeCertificateImageFrame(certificate?.imageFrame) ||
+    (legacyCrop?.mode === 'magic' ? normalizeCertificateImageFrame(legacyCrop) : null)
+
   return {
     ...certificate,
     image: typeof certificate.image === 'string' ? certificate.image : '',
     imageSource: typeof certificate.imageSource === 'string' ? certificate.imageSource : '',
     imageCrop: normalizeCertificateImageCrop(certificate.imageCrop),
+    imageFrame: migratedFrame,
   }
 }
 

@@ -4,11 +4,11 @@ import { isImageFile } from '../../lib/mediaFileTypes'
 import { hasMediaSrc } from '../../lib/mediaUrl'
 import { isSupabaseConfigured } from '../../lib/supabase'
 import { getCertificateDisplayImage } from '../../data/aboutContentStore'
+import { DEFAULT_FRAME_SETTINGS, normalizeCertificateImageFrame } from '../../lib/certificateMagicFrame'
 import { useConfirmDelete } from './DeleteConfirmDialog'
-import ImageCropDialog from './ImageCropDialog'
+import CertificateMagicFrameDialog from './CertificateMagicFrameDialog'
 
 const MAX_FILE_SIZE_MB = 12
-const CROP_ASPECT = 4 / 3
 
 async function uploadImageFile(file) {
   const canUpload = await isMediaStorageAvailable()
@@ -34,7 +34,7 @@ async function uploadImageFile(file) {
 export default function CertificateImageField({
   image = '',
   imageSource = '',
-  imageCrop = null,
+  imageFrame = null,
   onChange,
 }) {
   const confirmDelete = useConfirmDelete()
@@ -44,38 +44,39 @@ export default function CertificateImageField({
   const [error, setError] = useState('')
   const [uploading, setUploading] = useState(false)
   const [uploadStatus, setUploadStatus] = useState('')
-  const [cropSrc, setCropSrc] = useState('')
-  const [cropOpen, setCropOpen] = useState(false)
-  const [cropSessionKey, setCropSessionKey] = useState(0)
-  const [restoreCrop, setRestoreCrop] = useState(false)
+  const [studioSrc, setStudioSrc] = useState('')
+  const [studioOpen, setStudioOpen] = useState(false)
+  const [studioSessionKey, setStudioSessionKey] = useState(0)
+  const [restoreSettings, setRestoreSettings] = useState(false)
 
   const displaySrc = getCertificateDisplayImage({ image, imageSource })
   const sourceSrc = hasMediaSrc(imageSource) ? imageSource.trim() : hasMediaSrc(image) ? image.trim() : ''
+  const savedFrame = normalizeCertificateImageFrame(imageFrame) || { ...DEFAULT_FRAME_SETTINGS }
 
-  const revokeCropSrc = (src) => {
+  const revokeStudioSrc = (src) => {
     if (src?.startsWith('blob:')) URL.revokeObjectURL(src)
   }
 
-  const closeCrop = useCallback(() => {
-    setCropOpen(false)
-    setRestoreCrop(false)
-    setCropSrc((current) => {
-      revokeCropSrc(current)
+  const closeStudio = useCallback(() => {
+    setStudioOpen(false)
+    setRestoreSettings(false)
+    setStudioSrc((current) => {
+      revokeStudioSrc(current)
       return ''
     })
     pendingSourceUrlRef.current = ''
   }, [])
 
-  const openCrop = useCallback((src, shouldRestoreCrop = false) => {
+  const openStudio = useCallback((src, shouldRestore = false) => {
     if (!src) return
     setError('')
-    setRestoreCrop(shouldRestoreCrop)
-    setCropSessionKey((key) => key + 1)
-    setCropSrc((current) => {
-      if (current && current !== src) revokeCropSrc(current)
+    setRestoreSettings(shouldRestore)
+    setStudioSessionKey((key) => key + 1)
+    setStudioSrc((current) => {
+      if (current && current !== src) revokeStudioSrc(current)
       return src
     })
-    setCropOpen(true)
+    setStudioOpen(true)
   }, [])
 
   const emitChange = useCallback(
@@ -83,7 +84,8 @@ export default function CertificateImageField({
       onChange({
         image: next.image ?? '',
         imageSource: next.imageSource ?? '',
-        imageCrop: next.imageCrop ?? null,
+        imageCrop: null,
+        imageFrame: next.imageFrame ?? null,
       })
     },
     [onChange],
@@ -106,27 +108,31 @@ export default function CertificateImageField({
     setUploadStatus('')
     setUploading(true)
 
-    const localCropUrl = URL.createObjectURL(file)
+    const localStudioUrl = URL.createObjectURL(file)
 
     try {
       const uploaded = await uploadImageFile(file)
       pendingSourceUrlRef.current = uploaded.url
-      openCrop(localCropUrl, false)
-      setUploadStatus(uploaded.localOnly ? 'Original saved locally.' : 'Original uploaded. Adjust the crop, then apply.')
+      openStudio(localStudioUrl, false)
+      setUploadStatus(
+        uploaded.localOnly
+          ? 'Original saved locally. Remaster is ready.'
+          : 'Original uploaded. Remaster is ready — tweak if you like, then apply.',
+      )
     } catch (uploadError) {
-      revokeCropSrc(localCropUrl)
+      revokeStudioSrc(localStudioUrl)
       setError(uploadError?.message || 'Upload failed. Please try again.')
     } finally {
       setUploading(false)
     }
   }
 
-  const handleCropConfirm = useCallback(
-    async (croppedFile, percentCrop) => {
+  const handleStudioConfirm = useCallback(
+    async (framedFile, frameSettings) => {
       const sourceUrl = pendingSourceUrlRef.current || sourceSrc
-      setCropOpen(false)
-      setCropSrc((current) => {
-        revokeCropSrc(current)
+      setStudioOpen(false)
+      setStudioSrc((current) => {
+        revokeStudioSrc(current)
         return ''
       })
 
@@ -141,19 +147,19 @@ export default function CertificateImageField({
       setUploadStatus('')
 
       try {
-        const uploaded = await uploadImageFile(croppedFile)
+        const uploaded = await uploadImageFile(framedFile)
         emitChange({
           image: uploaded.url,
           imageSource: sourceUrl,
-          imageCrop: percentCrop,
+          imageFrame: normalizeCertificateImageFrame(frameSettings),
         })
         setUploadStatus(
           uploaded.localOnly
-            ? 'Crop saved locally. Original kept for re-adjusting.'
-            : 'Crop saved. Original kept for re-adjusting.',
+            ? 'Remaster saved locally. Original kept for re-adjusting.'
+            : 'Remaster saved. Original kept for re-adjusting.',
         )
       } catch (uploadError) {
-        setError(uploadError?.message || 'Could not save the cropped image.')
+        setError(uploadError?.message || 'Could not save the remastered certificate.')
       } finally {
         pendingSourceUrlRef.current = ''
         setUploading(false)
@@ -167,13 +173,13 @@ export default function CertificateImageField({
     event.stopPropagation()
     if (!sourceSrc || uploading) return
     pendingSourceUrlRef.current = sourceSrc
-    openCrop(sourceSrc, true)
+    openStudio(sourceSrc, true)
   }
 
   const handleClear = () => {
     setError('')
     setUploadStatus('')
-    emitChange({ image: '', imageSource: '', imageCrop: null })
+    emitChange({ image: '', imageSource: '', imageFrame: null })
   }
 
   const onDrop = (dropEvent) => {
@@ -207,7 +213,7 @@ export default function CertificateImageField({
               className="h-full w-full object-cover"
             />
             <span className="absolute left-3 top-3 rounded-full bg-black/50 px-2.5 py-1 text-[0.65rem] font-semibold tracking-wide text-white uppercase">
-              Image
+              Remastered
             </span>
           </div>
           <div className="flex flex-wrap gap-2 border-t border-slate-200/80 p-3">
@@ -225,14 +231,14 @@ export default function CertificateImageField({
               disabled={uploading || !sourceSrc}
               className="rounded-lg border border-brand/30 bg-brand-muted/40 px-3 py-1.5 text-xs font-semibold tracking-wide text-brand uppercase transition-colors hover:border-brand/50 hover:bg-brand-muted disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Adjust fit
+              Re-open Crop / Remaster
             </button>
             <button
               type="button"
               onClick={() =>
                 confirmDelete({
                   title: 'Remove this media?',
-                  message: 'The original and cropped certificate images will be cleared from this field.',
+                  message: 'The original photo and remastered certificate image will be cleared from this field.',
                   confirmLabel: 'Remove',
                   onConfirm: handleClear,
                 })
@@ -270,10 +276,10 @@ export default function CertificateImageField({
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 16V4m0 0l-4 4m4-4l4 4M4 20h16" />
           </svg>
           <span className="text-sm font-medium text-ink">
-            {uploading ? 'Uploading…' : 'Drag & drop certificate image'}
+            {uploading ? 'Uploading…' : 'Drop any certificate photo'}
           </span>
-          <span className="mt-1 text-xs text-ink-muted">
-            or click to browse · crop to card · max {MAX_FILE_SIZE_MB} MB
+          <span className="mt-1 max-w-xs text-xs text-ink-muted">
+            AI removes the background and rebuilds a clean studio card · max {MAX_FILE_SIZE_MB} MB
           </span>
         </button>
       )}
@@ -281,16 +287,13 @@ export default function CertificateImageField({
       {uploadStatus ? <p className="mt-2 text-xs text-brand">{uploadStatus}</p> : null}
       {error ? <p className="mt-2 text-xs text-accent-hover">{error}</p> : null}
 
-      <ImageCropDialog
-        key={cropSessionKey}
-        open={cropOpen}
-        imageSrc={cropSrc}
-        aspect={CROP_ASPECT}
-        initialCrop={restoreCrop ? imageCrop : null}
-        title="Crop certificate to card"
-        hint="Zoom out to see more of the image · drag any side or corner to crop · drag inside to move · original is kept for re-adjusting."
-        onCancel={closeCrop}
-        onConfirm={handleCropConfirm}
+      <CertificateMagicFrameDialog
+        key={studioSessionKey}
+        open={studioOpen}
+        imageSrc={studioSrc}
+        initialSettings={restoreSettings ? savedFrame : null}
+        onCancel={closeStudio}
+        onConfirm={handleStudioConfirm}
       />
     </div>
   )
