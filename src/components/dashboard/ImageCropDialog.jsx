@@ -10,20 +10,6 @@ const MIN_ZOOM = 0.35
 const MAX_ZOOM = 3
 const DEFAULT_ZOOM = 1
 
-function createCenteredFreeCrop(mediaWidth, mediaHeight) {
-  return centerCrop(
-    {
-      unit: '%',
-      x: 5,
-      y: 5,
-      width: 90,
-      height: 90,
-    },
-    mediaWidth,
-    mediaHeight,
-  )
-}
-
 function createCenteredAspectCrop(mediaWidth, mediaHeight, aspect) {
   return centerCrop(
     makeAspectCrop(
@@ -124,9 +110,7 @@ export default function ImageCropDialog({
       const savedCrop = normalizeCertificateImageCrop(initialCrop)
       const nextCrop = savedCrop
         ? { ...savedCrop, unit: '%' }
-        : aspect && aspect > 0
-          ? createCenteredAspectCrop(image.width, image.height, aspect)
-          : createCenteredFreeCrop(image.width, image.height)
+        : createCenteredAspectCrop(image.width, image.height, aspect)
 
       applyPercentCrop(nextCrop, image)
     },
@@ -151,11 +135,7 @@ export default function ImageCropDialog({
     setError('')
 
     try {
-      const file = await getCroppedImageFileFromElement(
-        image,
-        completedCrop,
-        aspect && aspect > 0 ? { aspect } : undefined,
-      )
+      const file = await getCroppedImageFileFromElement(image, completedCrop, { aspect })
       const savedPercent =
         normalizeCertificateImageCrop(percentCropRef.current) ||
         normalizeCertificateImageCrop({

@@ -1,12 +1,12 @@
-import { useMemo, useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { useAboutContent } from '../hooks/useAboutContent'
 import { getCertificateDisplayImage } from '../data/aboutContentStore'
 import { scrollPaginationSectionIntoView } from '../lib/scrollPaginationSection'
+import LazyImage from './LazyImage'
 import LazySection from './LazySection'
 
 const PAGE_SIZE = 9
 const MAX_VISIBLE_PAGES = 5
-const SEAM = '2px'
 
 function getVisiblePages(currentPage, pageCount) {
   if (pageCount <= MAX_VISIBLE_PAGES) {
@@ -22,23 +22,6 @@ function getVisiblePages(currentPage, pageCount) {
   }
 
   return Array.from({ length: end - start }, (_, index) => start + index)
-}
-
-/** Place items into columns in order; ties go left so the first row fills L→R. */
-function distributeToColumns(items, columnCount) {
-  const columns = Array.from({ length: columnCount }, () => [])
-  const heights = Array.from({ length: columnCount }, () => 0)
-
-  for (const item of items) {
-    let shortest = 0
-    for (let index = 1; index < columnCount; index += 1) {
-      if (heights[index] < heights[shortest]) shortest = index
-    }
-    columns[shortest].push(item)
-    heights[shortest] += 1
-  }
-
-  return columns
 }
 
 function Pagination({ page, pageCount, onChange }) {
@@ -119,90 +102,44 @@ function Pagination({ page, pageCount, onChange }) {
   )
 }
 
-function CertificateTile({ certificate, isActive, onToggle }) {
-  const imageSrc = getCertificateDisplayImage(certificate)
-
-  return (
-    <article
-      role="button"
-      tabIndex={0}
-      aria-expanded={isActive}
-      onClick={() => onToggle(certificate.id)}
-      onKeyDown={(event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault()
-          onToggle(certificate.id)
-        }
-      }}
-      className="group relative cursor-pointer overflow-hidden bg-surface-alt focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-alt lg:cursor-default"
-    >
-      <div className="relative overflow-hidden bg-surface-alt">
-        {imageSrc ? (
-          <img
-            src={imageSrc}
-            alt={certificate.title}
-            loading="lazy"
-            decoding="async"
-            className="block h-auto w-full transition-transform duration-500 group-hover:scale-[1.02]"
-          />
-        ) : (
-          <div className="flex aspect-4/3 w-full items-center justify-center px-4 text-center text-xs font-medium tracking-wide text-ink-muted uppercase">
-            Certificate image
-          </div>
-        )}
-
-        <div
-          className={`absolute inset-x-0 bottom-0 border-t border-white/25 bg-brand p-4 transition-transform duration-300 ease-out ${
-            isActive ? 'max-lg:translate-y-0' : 'max-lg:translate-y-full'
-          } lg:translate-y-full lg:group-hover:translate-y-0`}
-        >
-          <p className="text-xs font-semibold tracking-[0.14em] text-white uppercase">{certificate.title}</p>
-          <p className="mt-1 text-xs leading-relaxed text-white/85">{certificate.description}</p>
-        </div>
-      </div>
-    </article>
-  )
-}
-
 export default function CertificationGallery() {
   const { isReady, certificates, certificatesSection } = useAboutContent()
   const [page, setPage] = useState(0)
   const [activeCertId, setActiveCertId] = useState(null)
   const sectionRef = useRef(null)
-  const [columnCount, setColumnCount] = useState(1)
-  const [isCompact, setIsCompact] = useState(false)
+  const scrollContainerRef = useRef(null)
+  const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
-    const tabletMq = window.matchMedia('(min-width: 640px)')
-    const desktopMq = window.matchMedia('(min-width: 1024px)')
-
-    const sync = () => {
-      if (desktopMq.matches) setColumnCount(3)
-      else if (tabletMq.matches) setColumnCount(2)
-      else setColumnCount(1)
-      setIsCompact(!desktopMq.matches)
-    }
-
-    requestAnimationFrame(sync)
-    tabletMq.addEventListener('change', sync)
-    desktopMq.addEventListener('change', sync)
-    return () => {
-      tabletMq.removeEventListener('change', sync)
-      desktopMq.removeEventListener('change', sync)
-    }
+    const mq = window.matchMedia('(max-width: 1023px)')
+    requestAnimationFrame(() => setIsMobile(mq.matches))
+    const handler = (event) => setIsMobile(event.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
   }, [])
 
-  const pageCount = Math.ceil((certificates?.length ?? 0) / PAGE_SIZE)
+  if (!isReady || !certificatesSection) return null
+
+  const { label, title } = certificatesSection
+
+  const pageCount = Math.ceil(certificates.length / PAGE_SIZE)
   const safePage = Math.min(page, Math.max(pageCount - 1, 0))
   const start = safePage * PAGE_SIZE
-  const pageItems = (certificates ?? []).slice(start, start + PAGE_SIZE)
-  const columns = useMemo(() => distributeToColumns(pageItems, columnCount), [pageItems, columnCount])
+  const pageItems = certificates.slice(start, start + PAGE_SIZE)
 
   const handlePageChange = (nextPage) => {
     setActiveCertId(null)
     setPage(Math.max(0, Math.min(nextPage, pageCount - 1)))
 
-    if (!isCompact) {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (scrollContainerRef.current) {
+          scrollContainerRef.current.scrollLeft = 0
+        }
+      })
+    })
+
+    if (!isMobile) {
       scrollPaginationSectionIntoView(sectionRef)
     }
   }
@@ -210,10 +147,6 @@ export default function CertificationGallery() {
   const toggleCertificate = (certificateId) => {
     setActiveCertId((current) => (current === certificateId ? null : certificateId))
   }
-
-  if (!isReady || !certificatesSection) return null
-
-  const { label, title } = certificatesSection
 
   return (
     <section ref={sectionRef} id="certifications" className="scroll-mt-28 border-t border-slate-200 bg-surface-alt py-16 lg:py-20">
@@ -231,26 +164,52 @@ export default function CertificationGallery() {
         </p>
 
         <LazySection minHeight="20rem">
-          <div
-            key={`${safePage}-${columnCount}`}
-            className="mt-10 grid"
-            style={{
-              gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))`,
-              gap: SEAM,
-            }}
-          >
-            {columns.map((columnItems, columnIndex) => (
-              <div key={columnIndex} className="flex min-w-0 flex-col" style={{ gap: SEAM }}>
-                {columnItems.map((certificate) => (
-                  <CertificateTile
-                    key={certificate.id}
-                    certificate={certificate}
-                    isActive={activeCertId === certificate.id}
-                    onToggle={toggleCertificate}
-                  />
-                ))}
-              </div>
-            ))}
+          <div ref={scrollContainerRef} className="mt-10 mobile-card-scroll lg:grid lg:grid-cols-3 lg:gap-4">
+            {pageItems.map((certificate) => {
+              const isActive = activeCertId === certificate.id
+
+              return (
+                <article
+                  key={certificate.id}
+                  role="button"
+                  tabIndex={0}
+                  aria-expanded={isActive}
+                  onClick={() => toggleCertificate(certificate.id)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault()
+                      toggleCertificate(certificate.id)
+                    }
+                  }}
+                  className="mobile-card-scroll__item group relative cursor-pointer overflow-hidden rounded-sm bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:shadow-brand/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 lg:w-auto lg:cursor-default"
+                >
+                  <div className="relative aspect-[4/3] overflow-hidden bg-surface-alt">
+                    {getCertificateDisplayImage(certificate) ? (
+                      <LazyImage
+                        src={getCertificateDisplayImage(certificate)}
+                        alt={certificate.title}
+                        className="h-full w-full bg-transparent"
+                        imgClassName="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                        rootMargin={isMobile ? '40px 0px' : undefined}
+                        fetchPriority={isMobile ? 'low' : undefined}
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center px-4 text-center text-xs font-medium tracking-wide text-ink-muted uppercase">
+                        Certificate image
+                      </div>
+                    )}
+                    <div
+                      className={`absolute inset-x-0 bottom-0 border-t border-white/25 bg-brand p-4 transition-transform duration-300 ease-out ${
+                        isActive ? 'max-lg:translate-y-0' : 'max-lg:translate-y-full'
+                      } lg:translate-y-full lg:group-hover:translate-y-0`}
+                    >
+                      <p className="text-xs font-semibold tracking-[0.14em] text-white uppercase">{certificate.title}</p>
+                      <p className="mt-1 text-xs leading-relaxed text-white/85">{certificate.description}</p>
+                    </div>
+                  </div>
+                </article>
+              )
+            })}
           </div>
 
           <Pagination page={safePage} pageCount={pageCount} onChange={handlePageChange} />

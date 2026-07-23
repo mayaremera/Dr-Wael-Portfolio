@@ -8,6 +8,7 @@ import { useConfirmDelete } from './DeleteConfirmDialog'
 import ImageCropDialog from './ImageCropDialog'
 
 const MAX_FILE_SIZE_MB = 12
+const CROP_ASPECT = 4 / 3
 
 async function uploadImageFile(file) {
   const canUpload = await isMediaStorageAvailable()
@@ -196,14 +197,14 @@ export default function CertificateImageField({
 
       {displaySrc ? (
         <div className="overflow-hidden rounded-xl border border-slate-200/80 bg-white">
-          <div className="relative mx-auto aspect-4/3 w-full max-w-md bg-surface-alt">
+          <div className="relative mx-auto aspect-[4/3] w-full max-w-md bg-slate-900">
             <img
               key={displaySrc}
               src={displaySrc}
               alt=""
               loading="lazy"
               decoding="async"
-              className="h-full w-full object-contain"
+              className="h-full w-full object-cover"
             />
             <span className="absolute left-3 top-3 rounded-full bg-black/50 px-2.5 py-1 text-[0.65rem] font-semibold tracking-wide text-white uppercase">
               Image
@@ -272,7 +273,7 @@ export default function CertificateImageField({
             {uploading ? 'Uploading…' : 'Drag & drop certificate image'}
           </span>
           <span className="mt-1 text-xs text-ink-muted">
-            or click to browse · free crop · max {MAX_FILE_SIZE_MB} MB
+            or click to browse · crop to card · max {MAX_FILE_SIZE_MB} MB
           </span>
         </button>
       )}
@@ -284,10 +285,10 @@ export default function CertificateImageField({
         key={cropSessionKey}
         open={cropOpen}
         imageSrc={cropSrc}
-        aspect={null}
+        aspect={CROP_ASPECT}
         initialCrop={restoreCrop ? imageCrop : null}
-        title="Crop certificate"
-        hint="Crop freely to the certificate edges · mosaic tiles keep each image’s true shape · original is kept for re-adjusting."
+        title="Crop certificate to card"
+        hint="Zoom out to see more of the image · drag any side or corner to crop · drag inside to move · original is kept for re-adjusting."
         onCancel={closeCrop}
         onConfirm={handleCropConfirm}
       />
