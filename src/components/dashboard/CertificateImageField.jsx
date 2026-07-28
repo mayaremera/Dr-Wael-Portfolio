@@ -1,34 +1,51 @@
 import { useCallback, useRef, useState } from 'react'
-import { isMediaStorageAvailable, uploadMediaToStorage } from '../../lib/mediaUpload'
+import { assertCloudMediaReady, isMediaStorageAvailable, uploadMediaToStorage } from '../../lib/mediaUpload'
 import { isImageFile } from '../../lib/mediaFileTypes'
 import { hasMediaSrc } from '../../lib/mediaUrl'
 import { isSupabaseConfigured } from '../../lib/supabase'
 import { getCertificateDisplayImage } from '../../data/aboutContentStore'
-import { DEFAULT_FRAME_SETTINGS, normalizeCertificateImageFrame } from '../../lib/certificateMagicFrame'
+import { DEFAULT_FRAME_SETTINGS, FRAME_ASPECT, normalizeCertificateImageFrame } from '../../lib/certificateMagicFrame'
 import { useConfirmDelete } from './DeleteConfirmDialog'
 import CertificateMagicFrameDialog from './CertificateMagicFrameDialog'
 
 const MAX_FILE_SIZE_MB = 12
+const HEIC_OR_HEIF = /\.(heic|heif)$/i
 
+function isHeicFile(file) {
+  if (!file) return false
+  const type = (file.type || '').toLowerCase()
+  if (type === 'image/heic' || type === 'image/heif') return true
+  return HEIC_OR_HEIF.test(file.name || '')
+}
+
+async function fileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result)
+    reader.onerror = () => reject(new Error('Could not read that file. Try another one.'))
+    reader.readAsDataURL(file)
+  })
+}
+
+/**
+ * Upload a certificate image to Supabase when configured.
+ * Never falls back to data URLs while Supabase env vars are present.
+ */
 async function uploadImageFile(file) {
+  if (isSupabaseConfigured) {
+    await assertCloudMediaReady()
+    const result = await uploadMediaToStorage(file)
+    return { url: result.url, localOnly: false, path: result.path, bucket: result.bucket }
+  }
+
   const canUpload = await isMediaStorageAvailable()
-
-  if (isSupabaseConfigured && !canUpload) {
-    throw new Error('Sign in to Supabase before uploading media.')
+  if (canUpload) {
+    const result = await uploadMediaToStorage(file)
+    return { url: result.url, localOnly: false, path: result.path, bucket: result.bucket }
   }
 
-  if (!canUpload) {
-    const dataUrl = await new Promise((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onload = () => resolve(reader.result)
-      reader.onerror = () => reject(new Error('Could not read that file. Try another one.'))
-      reader.readAsDataURL(file)
-    })
-    return { url: dataUrl, localOnly: true }
-  }
-
-  const result = await uploadMediaToStorage(file)
-  return { url: result.url, localOnly: false }
+  const dataUrl = await fileToDataUrl(file)
+  return { url: dataUrl, localOnly: true, path: '', bucket: '' }
 }
 
 export default function CertificateImageField({
@@ -36,10 +53,19 @@ export default function CertificateImageField({
   imageSource = '',
   imageFrame = null,
   onChange,
+  aspect = FRAME_ASPECT,
+  previewAspectClassName = 'aspect-[4/3]',
+  title = 'Edit certificate photo',
+  hint = 'Pick an Improve style, then fine-tune with drag and zoom.',
+  emptyLabel = 'Drop a certificate photo',
+  badgeLabel = 'Photo',
+  saveHint = 'Save the certificate to keep it.',
+  initialZoom = 1,
+  minZoom = 0.6,
 }) {
   const confirmDelete = useConfirmDelete()
   const inputRef = useRef(null)
-  const pendingSourceUrlRef = useRef('')
+  const pendingOriginalFileRef = useRef(null)
   const [dragging, setDragging] = useState(false)
   const [error, setError] = useState('')
   const [uploading, setUploading] = useState(false)
@@ -64,7 +90,7 @@ export default function CertificateImageField({
       revokeStudioSrc(current)
       return ''
     })
-    pendingSourceUrlRef.current = ''
+    pendingOriginalFileRef.current = null
   }, [])
 
   const openStudio = useCallback((src, shouldRestore = false) => {
@@ -91,11 +117,16 @@ export default function CertificateImageField({
     [onChange],
   )
 
-  const handleFile = async (file) => {
+  const handleFile = (file) => {
     if (!file) return
 
     if (!isImageFile(file)) {
       setError('Please choose a supported image file (JPG, PNG, WebP, etc.).')
+      return
+    }
+
+    if (isHeicFile(file)) {
+      setError('HEIC/HEIF photos are not supported here. Export or convert to JPG or PNG, then upload again.')
       return
     }
 
@@ -105,87 +136,101 @@ export default function CertificateImageField({
     }
 
     setError('')
-    setUploadStatus('')
-    setUploading(true)
-
-    const localStudioUrl = URL.createObjectURL(file)
-
-    try {
-      const uploaded = await uploadImageFile(file)
-      pendingSourceUrlRef.current = uploaded.url
-      openStudio(localStudioUrl, false)
-      setUploadStatus(
-        uploaded.localOnly
-          ? 'Original saved locally. Remaster is ready.'
-          : 'Original uploaded. Remaster is ready — tweak if you like, then apply.',
-      )
-    } catch (uploadError) {
-      revokeStudioSrc(localStudioUrl)
-      setError(uploadError?.message || 'Upload failed. Please try again.')
-    } finally {
-      setUploading(false)
-    }
+    setUploadStatus('Ready to edit — crop, improve, then Save.')
+    pendingOriginalFileRef.current = file
+    openStudio(URL.createObjectURL(file), false)
   }
 
   const handleStudioConfirm = useCallback(
     async (framedFile, frameSettings) => {
-      const sourceUrl = pendingSourceUrlRef.current || sourceSrc
-      setStudioOpen(false)
-      setStudioSrc((current) => {
-        revokeStudioSrc(current)
-        return ''
-      })
-
-      if (!sourceUrl) {
-        setError('Original image is missing. Replace the image and try again.')
-        pendingSourceUrlRef.current = ''
-        return
-      }
+      const originalFile = pendingOriginalFileRef.current
+      const existingSourceUrl = sourceSrc
 
       setUploading(true)
       setError('')
-      setUploadStatus('')
+      setUploadStatus(isSupabaseConfigured ? 'Uploading to Supabase…' : 'Saving image…')
 
       try {
-        const uploaded = await uploadImageFile(framedFile)
+        if (isSupabaseConfigured) {
+          await assertCloudMediaReady()
+        }
+
+        let sourceUrl = existingSourceUrl
+
+        if (originalFile) {
+          const uploadedOriginal = await uploadImageFile(originalFile)
+          sourceUrl = uploadedOriginal.url
+        }
+
+        if (!sourceUrl) {
+          throw new Error('Original image is missing. Replace the image and try again.')
+        }
+
+        const uploadedRemaster = await uploadImageFile(framedFile)
+
+        if (
+          isSupabaseConfigured &&
+          (uploadedRemaster.localOnly ||
+            !String(uploadedRemaster.url).includes('/storage/v1/object/public/media/'))
+        ) {
+          throw new Error(
+            'Image did not upload to the media bucket. Check Settings → Test media upload, then try again.',
+          )
+        }
+
         emitChange({
-          image: uploaded.url,
+          image: uploadedRemaster.url,
           imageSource: sourceUrl,
           imageFrame: normalizeCertificateImageFrame(frameSettings),
         })
+
         setUploadStatus(
-          uploaded.localOnly
-            ? 'Remaster saved locally. Original kept for re-adjusting.'
-            : 'Remaster saved. Original kept for re-adjusting.',
+          uploadedRemaster.localOnly
+            ? 'Saved locally. Original kept for re-adjusting.'
+            : `Uploaded to Storage bucket media/${uploadedRemaster.path || 'file'}. ${saveHint}`,
         )
+
+        pendingOriginalFileRef.current = null
+        setStudioOpen(false)
+        setRestoreSettings(false)
+        setStudioSrc((current) => {
+          revokeStudioSrc(current)
+          return ''
+        })
       } catch (uploadError) {
         setError(uploadError?.message || 'Could not save the remastered certificate.')
+        setUploadStatus('')
+        // Re-throw so the dialog stays open and can show the same failure.
+        throw uploadError
       } finally {
-        pendingSourceUrlRef.current = ''
         setUploading(false)
       }
     },
-    [emitChange, sourceSrc],
+    [emitChange, sourceSrc, saveHint],
   )
 
   const handleAdjustImage = (event) => {
     event.preventDefault()
     event.stopPropagation()
-    if (!sourceSrc || uploading) return
-    pendingSourceUrlRef.current = sourceSrc
-    openStudio(sourceSrc, true)
+    if (uploading) return
+    // Re-open on the last saved card photo so Improve/crop edits are remembered
+    const editSrc = hasMediaSrc(image) ? image.trim() : sourceSrc
+    if (!editSrc) return
+    pendingOriginalFileRef.current = null
+    openStudio(editSrc, true)
   }
 
   const handleClear = () => {
     setError('')
     setUploadStatus('')
+    pendingOriginalFileRef.current = null
     emitChange({ image: '', imageSource: '', imageFrame: null })
   }
 
   const onDrop = (dropEvent) => {
     dropEvent.preventDefault()
     setDragging(false)
-    void handleFile(dropEvent.dataTransfer.files?.[0])
+    handleFile(dropEvent.dataTransfer.files?.[0])
   }
 
   return (
@@ -193,17 +238,17 @@ export default function CertificateImageField({
       <input
         ref={inputRef}
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/png,image/webp,image/gif,image/bmp,image/avif,image/*"
         className="hidden"
         onChange={(changeEvent) => {
-          void handleFile(changeEvent.target.files?.[0])
+          handleFile(changeEvent.target.files?.[0])
           changeEvent.target.value = ''
         }}
       />
 
       {displaySrc ? (
         <div className="overflow-hidden rounded-xl border border-slate-200/80 bg-white">
-          <div className="relative mx-auto aspect-[4/3] w-full max-w-md bg-slate-900">
+          <div className={`relative mx-auto w-full max-w-md bg-slate-900 ${previewAspectClassName}`}>
             <img
               key={displaySrc}
               src={displaySrc}
@@ -213,7 +258,7 @@ export default function CertificateImageField({
               className="h-full w-full object-cover"
             />
             <span className="absolute left-3 top-3 rounded-full bg-black/50 px-2.5 py-1 text-[0.65rem] font-semibold tracking-wide text-white uppercase">
-              Remastered
+              {badgeLabel}
             </span>
           </div>
           <div className="flex flex-wrap gap-2 border-t border-slate-200/80 p-3">
@@ -228,10 +273,10 @@ export default function CertificateImageField({
             <button
               type="button"
               onClick={handleAdjustImage}
-              disabled={uploading || !sourceSrc}
+              disabled={uploading || !(hasMediaSrc(image) || sourceSrc)}
               className="rounded-lg border border-brand/30 bg-brand-muted/40 px-3 py-1.5 text-xs font-semibold tracking-wide text-brand uppercase transition-colors hover:border-brand/50 hover:bg-brand-muted disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Re-open Crop / Remaster
+              Edit photo
             </button>
             <button
               type="button"
@@ -276,10 +321,10 @@ export default function CertificateImageField({
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 16V4m0 0l-4 4m4-4l4 4M4 20h16" />
           </svg>
           <span className="text-sm font-medium text-ink">
-            {uploading ? 'Uploading…' : 'Drop any certificate photo'}
+            {uploading ? 'Uploading…' : emptyLabel}
           </span>
           <span className="mt-1 max-w-xs text-xs text-ink-muted">
-            AI removes the background and rebuilds a clean studio card · max {MAX_FILE_SIZE_MB} MB
+            Adjust crop · Improve photo · Save · max {MAX_FILE_SIZE_MB} MB · JPG/PNG/WebP
           </span>
         </button>
       )}
@@ -292,6 +337,12 @@ export default function CertificateImageField({
         open={studioOpen}
         imageSrc={studioSrc}
         initialSettings={restoreSettings ? savedFrame : null}
+        aspect={aspect}
+        previewAspectClassName={previewAspectClassName}
+        title={title}
+        hint={hint}
+        initialZoom={initialZoom}
+        minZoom={minZoom}
         onCancel={closeStudio}
         onConfirm={handleStudioConfirm}
       />

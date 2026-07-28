@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import {
   CONTENT_UPDATED_EVENT,
   getCachedSectionData,
+  invalidateSectionCache,
   subscribeToRemoteContent,
   subscribeToSectionContent,
 } from '../data/contentSync'
@@ -54,6 +55,10 @@ export function useContentSection(loadLocal, loadRemote, sectionKey = null) {
     const refreshRemote = (changedSection) => {
       if (sectionKey && changedSection && changedSection !== sectionKey) return
 
+      if (sectionKey) {
+        invalidateSectionCache(sectionKey)
+      }
+
       loadRemote()
         .then(applyContent)
         .catch((error) => {
@@ -66,7 +71,6 @@ export function useContentSection(loadLocal, loadRemote, sectionKey = null) {
     const onContentUpdated = (event) => {
       const changedSection = event.detail?.section
       if (sectionKey && changedSection && changedSection !== sectionKey) return
-      if (sectionKey && getCachedSectionData(sectionKey)) return
       refreshRemote(changedSection)
     }
 

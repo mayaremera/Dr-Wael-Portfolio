@@ -1215,3 +1215,13 @@ select {
 .image-crop-stage .ReactCrop__drag-bar {
   z-index: 1;
 }
+
+/* Certificate magic-frame crop outline (grid uses ::before/::after — don't override) */
+.certificate-crop-area {
+  border-color: #f08a5d !important;
+}
+
+.certificate-crop-container .reactEasyCrop_CropAreaGrid::before,
+.certificate-crop-container .reactEasyCrop_CropAreaGrid::after {
+  border-color: rgba(240, 138, 93, 0.55);
+}

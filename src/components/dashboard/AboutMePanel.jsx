@@ -26,6 +26,7 @@ import { useDashboardSection } from '../../hooks/useDashboardSection'
 import DashboardSectionLoader from './DashboardSectionLoader'
 import { persistDashboardSection } from './persistDashboardSection'
 import { withCacheBust } from '../../lib/mediaUrl'
+import { isSupabaseConfigured } from '../../lib/supabase'
 const fieldClassName =
   'w-full rounded-lg border border-slate-200/90 bg-white px-3 py-2.5 text-sm text-ink outline-none transition-all placeholder:text-ink-muted/50 focus:border-brand/40 focus:ring-2 focus:ring-brand/15'
 
@@ -132,11 +133,6 @@ function toggleCertificateFeaturedSlot(selectedIds, certificateId, slotIndex) {
   return next
 }
 
-function getCertificateFeaturedSlot(selectedIds, certificateId) {
-  const slotIndex = (selectedIds ?? []).findIndex((id) => id === certificateId)
-  return slotIndex >= 0 ? slotIndex + 1 : null
-}
-
 function CertificateFeaturedCheckboxes({ certificateId, selectedIds, onToggle }) {
   const normalizedIds = Array.from({ length: CERTIFICATE_FEATURED_COUNT }, (_, index) => selectedIds?.[index] ?? '')
 
@@ -188,7 +184,7 @@ function CertificateEditor({ initialItem, onSave, onCancel }) {
         <div className="sm:col-span-2">
           <label className={labelClassName}>Certificate image</label>
           <p className="mb-2 text-xs text-ink-muted">
-            Upload any phone photo — AI removes the background and rebuilds it on a clean black or white studio card. Original is kept for re-opening.
+            Drop a photo, crop it, optionally Improve photo, then Save. The original stays available for Edit photo.
           </p>
           <CertificateImageField
             image={item.image}
@@ -714,6 +710,27 @@ export default function AboutMePanel() {
     const list = contentRef.current?.[listKey] ?? []
     const exists = list.some((entry) => entry.id === item.id)
 
+    if (listKey === 'certificates' && isSupabaseConfigured) {
+      const image = typeof item.image === 'string' ? item.image.trim() : ''
+      const imageSource = typeof item.imageSource === 'string' ? item.imageSource.trim() : ''
+      const isMediaUrl = (url) =>
+        Boolean(url) && url.includes('/storage/v1/object/public/media/') && !url.startsWith('data:')
+
+      if (image && !isMediaUrl(image)) {
+        setSaveError(
+          'Certificate image is not in the media bucket. Replace the image, wait for “Uploaded to Storage bucket media/…”, then Save again.',
+        )
+        return
+      }
+
+      if (imageSource && imageSource.startsWith('data:')) {
+        setSaveError(
+          'Certificate original image was not uploaded to Supabase. Replace the image and try again.',
+        )
+        return
+      }
+    }
+
     persistFromCurrent((current) => {
       const currentList = current[listKey] ?? []
       const normalizedItem =
@@ -932,14 +949,7 @@ export default function AboutMePanel() {
                         )}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <p className="font-medium text-ink">{item.title}</p>
-                          {getCertificateFeaturedSlot(content.certificatesFeaturedIds, item.id) ? (
-                            <span className="rounded-full bg-brand-muted px-2 py-0.5 text-[0.6rem] font-semibold tracking-wide text-brand uppercase">
-                              Slot {getCertificateFeaturedSlot(content.certificatesFeaturedIds, item.id)}
-                            </span>
-                          ) : null}
-                        </div>
+                        <p className="font-medium text-ink">{item.title}</p>
                         <p className="text-xs text-ink-muted">{item.issuer} · {item.year}</p>
                       </div>
                     </div>

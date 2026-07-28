@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { listRemoteSections } from '../../data/contentSync'
 import { SEED_SECTIONS, seedAllSectionsToSupabase } from '../../data/seedSupabase'
+import { createProbeJpegFile, uploadMediaToStorage } from '../../lib/mediaUpload'
 import { getSupabaseSession, isSupabaseConfigured, supabase } from '../../lib/supabase'
 
 function PanelShell({ eyebrow, title, description, children }) {
@@ -36,6 +37,8 @@ export default function SettingsPanel() {
   const [errorMessage, setErrorMessage] = useState('')
   const [loading, setLoading] = useState(true)
   const [seeding, setSeeding] = useState(false)
+  const [probingUpload, setProbingUpload] = useState(false)
+  const [probeUrl, setProbeUrl] = useState('')
 
   const refreshStatus = useCallback(async () => {
     setLoading(true)
@@ -91,6 +94,25 @@ export default function SettingsPanel() {
     }
   }
 
+  const handleTestMediaUpload = async () => {
+    setProbingUpload(true)
+    setStatusMessage('')
+    setErrorMessage('')
+    setProbeUrl('')
+
+    try {
+      const result = await uploadMediaToStorage(createProbeJpegFile())
+      setProbeUrl(result.url)
+      setStatusMessage(
+        `Media upload OK → bucket "${result.bucket}" / ${result.path}. Open Supabase → Storage → media and search that filename.`,
+      )
+    } catch (error) {
+      setErrorMessage(error?.message || 'Media upload test failed.')
+    } finally {
+      setProbingUpload(false)
+    }
+  }
+
   const savedSectionSet = new Set(sections.map((row) => row.section))
 
   return (
@@ -109,10 +131,26 @@ export default function SettingsPanel() {
               label={sections.length ? `${sections.length} sections in database` : 'No saved sections yet'}
             />
           </div>
+          {isSupabaseConfigured && import.meta.env.VITE_SUPABASE_URL ? (
+            <p className="mt-3 break-all text-xs text-ink-muted">
+              Project: <code className="text-ink">{import.meta.env.VITE_SUPABASE_URL}</code>
+              {' · '}
+              Images go to Storage bucket <code className="text-ink">media</code> (root), not a separate certificates
+              folder.
+            </p>
+          ) : null}
 
           {loading ? <p className="mt-4 text-sm text-ink-muted">Checking connection…</p> : null}
           {errorMessage ? <p className="mt-4 text-sm text-accent-hover">{errorMessage}</p> : null}
           {statusMessage ? <p className="mt-4 text-sm text-brand">{statusMessage}</p> : null}
+          {probeUrl ? (
+            <p className="mt-2 break-all text-xs text-ink-muted">
+              Probe URL:{' '}
+              <a href={probeUrl} target="_blank" rel="noreferrer" className="text-brand underline">
+                {probeUrl}
+              </a>
+            </p>
+          ) : null}
 
           <div className="mt-5 flex flex-wrap gap-3">
             <button
@@ -122,6 +160,14 @@ export default function SettingsPanel() {
               className="rounded-lg bg-brand px-4 py-2.5 text-xs font-semibold tracking-wide text-white uppercase transition-colors hover:bg-brand-light disabled:opacity-50"
             >
               {seeding ? 'Publishing…' : 'Publish missing defaults'}
+            </button>
+            <button
+              type="button"
+              onClick={handleTestMediaUpload}
+              disabled={probingUpload || !sessionEmail}
+              className="rounded-lg border border-brand/30 bg-brand-muted/40 px-4 py-2.5 text-xs font-semibold tracking-wide text-brand uppercase transition-colors hover:bg-brand-muted disabled:opacity-50"
+            >
+              {probingUpload ? 'Testing upload…' : 'Test media upload'}
             </button>
             <button
               type="button"
@@ -159,10 +205,20 @@ export default function SettingsPanel() {
           <h2 className="text-sm font-semibold text-ink">How to test</h2>
           <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm leading-relaxed text-ink-muted">
             <li>Make sure you are signed in with your Supabase admin email and password.</li>
-            <li>Click <strong className="text-ink">Publish missing defaults</strong> once to create the first rows.</li>
-            <li>Edit any tab (e.g. In the Field), save, then refresh this page — the timestamp should update.</li>
+            <li>
+              Click <strong className="text-ink">Test media upload</strong> — you should get a public URL under Storage →{' '}
+              <code className="text-ink">media</code>.
+            </li>
+            <li>
+              Click <strong className="text-ink">Publish missing defaults</strong> once to create the first rows.
+            </li>
+            <li>Edit any tab (e.g. Certificates), save, then refresh this page — the timestamp should update.</li>
             <li>Open the live site in another browser/incognito — you should see the same content.</li>
-            <li>In Supabase → Table Editor → <code className="text-ink">site_sections</code>, confirm the JSON changed.</li>
+            <li>
+              In Supabase → Table Editor → <code className="text-ink">site_sections</code> → row{' '}
+              <code className="text-ink">about</code>, confirm certificate image URLs (there is no separate certificates
+              table).
+            </li>
           </ol>
         </article>
       </div>

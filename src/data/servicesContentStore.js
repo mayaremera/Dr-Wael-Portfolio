@@ -64,6 +64,12 @@ function migrateTherapyConcept(concept) {
   const withHomepageImage = {
     ...concept,
     homepageImage: typeof concept.homepageImage === 'string' ? concept.homepageImage : '',
+    imageSource: typeof concept.imageSource === 'string' ? concept.imageSource : '',
+    imageFrame: concept.imageFrame && typeof concept.imageFrame === 'object' ? concept.imageFrame : null,
+    homepageImageFrame:
+      concept.homepageImageFrame && typeof concept.homepageImageFrame === 'object'
+        ? concept.homepageImageFrame
+        : null,
   }
 
   if (withHomepageImage.id === 'family-training') {
@@ -193,7 +199,10 @@ export const FILTER_GROUPS = ['Neurodevelopmental', 'Learning', 'Developmental',
 export const emptyTherapyConcept = {
   id: '',
   image: '',
+  imageSource: '',
+  imageFrame: null,
   homepageImage: '',
+  homepageImageFrame: null,
   title: '',
   subtitle: '',
   summary: '',

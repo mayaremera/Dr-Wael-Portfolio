@@ -56,9 +56,15 @@ function CheckIcon() {
 
 function ServiceCardImage({ src, alt }) {
   return (
-    <div className="relative h-36 w-full shrink-0 lg:h-auto lg:min-h-full lg:w-[38%] lg:max-w-[180px] lg:self-stretch">
+    <div className="relative aspect-square w-full shrink-0 overflow-hidden lg:w-[42%] lg:max-w-[11.5rem] lg:self-center">
       {hasMediaSrc(src) ? (
-        <img src={src} alt={alt} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover object-top lg:object-center" />
+        <img
+          src={src}
+          alt={alt}
+          loading="lazy"
+          decoding="async"
+          className="absolute inset-0 h-full w-full object-cover object-[center_30%]"
+        />
       ) : (
         <div className="absolute inset-0 bg-slate-100" aria-hidden="true" />
       )}
@@ -80,14 +86,14 @@ function MobileServiceDetailCard({ concept, index }) {
       className="animate-fade-up overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-sm lg:hidden"
       style={{ animationDelay: `${Math.min(index * 0.08, 0.4)}s` }}
     >
-      <div className="relative h-40 overflow-hidden">
+      <div className="relative aspect-[5/4] overflow-hidden">
         {hasMediaSrc(concept.image) ? (
           <img
             src={concept.image}
             alt={`${concept.title}, ${concept.subtitle}`}
             loading="lazy"
             decoding="async"
-            className="absolute inset-0 h-full w-full object-cover object-top"
+            className="absolute inset-0 h-full w-full object-cover object-center"
           />
         ) : (
           <div className="absolute inset-0 bg-slate-100" aria-hidden="true" />
@@ -157,13 +163,10 @@ function MobileServiceDetailCard({ concept, index }) {
 function ServiceDetailCard({ concept, index }) {
   const accent = serviceAccents[index % serviceAccents.length]
   const reversed = index % 2 === 1
-  const hasBullets = (concept.bullets?.length ?? 0) > 0
 
-  const imageWrapClass = hasBullets
-    ? reversed
-      ? 'relative m-5 min-h-[200px] overflow-hidden rounded-xl sm:m-6 lg:my-6 lg:ml-0 lg:mr-6 lg:min-h-0 lg:flex-1'
-      : 'relative m-5 min-h-[200px] overflow-hidden rounded-xl sm:m-6 lg:my-6 lg:mr-0 lg:ml-6 lg:min-h-0 lg:flex-1'
-    : 'relative m-5 min-h-[200px] overflow-hidden rounded-xl sm:m-6 lg:mb-6 lg:aspect-5/4 lg:min-h-[300px]'
+  const imageWrapClass = reversed
+    ? 'relative m-5 aspect-[5/4] overflow-hidden rounded-xl sm:m-6 lg:my-6 lg:ml-0 lg:mr-6'
+    : 'relative m-5 aspect-[5/4] overflow-hidden rounded-xl sm:m-6 lg:my-6 lg:mr-0 lg:ml-6'
 
   return (
     <>
@@ -183,7 +186,7 @@ function ServiceDetailCard({ concept, index }) {
       />
 
       <div className={`relative flex flex-col lg:items-stretch ${reversed ? 'lg:flex-row-reverse' : 'lg:flex-row'}`}>
-        <div className={`relative lg:w-[44%] xl:w-[42%] ${hasBullets ? 'lg:flex lg:flex-col' : ''}`}>
+        <div className="relative lg:w-[44%] xl:w-[42%]">
           <div className={imageWrapClass}>
             {hasMediaSrc(concept.image) ? (
               <img
@@ -191,7 +194,7 @@ function ServiceDetailCard({ concept, index }) {
                 alt={`${concept.title}, ${concept.subtitle}`}
                 loading="lazy"
                 decoding="async"
-                className="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.04]"
+                className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.04]"
               />
             ) : (
               <div className="absolute inset-0 bg-slate-100" aria-hidden="true" />
@@ -450,9 +453,7 @@ export default function TherapyConcepts({ showCasesPreview = false, fullDetail =
 
   if (!isReady || !speechLanguageServices) return null
 
-  const displayConcepts = fullDetail
-    ? therapyConcepts
-    : therapyConcepts.filter((concept) => !concept.pageOnly)
+  const displayConcepts = therapyConcepts
   const ctaHref = showCasesPreview ? '/services' : '#contact'
 
   return (

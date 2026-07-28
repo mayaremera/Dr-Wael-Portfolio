@@ -93,9 +93,17 @@ export default function Footer() {
         </div>
 
         <div className="mt-12 border-t border-white/15 pt-8 text-center sm:text-left">
-          <p className="text-sm text-white/50">
-            &copy; {year} {site.name}. All Rights Reserved.
-          </p>
+          <a
+            href="https://youssefashour.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group inline-block text-sm text-white/50 transition-colors hover:text-white/70"
+          >
+            &copy; {year} {site.name}. All Rights Reserved. Developed by{' '}
+            <span className="font-semibold text-accent transition-colors group-hover:text-accent-hover">
+              Youssef Ashour
+            </span>
+          </a>
         </div>
       </div>
       <div

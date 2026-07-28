@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import DashboardItemList from './DashboardItemList'
 import DashboardSaveNotice from './DashboardSaveNotice'
 import MediaDropzone from './MediaDropzone'
+import ServiceCoverImagesField from './ServiceCoverImagesField'
 import { useConfirmDelete } from './DeleteConfirmDialog'
 import {
   FILTER_GROUPS,
@@ -163,57 +164,25 @@ function TherapyConceptEditor({ initialConcept, onSave, onCancel }) {
         <div className="sm:col-span-2">
           <label className={labelClassName}>Cover image</label>
           <p className="mb-2 text-xs text-ink-muted">
-            Crop separately for each place the card appears. Clinical expertise cards are not included here.
+            Upload once, then frame separately for the Services page (5:4) and homepage (1:1). Clinical expertise cards are not included here.
           </p>
-          <div className="grid gap-4 lg:grid-cols-2">
-            <div>
-              <p className="mb-1.5 text-[0.65rem] font-semibold tracking-wide text-ink-muted uppercase">
-                Services page card
-              </p>
-              <p className="mb-2 text-[0.65rem] text-ink-muted">Used on /services detail cards (5:4). Drag any side or corner to frame the photo.</p>
-              <MediaDropzone
-                image={concept.image}
-                video=""
-                accept="image/*"
-                emptyLabel="Drag & drop services image"
-                cropAspect={5 / 4}
-                cropTitle="Crop services page card"
-                cropHint="Drag any side or corner to resize · drag inside to move · the selected area fills the card."
-                previewAspectClassName="aspect-[5/4]"
-                onChange={({ image }) => updateField('image', image)}
-                onClear={() => updateField('image', '')}
-              />
-            </div>
-            <div>
-              <p className="mb-1.5 text-[0.65rem] font-semibold tracking-wide text-ink-muted uppercase">
-                Homepage service card
-              </p>
-              <p className="mb-2 text-[0.65rem] text-ink-muted">Used in the homepage side image (3:4). Drag any side or corner to frame the photo.</p>
-              <MediaDropzone
-                image={concept.homepageImage || ''}
-                video=""
-                accept="image/*"
-                emptyLabel="Drag & drop homepage image"
-                cropAspect={3 / 4}
-                cropTitle="Crop homepage service card"
-                cropHint="Drag any side or corner to resize · drag inside to move · the selected area fills the card."
-                previewAspectClassName="aspect-[3/4]"
-                onChange={({ image }) => updateField('homepageImage', image)}
-                onClear={() => updateField('homepageImage', '')}
-              />
-            </div>
-          </div>
-        </div>
-        <div className="sm:col-span-2">
-          <label className="flex items-center gap-2 text-sm text-ink">
-            <input
-              type="checkbox"
-              checked={!!concept.pageOnly}
-              onChange={(e) => updateField('pageOnly', e.target.checked)}
-              className="h-4 w-4 rounded border-slate-300 text-brand focus:ring-brand"
-            />
-            Show on Services page only (hide from homepage preview)
-          </label>
+          <ServiceCoverImagesField
+            image={concept.image}
+            imageSource={concept.imageSource}
+            imageFrame={concept.imageFrame}
+            homepageImage={concept.homepageImage || ''}
+            homepageImageFrame={concept.homepageImageFrame}
+            onChange={(next) => {
+              setConcept((current) => ({
+                ...current,
+                image: next.image ?? '',
+                imageSource: next.imageSource ?? '',
+                imageFrame: next.imageFrame ?? null,
+                homepageImage: next.homepageImage ?? '',
+                homepageImageFrame: next.homepageImageFrame ?? null,
+              }))
+            }}
+          />
         </div>
         <div className="sm:col-span-2">
           <StringListEditor label="Detail paragraphs" items={concept.paragraphs} onChange={(paragraphs) => updateField('paragraphs', paragraphs)} addLabel="Add paragraph" />
@@ -466,7 +435,10 @@ export default function ServicesPanel() {
   const normalizeTherapyConcept = (concept) => ({
     ...concept,
     image: concept.image ? withCacheBust(concept.image) : '',
+    imageSource: concept.imageSource ? withCacheBust(concept.imageSource) : '',
     homepageImage: concept.homepageImage ? withCacheBust(concept.homepageImage) : '',
+    imageFrame: concept.imageFrame ?? null,
+    homepageImageFrame: concept.homepageImageFrame ?? null,
   })
 
   const normalizeClinicalCase = (item) => ({
@@ -493,11 +465,6 @@ export default function ServicesPanel() {
 
     next[slotIndex] = caseId
     return next
-  }
-
-  function getClinicalCaseFeaturedSlot(selectedIds, caseId) {
-    const slotIndex = (selectedIds ?? []).findIndex((id) => id === caseId)
-    return slotIndex >= 0 ? slotIndex + 1 : null
   }
 
   function ClinicalCaseFeaturedCheckboxes({ caseId, selectedIds, onToggle }) {
@@ -794,11 +761,6 @@ export default function ServicesPanel() {
                           {item.abbr ? (
                             <span className="rounded-full bg-accent/15 px-2 py-0.5 text-[0.6rem] font-semibold tracking-wide text-accent-hover uppercase">
                               {item.abbr}
-                            </span>
-                          ) : null}
-                          {getClinicalCaseFeaturedSlot(content.clinicalCasesFeaturedIds, item.id) ? (
-                            <span className="rounded-full bg-brand/10 px-2 py-0.5 text-[0.6rem] font-semibold tracking-wide text-brand uppercase border border-brand/20">
-                              Slot {getClinicalCaseFeaturedSlot(content.clinicalCasesFeaturedIds, item.id)}
                             </span>
                           ) : null}
                         </div>
