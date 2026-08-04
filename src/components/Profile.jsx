@@ -173,7 +173,7 @@ function TrustedCompanies() {
   return (
     <div className="mt-12 border-t border-slate-200/80 pt-10 lg:mt-14 lg:pt-12">
       <header className="mx-auto max-w-2xl text-center">
-        <p className="text-sm font-medium tracking-[0.1em] text-brand uppercase">Global collaboration</p>
+        <p className="text-sm font-medium tracking-[0.1em] text-brand uppercase">Professional Credentials</p>
         <h3 className="mt-2 font-serif text-2xl leading-tight text-ink md:text-3xl">{title}</h3>
         <p className="mt-3 text-sm leading-relaxed text-ink-muted md:text-base">{subtitle}</p>
       </header>
