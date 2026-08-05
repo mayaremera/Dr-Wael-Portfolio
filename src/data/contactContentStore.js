@@ -24,6 +24,7 @@ export function getDefaultContactContent() {
     directContact: {
       email: defaultSite.email,
       phone: defaultSite.phone,
+      whatsapp: defaultSite.whatsapp || '',
       domain: defaultSite.domain,
     },
   }
@@ -52,6 +53,10 @@ function mergeWithDefaults(saved) {
     directContact: {
       ...defaults.directContact,
       ...savedRest.directContact,
+      whatsapp:
+        typeof savedRest.directContact?.whatsapp === 'string'
+          ? savedRest.directContact.whatsapp
+          : defaults.directContact.whatsapp,
     },
   }
 }
@@ -83,4 +88,11 @@ export async function resetContactContent() {
     section: CONTENT_SECTIONS.CONTACT,
     storageKey: CONTACT_STORAGE_KEY,
   })
+}
+
+/** Build a wa.me link from a display phone/WhatsApp number. */
+export function toWhatsAppHref(whatsapp) {
+  const digits = String(whatsapp || '').replace(/\D/g, '')
+  if (!digits) return ''
+  return `https://wa.me/${digits}`
 }

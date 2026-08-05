@@ -1,5 +1,6 @@
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState } from 'react'
 import { useAboutContent } from '../hooks/useAboutContent'
+import { useIsNarrowViewport } from '../hooks/useIsNarrowViewport'
 import { getCertificateDisplayImage } from '../data/aboutContentStore'
 import { scrollPaginationSectionIntoView } from '../lib/scrollPaginationSection'
 import LazyImage from './LazyImage'
@@ -108,15 +109,7 @@ export default function CertificationGallery() {
   const [activeCertId, setActiveCertId] = useState(null)
   const sectionRef = useRef(null)
   const scrollContainerRef = useRef(null)
-  const [isMobile, setIsMobile] = useState(false)
-
-  useEffect(() => {
-    const mq = window.matchMedia('(max-width: 1023px)')
-    requestAnimationFrame(() => setIsMobile(mq.matches))
-    const handler = (event) => setIsMobile(event.matches)
-    mq.addEventListener('change', handler)
-    return () => mq.removeEventListener('change', handler)
-  }, [])
+  const isMobile = useIsNarrowViewport()
 
   if (!isReady || !certificatesSection) return null
 
@@ -190,7 +183,9 @@ export default function CertificationGallery() {
                         alt={certificate.title}
                         className="h-full w-full bg-transparent"
                         imgClassName="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
-                        rootMargin={isMobile ? '40px 0px' : undefined}
+                        rootMargin={isMobile ? '60px 140px' : undefined}
+                        mobileWidth={520}
+                        mobileQuality={65}
                         fetchPriority={isMobile ? 'low' : undefined}
                       />
                     ) : (

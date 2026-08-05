@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { useServicesContent } from '../hooks/useServicesContent'
 import { hasMediaSrc } from '../lib/mediaUrl'
+import LazyImage from './LazyImage'
 
 const sectionLinkClassName =
   'relative inline-block w-fit pb-1 text-xs font-semibold tracking-[0.12em] text-white uppercase transition-colors after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-accent after:transition-transform after:duration-300 after:ease-out hover:text-accent hover:after:scale-x-100'
@@ -57,10 +58,15 @@ function CaseSpotlight({ item, height }) {
     >
       <div className="relative h-44 shrink-0 sm:h-48 lg:h-full lg:w-[46%] lg:max-w-[300px] lg:shrink-0 xl:w-[48%] xl:max-w-[320px]">
         {hasMediaSrc(item.image) ? (
-          <img
+          <LazyImage
+            key={item.id}
             src={item.image}
             alt=""
-            className="absolute inset-0 h-full w-full object-cover"
+            className="absolute inset-0 h-full w-full"
+            imgClassName="absolute inset-0 h-full w-full object-cover"
+            mobileWidth={720}
+            mobileQuality={70}
+            fetchPriority="high"
           />
         ) : (
           <div className="absolute inset-0 bg-slate-100" aria-hidden="true" />
@@ -151,7 +157,14 @@ function CompactCaseTile({ item, isActive, onSelect }) {
       <div className="flex items-stretch">
         <div className="relative w-16 shrink-0 overflow-hidden sm:w-20">
           {hasMediaSrc(item.image) ? (
-            <img src={item.image} alt="" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
+            <LazyImage
+              src={item.image}
+              alt=""
+              className="absolute inset-0 h-full w-full"
+              imgClassName="absolute inset-0 h-full w-full object-cover"
+              mobileWidth={160}
+              mobileQuality={60}
+            />
           ) : (
             <div className="absolute inset-0 bg-white/10" aria-hidden="true" />
           )}

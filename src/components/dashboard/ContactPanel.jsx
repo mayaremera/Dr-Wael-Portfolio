@@ -283,8 +283,8 @@ export default function ContactPanel() {
 
           <section className="mt-6 rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-brand/5">
             <p className="text-[0.65rem] font-semibold tracking-wide text-brand uppercase">3 · Direct contact</p>
-            <h2 className="mt-1 font-serif text-xl text-ink">Email &amp; phone</h2>
-            <p className="mt-1 text-sm text-ink-muted">Shown beside the location card on the contact page.</p>
+            <h2 className="mt-1 font-serif text-xl text-ink">Email, phone &amp; WhatsApp</h2>
+            <p className="mt-1 text-sm text-ink-muted">Shown beside the location card on the contact page and in the mobile header contact menu.</p>
             <div className="mt-4 grid gap-4 md:grid-cols-2">
               <div>
                 <label className={labelClassName}>Email</label>
@@ -301,6 +301,18 @@ export default function ContactPanel() {
                   value={content.directContact.phone}
                   onChange={(event) => updateDirectContact('phone', event.target.value)}
                 />
+              </div>
+              <div className="md:col-span-2">
+                <label className={labelClassName}>WhatsApp</label>
+                <input
+                  className={fieldClassName}
+                  value={content.directContact.whatsapp || ''}
+                  onChange={(event) => updateDirectContact('whatsapp', event.target.value)}
+                  placeholder="+1 321 509 6224"
+                />
+                <p className="mt-1.5 text-xs text-ink-muted">
+                  Include country code. Leave blank to hide the WhatsApp card.
+                </p>
               </div>
             </div>
             <button

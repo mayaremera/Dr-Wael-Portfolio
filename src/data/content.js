@@ -10,6 +10,7 @@ export const site = {
   domain: 'drwaelslp.com',
   email: 'info@drwaeldk.com',
   phone: '+1 913 309 6288',
+  whatsapp: '',
   languages: ['English', 'Arabic', 'Spanish'],
   tagline: 'Every child has something to say. We help them find the words.',
   footerTagline: 'Helping children communicate, connect, and thrive.',

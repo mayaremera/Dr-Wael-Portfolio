@@ -3,7 +3,7 @@ import { sortGalleryItems, GALLERY_PAGE_SIZE } from '../data/galleryContentStore
 import { useGalleryContent } from '../hooks/useGalleryContent'
 import { useInView } from '../hooks/useInView'
 import { protectedMediaProps, protectedShellProps, protectedVideoProps } from '../lib/mediaProtection'
-import { hasMediaSrc } from '../lib/mediaUrl'
+import { hasMediaSrc, optimizeMediaUrlForMobile } from '../lib/mediaUrl'
 import { scrollPaginationSectionIntoView } from '../lib/scrollPaginationSection'
 import LazySection from './LazySection'
 
@@ -18,8 +18,13 @@ function getItemDescription(item) {
 }
 
 function GalleryMediaPreview({ item, isMobile }) {
-  const [ref, inView] = useInView({ rootMargin: isMobile ? '40px 0px' : '120px 0px' })
+  const [ref, inView] = useInView({ rootMargin: isMobile ? '60px 140px' : '120px 0px' })
+  const [failedOptimized, setFailedOptimized] = useState(false)
   const mediaSrc = hasMediaSrc(item.src) ? item.src.trim() : ''
+  const displaySrc =
+    isMobile && !failedOptimized && item.type !== 'video'
+      ? optimizeMediaUrlForMobile(mediaSrc, { width: 560, quality: 65 })
+      : mediaSrc
 
   if (!mediaSrc) {
     return (
@@ -35,12 +40,16 @@ function GalleryMediaPreview({ item, isMobile }) {
         <div className="absolute inset-0 animate-pulse bg-slate-200" aria-hidden="true" />
       ) : (
         <img
-          src={encodeURI(mediaSrc)}
+          key={displaySrc}
+          src={encodeURI(displaySrc)}
           alt=""
           className="absolute inset-0 h-full w-full object-cover object-[center_28%] select-none"
           loading="lazy"
           decoding="async"
           {...(isMobile ? { fetchPriority: 'low' } : {})}
+          onError={() => {
+            if (!failedOptimized && displaySrc !== mediaSrc) setFailedOptimized(true)
+          }}
           {...protectedMediaProps}
         />
       )}

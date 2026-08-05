@@ -1,8 +1,9 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { useServicesContent } from '../hooks/useServicesContent'
-import { useState } from 'react'
+import { useIsNarrowViewport } from '../hooks/useIsNarrowViewport'
 import ClinicalSpecializations from './ClinicalSpecializations'
 import ContactButton from './ContactButton'
+import LazyImage from './LazyImage'
 import { hasMediaSrc } from '../lib/mediaUrl'
 
 const cardLinkClassName =
@@ -56,14 +57,15 @@ function CheckIcon() {
 
 function ServiceCardImage({ src, alt }) {
   return (
-    <div className="relative aspect-square w-full shrink-0 overflow-hidden lg:w-[42%] lg:max-w-[11.5rem] lg:self-center">
+    <div className="relative h-36 w-full shrink-0 overflow-hidden sm:h-40 lg:aspect-square lg:h-auto lg:w-[42%] lg:max-w-[11.5rem] lg:self-center">
       {hasMediaSrc(src) ? (
-        <img
+        <LazyImage
           src={src}
           alt={alt}
-          loading="lazy"
-          decoding="async"
-          className="absolute inset-0 h-full w-full object-cover object-[center_30%]"
+          className="absolute inset-0 h-full w-full"
+          imgClassName="absolute inset-0 h-full w-full object-cover object-[center_30%]"
+          mobileWidth={480}
+          mobileQuality={65}
         />
       ) : (
         <div className="absolute inset-0 bg-slate-100" aria-hidden="true" />
@@ -83,17 +85,18 @@ function MobileServiceDetailCard({ concept, index }) {
 
   return (
     <article
-      className="animate-fade-up overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-sm lg:hidden"
+      className="animate-fade-up overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-sm"
       style={{ animationDelay: `${Math.min(index * 0.08, 0.4)}s` }}
     >
       <div className="relative aspect-[5/4] overflow-hidden">
         {hasMediaSrc(concept.image) ? (
-          <img
+          <LazyImage
             src={concept.image}
             alt={`${concept.title}, ${concept.subtitle}`}
-            loading="lazy"
-            decoding="async"
-            className="absolute inset-0 h-full w-full object-cover object-center"
+            className="absolute inset-0 h-full w-full"
+            imgClassName="absolute inset-0 h-full w-full object-cover object-center"
+            mobileWidth={720}
+            mobileQuality={68}
           />
         ) : (
           <div className="absolute inset-0 bg-slate-100" aria-hidden="true" />
@@ -161,19 +164,22 @@ function MobileServiceDetailCard({ concept, index }) {
 }
 
 function ServiceDetailCard({ concept, index }) {
+  const isMobile = useIsNarrowViewport()
   const accent = serviceAccents[index % serviceAccents.length]
   const reversed = index % 2 === 1
+
+  // Mobile and desktop layouts stay separate so we never download both images.
+  if (isMobile) {
+    return <MobileServiceDetailCard concept={concept} index={index} />
+  }
 
   const imageWrapClass = reversed
     ? 'relative m-5 aspect-[5/4] overflow-hidden rounded-xl sm:m-6 lg:my-6 lg:ml-0 lg:mr-6'
     : 'relative m-5 aspect-[5/4] overflow-hidden rounded-xl sm:m-6 lg:my-6 lg:mr-0 lg:ml-6'
 
   return (
-    <>
-      <MobileServiceDetailCard concept={concept} index={index} />
-
-      <article
-      className="animate-fade-up group relative hidden overflow-hidden rounded-2xl bg-white shadow-[0_8px_40px_-12px_rgba(26,77,92,0.18)] ring-1 ring-slate-200/80 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_50px_-16px_rgba(26,77,92,0.22)] hover:ring-brand/20 lg:block"
+    <article
+      className="animate-fade-up group relative overflow-hidden rounded-2xl bg-white shadow-[0_8px_40px_-12px_rgba(26,77,92,0.18)] ring-1 ring-slate-200/80 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_50px_-16px_rgba(26,77,92,0.22)] hover:ring-brand/20"
       style={{ animationDelay: `${Math.min(index * 0.08, 0.4)}s` }}
     >
       <div
@@ -189,12 +195,12 @@ function ServiceDetailCard({ concept, index }) {
         <div className="relative lg:w-[44%] xl:w-[42%]">
           <div className={imageWrapClass}>
             {hasMediaSrc(concept.image) ? (
-              <img
+              <LazyImage
                 src={concept.image}
                 alt={`${concept.title}, ${concept.subtitle}`}
-                loading="lazy"
-                decoding="async"
-                className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.04]"
+                className="absolute inset-0 h-full w-full"
+                imgClassName="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.04]"
+                optimizeForMobile={false}
               />
             ) : (
               <div className="absolute inset-0 bg-slate-100" aria-hidden="true" />
@@ -204,11 +210,6 @@ function ServiceDetailCard({ concept, index }) {
               className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.12),transparent_55%)]"
               aria-hidden="true"
             />
-
-            <div className="absolute inset-x-0 bottom-0 hidden p-5 sm:p-6 lg:hidden">
-              <h3 className="font-serif text-2xl leading-tight text-white">{concept.title}</h3>
-              <p className="mt-1 text-sm font-medium text-white/85">{concept.subtitle}</p>
-            </div>
           </div>
         </div>
 
@@ -262,7 +263,6 @@ function ServiceDetailCard({ concept, index }) {
         </div>
       </div>
     </article>
-    </>
   )
 }
 
@@ -381,10 +381,13 @@ function CasesPreviewGrid({ cases }) {
           >
             <div className="relative h-36 w-full shrink-0 overflow-hidden">
               {hasMediaSrc(item.image) ? (
-                <img
+                <LazyImage
                   src={item.image}
                   alt={item.title}
-                  className="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-105 lg:object-center"
+                  className="absolute inset-0 h-full w-full"
+                  imgClassName="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-105 lg:object-center"
+                  mobileWidth={480}
+                  mobileQuality={65}
                   draggable="false"
                 />
               ) : (

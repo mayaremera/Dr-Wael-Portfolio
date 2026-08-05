@@ -112,6 +112,8 @@ function VideoCard({ item, onPlay }) {
               alt=""
               className="absolute inset-0 h-full w-full"
               imgClassName="absolute inset-0 h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+              mobileWidth={640}
+              mobileQuality={65}
               {...protectedMediaProps}
             />
           ) : (
