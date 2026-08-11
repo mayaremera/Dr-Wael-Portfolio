@@ -234,13 +234,29 @@ export function getPageSeo(pathname) {
   }
 }
 
+function cleanProfileUrl(url) {
+  if (!url) return ''
+  try {
+    const parsed = new URL(url)
+    ;['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'mibextid', 's', 't', 'invite', 'ev'].forEach(
+      (param) => parsed.searchParams.delete(param),
+    )
+    const search = parsed.searchParams.toString()
+    return `${parsed.origin}${parsed.pathname}${search ? `?${search}` : ''}`.replace(/\/$/, '')
+  } catch {
+    return url
+  }
+}
+
 function buildSameAs() {
   return [
     ...Object.values(site.social),
     site.academic.googleScholar,
     site.academic.researchGate,
     site.academic.orcid,
-  ].filter((url) => url && !url.endsWith('/'))
+  ]
+    .map(cleanProfileUrl)
+    .filter(Boolean)
 }
 
 function buildMedicalConditions() {
@@ -367,7 +383,7 @@ export function buildJsonLd(pathname) {
         '@type': 'MedicalCondition',
         name,
       })),
-      lastReviewed: '2026-06-23',
+      lastReviewed: '2026-08-12',
       reviewedBy: { '@id': `${SITE_URL}/#person` },
     })
   }

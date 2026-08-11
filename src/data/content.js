@@ -23,7 +23,7 @@ export const site = {
   academic: {
     googleScholar: 'https://scholar.google.com/citations?user=EEoUMHMAAAAJ&hl=en',
     researchGate: 'https://www.researchgate.net/profile/Wael-Aldakroury?ev=hdr_xprf',
-    orcid: 'https://orcid.org/my-orcid?orcid=0000-0003-3158-6414',
+    orcid: 'https://orcid.org/0000-0003-3158-6414',
     orcidId: '0000-0003-3158-6414',
   },
 }
