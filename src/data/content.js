@@ -1,31 +1,30 @@
-/** Site content — Dr. Wael A. Al-Dakroury, SLP (drwaelslp.com) */
+/** Site content — Dr. Wael A. Al-Dakroury, SLP (drwaeldk.com) */
 
 import heroMobileVertical from '../assets/hero-mobile-vertical.png'
+import {
+  SITE_ACADEMIC,
+  SITE_DOMAIN,
+  SITE_EMAIL,
+  SITE_JOB_TITLE,
+  SITE_LANGUAGES,
+  SITE_NAME,
+  SITE_PHONE,
+  SITE_SOCIAL,
+} from './siteIdentity'
 
 export const site = {
-  name: 'Dr. Wael A. Al-Dakroury',
-  title:
-    'Consultant Bilingual Speech Language Pathologist & Associate Professor in Speech Language Pathology',
+  name: SITE_NAME,
+  title: SITE_JOB_TITLE,
   suffix: 'SLP',
-  domain: 'drwaelslp.com',
-  email: 'info@drwaeldk.com',
-  phone: '+1 913 309 6288',
+  domain: SITE_DOMAIN,
+  email: SITE_EMAIL,
+  phone: SITE_PHONE,
   whatsapp: '',
-  languages: ['English', 'Arabic', 'Spanish'],
+  languages: [...SITE_LANGUAGES],
   tagline: 'Every child has something to say. We help them find the words.',
   footerTagline: 'Helping children communicate, connect, and thrive.',
-  social: {
-    facebook: 'https://www.facebook.com/share/18yWpgqVwW/?mibextid=wwXIfr',
-    threads: 'https://www.threads.com/@dr.waelaldakroury?invite=0',
-    linkedin: 'https://www.linkedin.com/in/waelslp?utm_source=share_via&utm_content=profile&utm_medium=member_ios',
-    twitter: 'https://x.com/waelslp?s=11&t=dyMPABoxYnqU0IAoWfilIQ',
-  },
-  academic: {
-    googleScholar: 'https://scholar.google.com/citations?user=EEoUMHMAAAAJ&hl=en',
-    researchGate: 'https://www.researchgate.net/profile/Wael-Aldakroury?ev=hdr_xprf',
-    orcid: 'https://orcid.org/0000-0003-3158-6414',
-    orcidId: '0000-0003-3158-6414',
-  },
+  social: SITE_SOCIAL,
+  academic: SITE_ACADEMIC,
 }
 
 export const images = {

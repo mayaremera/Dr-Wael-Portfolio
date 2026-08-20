@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { buildJsonLd, getPageSeo, SITE_URL } from '../lib/seo'
+import { useContactContent } from './useContactContent'
 
 const SEO_JSON_LD_ID = 'seo-json-ld'
 const SEO_MANAGED_ATTR = 'data-seo-managed'
@@ -63,7 +64,7 @@ function setJsonLd(data) {
   script.textContent = JSON.stringify(data)
 }
 
-function applySeo(pathname) {
+function applySeo(pathname, contact = {}) {
   const seo = getPageSeo(pathname)
   const isDashboard = pathname === '/dashboard' || pathname.startsWith('/dashboard/')
 
@@ -79,8 +80,8 @@ function applySeo(pathname) {
   setMetaName('description', seo.description)
   setMetaName('keywords', seo.keywords)
   setMetaName('author', 'Dr. Wael A. Al-Dakroury')
-  setMetaName('robots', 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1')
-  setMetaName('googlebot', 'index, follow')
+  setMetaName('robots', seo.robots)
+  setMetaName('googlebot', seo.isNotFound ? 'noindex, nofollow' : 'index, follow')
   setMetaName('application-name', 'Dr. Wael Al-Dakroury SLP')
   setMetaName('theme-color', '#1a4d5c')
 
@@ -103,18 +104,23 @@ function applySeo(pathname) {
 
   setLink('canonical', seo.canonical)
 
-  setLink('alternate', seo.canonical, { hreflang: 'en' })
-  setLink('alternate', seo.canonical, { hreflang: 'ar' })
-  setLink('alternate', seo.canonical, { hreflang: 'es' })
-  setLink('alternate', seo.canonical, { hreflang: 'x-default' })
-
-  setJsonLd(buildJsonLd(pathname))
+  if (!seo.isNotFound) {
+    setLink('alternate', seo.canonical, { hreflang: 'en' })
+    setLink('alternate', seo.canonical, { hreflang: 'ar' })
+    setLink('alternate', seo.canonical, { hreflang: 'es' })
+    setLink('alternate', seo.canonical, { hreflang: 'x-default' })
+    setJsonLd(buildJsonLd(pathname, contact))
+  }
 }
 
 export function useSeo(pathname) {
+  const { directContact } = useContactContent()
+  const phone = directContact?.phone?.trim() || ''
+  const email = directContact?.email?.trim() || ''
+
   useEffect(() => {
-    applySeo(pathname)
-  }, [pathname])
+    applySeo(pathname, { phone, email })
+  }, [pathname, phone, email])
 }
 
 export function getDefaultSeoTags() {

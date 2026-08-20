@@ -1,63 +1,23 @@
 /**
  * After Vite build, write static HTML shells for each public route so crawlers
- * get correct title/description/canonical without waiting on JS.
+ * get correct title/description/canonical, JSON-LD, and page-specific content
+ * without waiting on JS.
  */
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import {
+  PAGE_SEO,
+  PUBLIC_ROUTES,
+  SITE_URL,
+  buildJsonLd,
+  getPageSeo,
+  renderCrawlerNoscript,
+} from '../src/lib/pageSeo.js'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const distDir = join(root, 'dist')
 const indexPath = join(distDir, 'index.html')
-const SITE_URL = 'https://drwaelslp.com'
-
-const PAGE_SEO = {
-  '/': {
-    title: 'Dr. Wael Al-Dakroury | ASHA Fellow Speech-Language Pathologist & Professor',
-    description:
-      'Dr. Wael A. Al-Dakroury — ASHA Fellow (F-ASHA), CCC-SLP, bilingual speech-language pathologist, professor & international leader in communication sciences. Expert care for autism, ADHD, language disorders, stuttering & speech sound disorders. Serving families in the USA, Canada, Saudi Arabia, GCC & Middle East. English, Arabic & Spanish-speaking families welcome.',
-    priority: '1.0',
-    changefreq: 'weekly',
-  },
-  '/about-me': {
-    title: 'About Dr. Wael Al-Dakroury | ASHA Fellow, Professor & SLP Leader',
-    description:
-      'Biography of Dr. Wael A. Al-Dakroury — Ph.D., CCC-SLP, ASHA Fellow, Associate Professor, Director of Communication Disorders. 30+ years in speech-language pathology, ASHA SIG17 Chief Editor, IALP committee member, honorary president EACSL.',
-    priority: '0.9',
-    changefreq: 'monthly',
-  },
-  '/services': {
-    title: 'Speech & Language Therapy Services | Autism, ADHD, DLD & More — Dr. Wael Al-Dakroury',
-    description:
-      'Evidence-based speech & language therapy for autism (ASD), ADHD, developmental language disorder (DLD), speech sound disorders, stuttering, pragmatic communication & global developmental delay. Screening, assessment, therapy, family training & professional workshops. Bilingual English & Arabic.',
-    priority: '0.95',
-    changefreq: 'monthly',
-  },
-  '/gallery': {
-    title: 'Gallery | Dr. Wael Al-Dakroury — Lectures, Ceremonies & Clinical Highlights',
-    description:
-      'Watch Dr. Wael Al-Dakroury in lectures, ASHA conferences, award ceremonies & clinical settings. Video library and photo gallery showcasing decades of contribution to speech-language pathology worldwide.',
-    priority: '0.8',
-    changefreq: 'weekly',
-  },
-  '/in-the-field': {
-    title: 'In the Field | Dr. Wael Al-Dakroury — Conferences, ASHA & Global SLP Leadership',
-    description:
-      "Dr. Wael Al-Dakroury's global engagements — ASHA panels, university lectures, international conferences, leadership meetings & professional training across the USA, Canada, Saudi Arabia, GCC, Egypt & the Middle East.",
-    priority: '0.8',
-    changefreq: 'weekly',
-  },
-  '/contact': {
-    title: 'Contact Dr. Wael Al-Dakroury | Book Speech & Language Consultation',
-    description:
-      'Contact Dr. Wael A. Al-Dakroury for speech & language consultation, professional speaking, clinical supervision & family appointments. Reach via phone, email or contact form. English & Arabic. Serving USA, Canada, Saudi Arabia, UAE, Qatar, Bahrain, Oman, Egypt, Jordan & Kuwait.',
-    priority: '0.85',
-    changefreq: 'monthly',
-  },
-}
-
-const PUBLIC_ROUTES = Object.keys(PAGE_SEO)
-const OG_IMAGE = `${SITE_URL}/images/dr-wael.jpeg`
 
 function escapeHtml(value) {
   return String(value)
@@ -65,10 +25,6 @@ function escapeHtml(value) {
     .replaceAll('<', '&lt;')
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;')
-}
-
-function absoluteUrl(path) {
-  return path === '/' ? `${SITE_URL}/` : `${SITE_URL}${path}`
 }
 
 function replaceMetaByName(html, name, content) {
@@ -101,43 +57,59 @@ function replaceTitle(html, title) {
   return html.replace(/<title>[^<]*<\/title>/i, `<title>${escapeHtml(title)}</title>`)
 }
 
+function replaceJsonLd(html, data) {
+  const json = JSON.stringify(data, null, 2).replace(/</g, '\\u003c')
+  const tag = `<script id="seo-json-ld" type="application/ld+json">\n${json}\n    </script>`
+  const withId = /<script id="seo-json-ld"[^>]*>[\s\S]*?<\/script>/i
+  if (withId.test(html)) return html.replace(withId, tag)
+  const anyLd = /<script type="application\/ld\+json">[\s\S]*?<\/script>/i
+  if (anyLd.test(html)) return html.replace(anyLd, tag)
+  return html.replace('</head>', `    ${tag}\n  </head>`)
+}
+
+function replaceNoscript(html, inner) {
+  const tag = `<noscript>\n${inner}\n    </noscript>`
+  const re = /<noscript>[\s\S]*?<\/noscript>/i
+  return re.test(html) ? html.replace(re, tag) : html.replace('<div id="root"></div>', `${tag}\n    <div id="root"></div>`)
+}
+
 function applyPageSeo(html, path) {
-  const seo = PAGE_SEO[path]
-  const canonical = absoluteUrl(path)
+  const seo = getPageSeo(path)
   let next = html
   next = replaceTitle(next, seo.title)
   next = replaceMetaByName(next, 'description', seo.description)
+  next = replaceMetaByName(next, 'keywords', seo.keywords)
   next = replaceMetaByName(next, 'twitter:title', seo.title)
   next = replaceMetaByName(next, 'twitter:description', seo.description)
-  next = replaceMetaByName(next, 'twitter:image', OG_IMAGE)
+  next = replaceMetaByName(next, 'twitter:image', seo.image)
   next = replaceMetaByProperty(next, 'og:title', seo.title)
   next = replaceMetaByProperty(next, 'og:description', seo.description)
-  next = replaceMetaByProperty(next, 'og:url', canonical)
-  next = replaceMetaByProperty(next, 'og:image', OG_IMAGE)
-  next = replaceLinkCanonical(next, canonical)
-  next = replaceHreflang(next, canonical)
+  next = replaceMetaByProperty(next, 'og:url', seo.canonical)
+  next = replaceMetaByProperty(next, 'og:image', seo.image)
+  next = replaceLinkCanonical(next, seo.canonical)
+  next = replaceHreflang(next, seo.canonical)
+  next = replaceJsonLd(next, buildJsonLd(path))
+  next = replaceNoscript(next, renderCrawlerNoscript(path))
   return next
 }
 
 function writeSitemap() {
   const today = new Date().toISOString().slice(0, 10)
   const urls = PUBLIC_ROUTES.map((path) => {
-    const loc = absoluteUrl(path)
-    const seo = PAGE_SEO[path]
-    const hreflang =
-      path === '/'
-        ? `
+    const seo = getPageSeo(path)
+    const page = PAGE_SEO[path]
+    const loc = seo.canonical
+    const hreflang = `
     <xhtml:link rel="alternate" hreflang="en" href="${loc}" />
     <xhtml:link rel="alternate" hreflang="ar" href="${loc}" />
     <xhtml:link rel="alternate" hreflang="es" href="${loc}" />
     <xhtml:link rel="alternate" hreflang="x-default" href="${loc}" />`
-        : ''
 
     return `  <url>
     <loc>${loc}</loc>
     <lastmod>${today}</lastmod>
-    <changefreq>${seo.changefreq}</changefreq>
-    <priority>${seo.priority}</priority>${hreflang}
+    <changefreq>${page.changefreq}</changefreq>
+    <priority>${page.priority}</priority>${hreflang}
   </url>`
   }).join('\n')
 
@@ -171,5 +143,11 @@ for (const path of PUBLIC_ROUTES) {
   writeFileSync(outFile, html)
 }
 
+let notFoundHtml = replaceTitle(baseHtml, 'Page not found | Dr. Wael Al-Dakroury')
+notFoundHtml = replaceMetaByName(notFoundHtml, 'robots', 'noindex, nofollow')
+notFoundHtml = replaceMetaByName(notFoundHtml, 'googlebot', 'noindex, nofollow')
+notFoundHtml = notFoundHtml.replace(/<link\s+rel="canonical"\s+href="[^"]*"\s*\/?>/i, '')
+writeFileSync(join(distDir, '404.html'), notFoundHtml)
+
 writeSitemap()
-console.log(`prerender-seo: wrote ${PUBLIC_ROUTES.length} routes + sitemap.xml`)
+console.log(`prerender-seo: wrote ${PUBLIC_ROUTES.length} routes + sitemap.xml (${SITE_URL})`)
