@@ -265,7 +265,7 @@ function buildMedicalConditions() {
 
 export function buildJsonLd(pathname) {
   const seo = getPageSeo(pathname)
-  const phoneTel = site.phone.replace(/\s/g, '')
+  const phoneTel = site.phone.replace(/[^\d+]/g, '')
 
   const person = {
     '@type': ['Person', 'Physician'],
@@ -285,6 +285,13 @@ export function buildJsonLd(pathname) {
     nationality: {
       '@type': 'Country',
       name: 'Saudi Arabia',
+    },
+    contactPoint: {
+      '@type': 'ContactPoint',
+      telephone: phoneTel,
+      email: site.email,
+      contactType: 'customer service',
+      availableLanguage: ['English', 'Arabic', 'Spanish'],
     },
     alumniOf: profileDetails.education.map((entry) => ({
       '@type': 'EducationalOrganization',
@@ -324,11 +331,6 @@ export function buildJsonLd(pathname) {
     description: DEFAULT_DESCRIPTION,
     inLanguage: ['en', 'ar', 'es'],
     publisher: { '@id': `${SITE_URL}/#person` },
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: `${SITE_URL}/?q={search_term_string}`,
-      'query-input': 'required name=search_term_string',
-    },
   }
 
   const practice = {
@@ -348,6 +350,13 @@ export function buildJsonLd(pathname) {
     })),
     founder: { '@id': `${SITE_URL}/#person` },
     parentOrganization: { '@id': `${SITE_URL}/#person` },
+    contactPoint: {
+      '@type': 'ContactPoint',
+      telephone: phoneTel,
+      email: site.email,
+      contactType: 'customer service',
+      availableLanguage: ['English', 'Arabic', 'Spanish'],
+    },
   }
 
   const breadcrumbItems = buildBreadcrumbs(seo.path)

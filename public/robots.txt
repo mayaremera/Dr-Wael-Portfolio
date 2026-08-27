@@ -3,5 +3,5 @@ Allow: /
 Disallow: /dashboard
 Disallow: /dashboard/
 
-Host: https://drwaelslp.com
-Sitemap: https://drwaelslp.com/sitemap.xml
+Host: https://drwaeldk.com
+Sitemap: https://drwaeldk.com/sitemap.xml

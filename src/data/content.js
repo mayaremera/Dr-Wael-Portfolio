@@ -1,4 +1,4 @@
-/** Site content — Dr. Wael A. Al-Dakroury, SLP (drwaelslp.com) */
+/** Site content — Dr. Wael A. Al-Dakroury, SLP (drwaeldk.com) */
 
 import heroMobileVertical from '../assets/hero-mobile-vertical.png'
 
@@ -7,9 +7,9 @@ export const site = {
   title:
     'Consultant Bilingual Speech Language Pathologist & Associate Professor in Speech Language Pathology',
   suffix: 'SLP',
-  domain: 'drwaelslp.com',
+  domain: 'drwaeldk.com',
   email: 'info@drwaeldk.com',
-  phone: '+1 913 309 6288',
+  phone: '+1 321-509-6224',
   whatsapp: '',
   languages: ['English', 'Arabic', 'Spanish'],
   tagline: 'Every child has something to say. We help them find the words.',

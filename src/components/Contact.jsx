@@ -274,7 +274,7 @@ export default function Contact() {
                 compact
               />
               <ContactLink
-                href={`tel:${directContact.phone.replace(/\s/g, '')}`}
+                href={`tel:${directContact.phone.replace(/[^\d+]/g, '')}`}
                 label={directContact.phone}
                 icon={<PhoneIcon />}
                 compact
