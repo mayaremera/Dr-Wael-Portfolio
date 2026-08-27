@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useContactContent } from '../hooks/useContactContent'
 import { toWhatsAppHref } from '../data/contactContentStore'
+import { toTelHref } from '../data/siteIdentity'
 import ContactButton from './ContactButton'
 import { CONTACT_RECIPIENT_EMAIL, submitContactForm } from '../lib/contactFormSubmit'
 
@@ -274,7 +275,7 @@ export default function Contact() {
                 compact
               />
               <ContactLink
-                href={`tel:${directContact.phone.replace(/[^\d+]/g, '')}`}
+                href={`tel:${toTelHref(directContact.phone)}`}
                 label={directContact.phone}
                 icon={<PhoneIcon />}
                 compact

@@ -12,9 +12,25 @@
       "headers": [{ "key": "Content-Type", "value": "text/plain; charset=utf-8" }]
     }
   ],
+  "redirects": [
+    {
+      "source": "/cases",
+      "destination": "/services",
+      "permanent": true
+    },
+    {
+      "source": "/video-gallery",
+      "destination": "/gallery",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
-      "source": "/((?!assets/).*)",
+      "source": "/dashboard",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/dashboard/:path*",
       "destination": "/index.html"
     }
   ]
