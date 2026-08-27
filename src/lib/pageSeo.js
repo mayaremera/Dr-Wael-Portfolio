@@ -43,6 +43,11 @@ export const NAME_VARIANTS = [
   'د. وائل الدكروري',
   'دكتور وائل الدكروري',
   'الدكتور وائل الدكروري',
+  'د. وائل الدكروري السعودية',
+  'دكتور وائل الدكروري السعودية',
+  'دكتور وائل الدكروري الرياض',
+  'وائل الدكروري الرياض',
+  'وائل الدكروري السعودية',
 ]
 
 const DISORDER_KEYWORDS = [
@@ -86,10 +91,23 @@ const ENGLISH_KEYWORDS = [
 ]
 
 const ARABIC_KEYWORDS = [
+  'دكتور وائل الدكروري',
+  'الدكتور وائل الدكروري',
+  'د. وائل الدكروري',
+  'وائل الدكروري',
+  'دكتور وائل الدكروري السعودية',
+  'دكتور وائل الدكروري الرياض',
+  'وائل الدكروري السعودية',
+  'وائل الدكروري الرياض',
+  'أخصائي نطق ولغة السعودية',
+  'أخصائي نطق ولغة الرياض',
   'علاج النطق واللغة',
+  'علاج النطق الرياض',
+  'علاج النطق السعودية',
   'اضطرابات النطق',
   'اضطرابات اللغة',
   'اخصائي نطق ولغة',
+  'أخصائي نطق ولغة',
   'معالج نطق',
   'علاج تأخر النطق',
   'اضطراب طيف التوحد',
@@ -103,6 +121,10 @@ const ARABIC_KEYWORDS = [
   'دكتور نطق ولغة',
   'بروفيسور نطق ولغة',
   'زميل جمعية ASHA',
+  'جامعة الفيصل',
+  'مجمع العناية النفسية',
+  'الرياض',
+  'السعودية',
 ]
 
 const SPANISH_KEYWORDS = [
@@ -180,12 +202,22 @@ const CREDENTIALS = ['Ph.D.', 'CCC-SLP', 'ASHA Fellow (F-ASHA)']
 const PERSON_BIO =
   'Dr. Wael is an internationally recognized speech-language pathologist with 30+ years of experience. He directs the Communication Disorders Department at Psych Care Complex, Riyadh, serves as Associate Professor at Alfaisal University, and was named ASHA Fellow.'
 
+const PERSON_BIO_AR =
+  'الدكتور وائل الدكروري أخصائي نطق ولغة معترف به دولياً بخبرة تزيد عن 30 عاماً. يدير قسم اضطرابات التواصل في مجمع العناية النفسية بالرياض، ويعمل أستاذاً مشاركاً في جامعة الفيصل، وهو زميل جمعية ASHA.'
+
 const PERSON_BIO_EXTENDED = [
   PERSON_BIO,
+  PERSON_BIO_AR,
   'Named ASHA Fellow (F-ASHA) — one of the highest honors awarded by the American Speech-Language-Hearing Association — he is also a clinical educator in graduate Speech-Language Pathology programs.',
   'He offers bilingual care in English and Arabic, specializing in autism, ADHD, language disorders, speech sound disorders, and fluency, with evidence-based, family-centered support at every step.',
+  'يقدم رعاية ثنائية اللغة بالعربية والإنجليزية، مع تخصص في التوحد واضطراب فرط الحركة وتشتت الانتباه واضطرابات اللغة والنطق والطلاقة، بدعم قائم على الأدلة وموجه للأسرة.',
   'As an international speaker, consultant, and professional mentor, he collaborates with universities, healthcare organizations, and professional associations worldwide — advancing communication sciences through clinical excellence, education, and leadership.',
 ]
+
+const HOME_TITLE =
+  'دكتور وائل الدكروري | Dr. Wael Al-Dakroury — ASHA Fellow Speech-Language Pathologist'
+const HOME_DESCRIPTION =
+  'الموقع الرسمي للدكتور وائل الدكروري (السعودية / الرياض) — زميل ASHA، أخصائي نطق ولغة واستاذ مشارك. Official website of Dr. Wael A. Al-Dakroury — ASHA Fellow (F-ASHA), CCC-SLP, bilingual speech-language pathologist and associate professor in Riyadh, Saudi Arabia.'
 
 const SERVICES_INTRO =
   'Our speech-language services are here to help your child express themselves clearly and confidently—at home, in school, and in everyday life.'
@@ -217,30 +249,32 @@ const PATH_ALIASES = {
 
 export const PAGE_SEO = {
   '/': {
-    title: 'Dr. Wael Al-Dakroury | ASHA Fellow Speech-Language Pathologist & Professor',
-    description:
-      'Official website of Dr. Wael A. Al-Dakroury — ASHA Fellow (F-ASHA), CCC-SLP, bilingual speech-language pathologist, associate professor, and international leader in communication sciences. Learn about his work, clinical services, and how to book a consultation.',
+    title: HOME_TITLE,
+    description: HOME_DESCRIPTION,
     keywords: [
       ...GLOBAL_KEYWORDS,
       'best speech therapist',
       'international speech pathologist',
       'ASHA International Ambassador',
+      'دكتور وائل الدكروري الموقع الرسمي',
     ],
     changefreq: 'weekly',
     priority: '1.0',
     crawler: {
-      heading: 'Dr. Wael A. Al-Dakroury — Speech-Language Pathologist & ASHA Fellow',
+      heading: 'دكتور وائل الدكروري | Dr. Wael A. Al-Dakroury — Speech-Language Pathologist & ASHA Fellow',
       paragraphs: [
         `${SITE_JOB_TITLE}. Official website of Dr. Wael A. Al-Dakroury, offering bilingual speech-language pathology care in English and Arabic for children and families.`,
         PERSON_BIO,
+        PERSON_BIO_AR,
         'He specializes in autism, ADHD, language disorders, speech sound disorders, and fluency, with evidence-based, family-centered support. Families in the United States, Canada, Saudi Arabia, UAE, Qatar, Bahrain, Oman, Egypt, Jordan, and Kuwait are welcome.',
+        'يتخصص في التوحد واضطرابات اللغة والنطق والطلاقة، ويخدم العائلات في السعودية والخليج والولايات المتحدة وكندا ومصر والأردن.',
       ],
     },
   },
   '/about-me': {
-    title: 'About Dr. Wael Al-Dakroury | Biography, Credentials & Experience',
+    title: 'عن الدكتور وائل الدكروري | About Dr. Wael Al-Dakroury — Biography & Credentials',
     description:
-      'Biography of Dr. Wael A. Al-Dakroury — Ph.D., CCC-SLP, ASHA Fellow, Associate Professor at Alfaisal University, and Director of the Communication Disorders Department at Psych Care Complex, Riyadh. Education, credentials, leadership roles, and 30+ years of clinical and academic experience.',
+      'السيرة الذاتية للدكتور وائل الدكروري — زميل ASHA، أستاذ مشارك في جامعة الفيصل، ومدير قسم اضطرابات التواصل في مجمع العناية النفسية بالرياض، السعودية. Biography, credentials, education, and 30+ years of clinical and academic experience.',
     keywords: [
       ...GLOBAL_KEYWORDS,
       'ASHA Fellow biography',
@@ -251,23 +285,24 @@ export const PAGE_SEO = {
       'Psych Care Complex Riyadh',
       'IALP child language committee',
       'EACSL honorary president',
+      'سيرة الدكتور وائل الدكروري',
     ],
     changefreq: 'monthly',
     priority: '0.9',
     crawler: {
-      heading: 'About Dr. Wael A. Al-Dakroury',
+      heading: 'عن الدكتور وائل الدكروري | About Dr. Wael A. Al-Dakroury',
       paragraphs: PERSON_BIO_EXTENDED,
       lists: [
-        { title: 'Credentials', items: CREDENTIALS },
-        { title: 'Education', items: EDUCATION },
-        { title: 'Professional roles', items: ROLES },
+        { title: 'Credentials / المؤهلات', items: CREDENTIALS },
+        { title: 'Education / التعليم', items: EDUCATION },
+        { title: 'Professional roles / المناصب المهنية', items: ROLES },
       ],
     },
   },
   '/services': {
-    title: 'Speech & Language Therapy Services | Dr. Wael Al-Dakroury',
+    title: 'خدمات علاج النطق واللغة | Speech Therapy Services — Dr. Wael Al-Dakroury',
     description:
-      'Bilingual speech-language pathology services from Dr. Wael Al-Dakroury: screening, assessment, therapy, family counseling, family training, and professional workshops. Clinical care for autism, ADHD, DLD, speech sound disorders, stuttering, pragmatic communication, and related childhood communication needs.',
+      'خدمات علاج النطق واللغة ثنائية اللغة مع الدكتور وائل الدكروري في الرياض والسعودية: تقييم، علاج، إرشاد أسري، وتدريب مهني. Bilingual speech-language pathology services: screening, assessment, therapy, family counseling, family training, and professional workshops for autism, ADHD, DLD, speech sound disorders, stuttering, and pragmatic communication.',
     keywords: [
       ...GLOBAL_KEYWORDS,
       'speech therapy services',
@@ -278,22 +313,27 @@ export const PAGE_SEO = {
       'professional SLP workshops',
       'school age language therapy',
       'clinical supervision SLP',
+      'خدمات علاج النطق الرياض',
     ],
     changefreq: 'monthly',
     priority: '0.95',
     crawler: {
-      heading: 'Bilingual Speech-Language Pathology Services',
-      paragraphs: [SERVICES_INTRO, CASES_INTRO],
+      heading: 'خدمات علاج النطق واللغة | Bilingual Speech-Language Pathology Services',
+      paragraphs: [
+        SERVICES_INTRO,
+        CASES_INTRO,
+        'نقدم خدمات تقييم وعلاج اضطرابات التواصل للأطفال باللغة العربية والإنجليزية، مع دعم موجّه للأسرة في السعودية والخليج.',
+      ],
       lists: [
-        { title: 'Clinical services', items: THERAPY_SERVICES },
-        { title: 'Conditions we understand and treat', items: CONDITIONS_TREATED },
+        { title: 'Clinical services / الخدمات السريرية', items: THERAPY_SERVICES },
+        { title: 'Conditions we understand and treat / الحالات التي نتعامل معها', items: CONDITIONS_TREATED },
       ],
     },
   },
   '/gallery': {
-    title: 'Gallery | Dr. Wael Al-Dakroury — Lectures, Ceremonies & Clinical Highlights',
+    title: 'المعرض | Gallery — Dr. Wael Al-Dakroury Lectures & Clinical Highlights',
     description:
-      'Video library and photo gallery from Dr. Wael Al-Dakroury’s lectures, ASHA conferences, award ceremonies, and clinical settings — snapshots from sessions, training, and professional events.',
+      'معرض صور وفيديو للدكتور وائل الدكروري من محاضرات ومؤتمرات ASHA وفعاليات مهنية. Video library and photo gallery from lectures, ASHA conferences, award ceremonies, and clinical settings.',
     keywords: [
       ...GLOBAL_KEYWORDS,
       'speech pathology lectures',
@@ -305,16 +345,17 @@ export const PAGE_SEO = {
     changefreq: 'weekly',
     priority: '0.8',
     crawler: {
-      heading: 'Gallery — Insights and Moments from Practice',
+      heading: 'المعرض | Gallery — Insights and Moments from Practice',
       paragraphs: [
         'Photos from clinical work, training sessions, and professional events, plus videos from lectures, conferences, and award ceremonies featuring Dr. Wael Al-Dakroury.',
+        'صور ومقاطع من العمل السريري والتدريب والمؤتمرات المهنية للدكتور وائل الدكروري.',
       ],
     },
   },
   '/in-the-field': {
-    title: 'In the Field | Dr. Wael Al-Dakroury — Conferences, ASHA & Global SLP Leadership',
+    title: 'في الميدان | In the Field — Dr. Wael Al-Dakroury Global SLP Leadership',
     description:
-      'Global engagements of Dr. Wael Al-Dakroury — conferences, university lectures, ASHA panels, leadership meetings, and professional training across the USA, Canada, Saudi Arabia, GCC, Egypt, and the Middle East.',
+      'مشاركات الدكتور وائل الدكروري العالمية — مؤتمرات ومحاضرات وقيادة مهنية في السعودية والخليج والولايات المتحدة وكندا ومصر. Global engagements: conferences, university lectures, ASHA panels, leadership meetings, and professional training.',
     keywords: [
       ...GLOBAL_KEYWORDS,
       'ASHA Connect',
@@ -327,17 +368,18 @@ export const PAGE_SEO = {
     changefreq: 'weekly',
     priority: '0.8',
     crawler: {
-      heading: 'In the Field — Conferences, Lectures & Global Leadership',
+      heading: 'في الميدان | In the Field — Conferences, Lectures & Global Leadership',
       paragraphs: [
         'Conferences, lectures, meetings, and professional engagements: a snapshot of where Dr. Wael is contributing now and highlights from recent months.',
         'Current and recent leadership roles include ASHA Fellow (F-ASHA), Editor of Perspectives SIG 17, ASHA International Ambassador, Member of the IALP Child Language Committee, and recipient of the ASHA Certificate of Recognition for International Achievement.',
+        'يشمل نشاطه الميداني مؤتمرات ومحاضرات واجتماعات قيادية في السعودية والخليج والولايات المتحدة وكندا ومصر والشرق الأوسط.',
       ],
     },
   },
   '/contact': {
-    title: 'Contact Dr. Wael Al-Dakroury | Book a Speech & Language Consultation',
+    title: 'تواصل مع الدكتور وائل الدكروري | Contact Dr. Wael Al-Dakroury',
     description:
-      'Contact Dr. Wael A. Al-Dakroury to book a speech and language consultation, ask a question, or inquire about professional speaking, clinical supervision, or family appointments. Reach the practice by phone, email, or the contact form.',
+      'تواصل مع الدكتور وائل الدكروري لحجز استشارة نطق ولغة أو الاستفسار عن التدريب والإشراف السريري — الرياض، السعودية. Contact Dr. Wael A. Al-Dakroury by phone, email, or the contact form for consultation, speaking, clinical supervision, or family appointments.',
     keywords: [
       ...GLOBAL_KEYWORDS,
       'book speech therapy consultation',
@@ -345,15 +387,18 @@ export const PAGE_SEO = {
       'SLP appointment Riyadh',
       'speech therapy inquiry',
       'professional consultation SLP',
+      'حجز موعد نطق ولغة الرياض',
     ],
     changefreq: 'monthly',
     priority: '0.85',
     crawler: {
-      heading: 'Contact Dr. Wael A. Al-Dakroury',
+      heading: 'تواصل مع الدكتور وائل الدكروري | Contact Dr. Wael A. Al-Dakroury',
       paragraphs: [
         'Parents, colleagues, and institutions are welcome. Reach out to book a session or ask a question.',
+        'يسعد الدكتور وائل الدكروري باستقبال استفسارات الأهالي والزملاء والمؤسسات لحجز جلسة أو طرح سؤال.',
         `Email: ${SITE_EMAIL}. Phone: ${SITE_PHONE}.`,
         'Psych Care Complex — Communication Disorders Department, Riyadh, Saudi Arabia.',
+        'مجمع العناية النفسية — قسم اضطرابات التواصل، الرياض، المملكة العربية السعودية.',
       ],
     },
   },
@@ -473,7 +518,7 @@ export function buildJsonLd(pathname, contact = {}) {
     familyName: 'Al-Dakroury',
     honorificPrefix: 'Dr.',
     jobTitle: SITE_JOB_TITLE,
-    description: PERSON_BIO,
+    description: `${PERSON_BIO} ${PERSON_BIO_AR}`,
     url: `${SITE_URL}/`,
     image: seo.image,
     email,
@@ -482,6 +527,15 @@ export function buildJsonLd(pathname, contact = {}) {
     nationality: {
       '@type': 'Country',
       name: 'Saudi Arabia',
+    },
+    homeLocation: {
+      '@type': 'Place',
+      name: 'Riyadh, Saudi Arabia',
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: 'Riyadh',
+        addressCountry: 'SA',
+      },
     },
     alumniOf: EDUCATION.map((entry) => ({
       '@type': 'EducationalOrganization',
@@ -513,6 +567,7 @@ export function buildJsonLd(pathname, contact = {}) {
       telephone: phoneTel,
       email,
       availableLanguage: SITE_LANGUAGES,
+      areaServed: ['SA', 'AE', 'QA', 'BH', 'OM', 'KW', 'EG', 'JO', 'US', 'CA'],
       url: `${SITE_URL}/contact`,
     },
   }
@@ -522,6 +577,7 @@ export function buildJsonLd(pathname, contact = {}) {
     '@id': `${SITE_URL}/#website`,
     url: `${SITE_URL}/`,
     name: SITE_NAME,
+    alternateName: ['دكتور وائل الدكروري', 'الدكتور وائل الدكروري', 'Dr Wael Al Dakroury'],
     description: PAGE_SEO['/'].description,
     inLanguage: ['en', 'ar', 'es'],
     publisher: { '@id': `${SITE_URL}/#person` },
@@ -531,6 +587,7 @@ export function buildJsonLd(pathname, contact = {}) {
     '@type': 'MedicalBusiness',
     '@id': `${SITE_URL}/#practice`,
     name: `${SITE_NAME} — Bilingual Speech-Language Pathology Services`,
+    alternateName: 'خدمات علاج النطق واللغة — الدكتور وائل الدكروري',
     description: CASES_INTRO,
     url: `${SITE_URL}/services`,
     image: seo.image,
@@ -538,6 +595,11 @@ export function buildJsonLd(pathname, contact = {}) {
     email,
     availableLanguage: SITE_LANGUAGES,
     areaServed,
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Riyadh',
+      addressCountry: 'SA',
+    },
     founder: { '@id': `${SITE_URL}/#person` },
     contactPoint: {
       '@type': 'ContactPoint',
@@ -545,6 +607,7 @@ export function buildJsonLd(pathname, contact = {}) {
       telephone: phoneTel,
       email,
       availableLanguage: SITE_LANGUAGES,
+      areaServed: ['SA', 'AE', 'QA', 'BH', 'OM', 'KW', 'EG', 'JO', 'US', 'CA'],
       url: `${SITE_URL}/contact`,
     },
   }
@@ -555,7 +618,7 @@ export function buildJsonLd(pathname, contact = {}) {
     url: seo.canonical,
     name: seo.title,
     description: seo.description,
-    inLanguage: 'en',
+    inLanguage: ['en', 'ar'],
     isPartOf: { '@id': `${SITE_URL}/#website` },
     about: { '@id': `${SITE_URL}/#person` },
     primaryImageOfPage: { '@type': 'ImageObject', url: seo.image },
@@ -634,7 +697,11 @@ export function renderCrawlerNoscript(pathname) {
   const seo = getPageSeo(path)
   const lists = page.crawler.lists?.map(renderList).join('\n') ?? ''
   const paragraphs = page.crawler.paragraphs
-    .map((paragraph) => `        <p>${escapeHtml(paragraph)}</p>`)
+    .map((paragraph) => {
+      const isArabic = /[\u0600-\u06FF]/.test(paragraph)
+      const attrs = isArabic ? ' lang="ar" dir="rtl"' : ''
+      return `        <p${attrs}>${escapeHtml(paragraph)}</p>`
+    })
     .join('\n')
   const nav = NAV_LINKS.map((link) => `          <a href="${link.href}">${escapeHtml(link.label)}</a>`).join(' |\n')
 
@@ -642,6 +709,10 @@ export function renderCrawlerNoscript(pathname) {
         <h1>${escapeHtml(page.crawler.heading)}</h1>
 ${paragraphs}
 ${lists}
+        <p lang="ar" dir="rtl">
+          الموقع الرسمي للدكتور وائل الدكروري في السعودية:
+          <a href="${SITE_URL}/">${SITE_URL}/</a>.
+        </p>
         <p>
           Official website: <a href="${SITE_URL}/">${SITE_URL}/</a>.
           This page: <a href="${escapeHtml(seo.canonical)}">${escapeHtml(seo.canonical)}</a>.

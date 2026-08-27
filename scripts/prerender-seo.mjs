@@ -46,11 +46,20 @@ function replaceLinkCanonical(html, href) {
 }
 
 function replaceHreflang(html, href) {
-  return html
+  let next = html
     .replace(/hreflang="en" href="[^"]*"/g, `hreflang="en" href="${escapeHtml(href)}"`)
     .replace(/hreflang="ar" href="[^"]*"/g, `hreflang="ar" href="${escapeHtml(href)}"`)
+    .replace(/hreflang="ar-SA" href="[^"]*"/g, `hreflang="ar-SA" href="${escapeHtml(href)}"`)
     .replace(/hreflang="es" href="[^"]*"/g, `hreflang="es" href="${escapeHtml(href)}"`)
     .replace(/hreflang="x-default" href="[^"]*"/g, `hreflang="x-default" href="${escapeHtml(href)}"`)
+
+  if (!/hreflang="ar-SA"/i.test(next)) {
+    next = next.replace(
+      /hreflang="ar" href="[^"]*"\s*\/?>/,
+      (match) => `${match}\n    <link rel="alternate" hreflang="ar-SA" href="${escapeHtml(href)}" />`,
+    )
+  }
+  return next
 }
 
 function replaceTitle(html, title) {
@@ -102,6 +111,7 @@ function writeSitemap() {
     const hreflang = `
     <xhtml:link rel="alternate" hreflang="en" href="${loc}" />
     <xhtml:link rel="alternate" hreflang="ar" href="${loc}" />
+    <xhtml:link rel="alternate" hreflang="ar-SA" href="${loc}" />
     <xhtml:link rel="alternate" hreflang="es" href="${loc}" />
     <xhtml:link rel="alternate" hreflang="x-default" href="${loc}" />`
 

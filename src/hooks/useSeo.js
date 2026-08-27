@@ -107,6 +107,7 @@ function applySeo(pathname, contact = {}) {
   if (!seo.isNotFound) {
     setLink('alternate', seo.canonical, { hreflang: 'en' })
     setLink('alternate', seo.canonical, { hreflang: 'ar' })
+    setLink('alternate', seo.canonical, { hreflang: 'ar-SA' })
     setLink('alternate', seo.canonical, { hreflang: 'es' })
     setLink('alternate', seo.canonical, { hreflang: 'x-default' })
     setJsonLd(buildJsonLd(pathname, contact))
