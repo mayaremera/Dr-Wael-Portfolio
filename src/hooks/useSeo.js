@@ -35,6 +35,34 @@ function setMetaProperty(property, content) {
   element.content = content
 }
 
+function clearMetaProperty(property) {
+  document.head.querySelectorAll(`meta[property="${property}"]`).forEach((element) => element.remove())
+}
+
+function setAlternateLocales(locales) {
+  clearMetaProperty('og:locale:alternate')
+  locales.forEach((locale) => {
+    const meta = document.createElement('meta')
+    meta.setAttribute('property', 'og:locale:alternate')
+    meta.setAttribute(SEO_MANAGED_ATTR, 'true')
+    meta.content = locale
+    document.head.appendChild(meta)
+  })
+}
+
+function setHreflangAlternates(canonical) {
+  const allowed = new Set(['en', 'ar', 'ar-SA', 'x-default'])
+  document.head.querySelectorAll('link[rel="alternate"][hreflang]').forEach((link) => {
+    const lang = link.getAttribute('hreflang')
+    if (!allowed.has(lang)) link.remove()
+  })
+
+  setLink('alternate', canonical, { hreflang: 'en' })
+  setLink('alternate', canonical, { hreflang: 'ar' })
+  setLink('alternate', canonical, { hreflang: 'ar-SA' })
+  setLink('alternate', canonical, { hreflang: 'x-default' })
+}
+
 function setLink(rel, href, extra = {}) {
   if (!href) return
 
@@ -93,9 +121,7 @@ function applySeo(pathname, contact = {}) {
   setMetaProperty('og:image', seo.image)
   setMetaProperty('og:image:alt', 'Dr. Wael A. Al-Dakroury — Speech-Language Pathologist & ASHA Fellow')
   setMetaProperty('og:locale', seo.locale)
-  seo.alternateLocales.forEach((locale) => {
-    setMetaProperty('og:locale:alternate', locale)
-  })
+  setAlternateLocales(seo.alternateLocales)
 
   setMetaName('twitter:card', 'summary_large_image')
   setMetaName('twitter:title', seo.title)
@@ -105,11 +131,7 @@ function applySeo(pathname, contact = {}) {
   setLink('canonical', seo.canonical)
 
   if (!seo.isNotFound) {
-    setLink('alternate', seo.canonical, { hreflang: 'en' })
-    setLink('alternate', seo.canonical, { hreflang: 'ar' })
-    setLink('alternate', seo.canonical, { hreflang: 'ar-SA' })
-    setLink('alternate', seo.canonical, { hreflang: 'es' })
-    setLink('alternate', seo.canonical, { hreflang: 'x-default' })
+    setHreflangAlternates(seo.canonical)
     setJsonLd(buildJsonLd(pathname, contact))
   }
 }

@@ -50,108 +50,6 @@ export const NAME_VARIANTS = [
   'وائل الدكروري السعودية',
 ]
 
-const DISORDER_KEYWORDS = [
-  'autism spectrum disorder speech therapy',
-  'ASD communication disorders',
-  'ADHD speech and language',
-  'developmental language disorder',
-  'DLD bilingual children',
-  'speech sound disorders',
-  'childhood stuttering',
-  'fluency disorders',
-  'social pragmatic communication disorder',
-  'intellectual disability communication',
-  'global developmental delay language',
-  'specific learning disorder language',
-  'childhood apraxia of speech',
-  'AAC augmentative communication',
-  'bilingual speech therapy',
-  'multilingual language disorders',
-]
-
-const ENGLISH_KEYWORDS = [
-  'speech language pathologist',
-  'speech therapist',
-  'speech therapy',
-  'communication disorders',
-  'ASHA Fellow',
-  'CCC-SLP',
-  'pediatric SLP',
-  'speech pathology professor',
-  'speech therapy consultation',
-  'speech therapy Riyadh',
-  'speech therapy USA',
-  'speech therapy Canada',
-  'speech therapy Saudi Arabia',
-  'speech therapy UAE',
-  'speech therapy Qatar',
-  'speech therapy Egypt',
-  ...DISORDER_KEYWORDS,
-  ...NAME_VARIANTS,
-]
-
-const ARABIC_KEYWORDS = [
-  'دكتور وائل الدكروري',
-  'الدكتور وائل الدكروري',
-  'د. وائل الدكروري',
-  'وائل الدكروري',
-  'دكتور وائل الدكروري السعودية',
-  'دكتور وائل الدكروري الرياض',
-  'وائل الدكروري السعودية',
-  'وائل الدكروري الرياض',
-  'أخصائي نطق ولغة السعودية',
-  'أخصائي نطق ولغة الرياض',
-  'علاج النطق واللغة',
-  'علاج النطق الرياض',
-  'علاج النطق السعودية',
-  'اضطرابات النطق',
-  'اضطرابات اللغة',
-  'اخصائي نطق ولغة',
-  'أخصائي نطق ولغة',
-  'معالج نطق',
-  'علاج تأخر النطق',
-  'اضطراب طيف التوحد',
-  'فرط الحركة وتشتت الانتباه',
-  'اضطراب النطق الاجتماعي',
-  'تأخر النمو الشامل',
-  'علاج التأتأة',
-  'اضطرابات الصوت',
-  'تعدد اللغات والنطق',
-  'استشارة نطق ولغة',
-  'دكتور نطق ولغة',
-  'بروفيسور نطق ولغة',
-  'زميل جمعية ASHA',
-  'جامعة الفيصل',
-  'مجمع العناية النفسية',
-  'الرياض',
-  'السعودية',
-]
-
-const SPANISH_KEYWORDS = [
-  'patología del habla y lenguaje',
-  'terapia del habla',
-  'terapia de lenguaje',
-  'logopeda',
-  'logopedia infantil',
-  'trastornos del lenguaje',
-  'trastornos de la comunicación',
-  'terapia del habla autismo',
-  'trastorno del espectro autista comunicación',
-  'TDL trastorno del desarrollo del lenguaje',
-  'disartria infantil',
-  'terapia de fluidez tartamudez',
-  'trastorno fonológico',
-  'terapia bilingüe',
-  'patólogo del habla',
-  'especialista en comunicación',
-  'Dr Wael Al Dakroury',
-  'terapia del habla Arabia Saudita',
-  'terapia del habla EAU',
-  'terapia del habla Egipto',
-]
-
-export const GLOBAL_KEYWORDS = [...ENGLISH_KEYWORDS, ...ARABIC_KEYWORDS, ...SPANISH_KEYWORDS]
-
 const CLINICAL_AREAS = [
   'Developmental Language Disorder',
   'Speech Sound Disorders',
@@ -252,11 +150,14 @@ export const PAGE_SEO = {
     title: HOME_TITLE,
     description: HOME_DESCRIPTION,
     keywords: [
-      ...GLOBAL_KEYWORDS,
-      'best speech therapist',
-      'international speech pathologist',
-      'ASHA International Ambassador',
-      'دكتور وائل الدكروري الموقع الرسمي',
+      'دكتور وائل الدكروري',
+      'Dr Wael Al Dakroury',
+      'speech language pathologist',
+      'ASHA Fellow',
+      'علاج النطق واللغة',
+      'أخصائي نطق ولغة الرياض',
+      'bilingual SLP',
+      'Riyadh speech therapy',
     ],
     changefreq: 'weekly',
     priority: '1.0',
@@ -276,16 +177,14 @@ export const PAGE_SEO = {
     description:
       'السيرة الذاتية للدكتور وائل الدكروري — زميل ASHA، أستاذ مشارك في جامعة الفيصل، ومدير قسم اضطرابات التواصل في مجمع العناية النفسية بالرياض، السعودية. Biography, credentials, education, and 30+ years of clinical and academic experience.',
     keywords: [
-      ...GLOBAL_KEYWORDS,
+      'دكتور وائل الدكروري',
       'ASHA Fellow biography',
-      'speech pathology professor',
-      'Queen Margaret University PhD',
-      'San Jose State University SLP',
       'Alfaisal University professor',
       'Psych Care Complex Riyadh',
-      'IALP child language committee',
-      'EACSL honorary president',
       'سيرة الدكتور وائل الدكروري',
+      'Queen Margaret University PhD',
+      'CCC-SLP',
+      'speech pathology professor',
     ],
     changefreq: 'monthly',
     priority: '0.9',
@@ -304,16 +203,14 @@ export const PAGE_SEO = {
     description:
       'خدمات علاج النطق واللغة ثنائية اللغة مع الدكتور وائل الدكروري في الرياض والسعودية: تقييم، علاج، إرشاد أسري، وتدريب مهني. Bilingual speech-language pathology services: screening, assessment, therapy, family counseling, family training, and professional workshops for autism, ADHD, DLD, speech sound disorders, stuttering, and pragmatic communication.',
     keywords: [
-      ...GLOBAL_KEYWORDS,
-      'speech therapy services',
-      'language assessment children',
-      'autism speech therapy services',
-      'parent coaching speech therapy',
-      'family training communication',
-      'professional SLP workshops',
-      'school age language therapy',
-      'clinical supervision SLP',
       'خدمات علاج النطق الرياض',
+      'speech therapy services',
+      'autism speech therapy',
+      'ADHD language therapy',
+      'family counseling SLP',
+      'bilingual speech therapy',
+      'developmental language disorder',
+      'علاج النطق الرياض',
     ],
     changefreq: 'monthly',
     priority: '0.95',
@@ -335,12 +232,12 @@ export const PAGE_SEO = {
     description:
       'معرض صور وفيديو للدكتور وائل الدكروري من محاضرات ومؤتمرات ASHA وفعاليات مهنية. Video library and photo gallery from lectures, ASHA conferences, award ceremonies, and clinical settings.',
     keywords: [
-      ...GLOBAL_KEYWORDS,
-      'speech pathology lectures',
+      'Dr Wael Al Dakroury gallery',
       'ASHA conference videos',
-      'autism research award',
+      'speech pathology lectures',
+      'معرض الدكتور وائل الدكروري',
       'SLP professional videos',
-      'communication sciences gallery',
+      'clinical highlights',
     ],
     changefreq: 'weekly',
     priority: '0.8',
@@ -357,13 +254,12 @@ export const PAGE_SEO = {
     description:
       'مشاركات الدكتور وائل الدكروري العالمية — مؤتمرات ومحاضرات وقيادة مهنية في السعودية والخليج والولايات المتحدة وكندا ومصر. Global engagements: conferences, university lectures, ASHA panels, leadership meetings, and professional training.',
     keywords: [
-      ...GLOBAL_KEYWORDS,
-      'ASHA Connect',
+      'ASHA International Ambassador',
       'international SLP speaker',
       'speech pathology conference',
+      'في الميدان وائل الدكروري',
       'university guest lecture SLP',
       'global communication sciences',
-      'professional development SLP',
     ],
     changefreq: 'weekly',
     priority: '0.8',
@@ -379,23 +275,22 @@ export const PAGE_SEO = {
   '/contact': {
     title: 'تواصل مع الدكتور وائل الدكروري | Contact Dr. Wael Al-Dakroury',
     description:
-      'تواصل مع الدكتور وائل الدكروري لحجز استشارة نطق ولغة أو الاستفسار عن التدريب والإشراف السريري — الرياض، السعودية. Contact Dr. Wael A. Al-Dakroury by phone, email, or the contact form for consultation, speaking, clinical supervision, or family appointments.',
+      'تواصل مع الدكتور وائل الدكروري عبر الهاتف أو البريد أو نموذج طلب الموعد — الرياض، السعودية. Contact Dr. Wael A. Al-Dakroury by phone, email, or the on-page appointment request form for consultation, speaking, clinical supervision, or family appointments.',
     keywords: [
-      ...GLOBAL_KEYWORDS,
-      'book speech therapy consultation',
+      'تواصل الدكتور وائل الدكروري',
       'contact speech language pathologist',
+      'حجز موعد نطق ولغة الرياض',
       'SLP appointment Riyadh',
       'speech therapy inquiry',
-      'professional consultation SLP',
-      'حجز موعد نطق ولغة الرياض',
+      'book speech therapy consultation',
     ],
     changefreq: 'monthly',
     priority: '0.85',
     crawler: {
       heading: 'تواصل مع الدكتور وائل الدكروري | Contact Dr. Wael A. Al-Dakroury',
       paragraphs: [
-        'Parents, colleagues, and institutions are welcome. Reach out to book a session or ask a question.',
-        'يسعد الدكتور وائل الدكروري باستقبال استفسارات الأهالي والزملاء والمؤسسات لحجز جلسة أو طرح سؤال.',
+        'Parents, colleagues, and institutions are welcome. Use the on-page appointment request form, or reach out by phone or email to book a session or ask a question.',
+        'يسعد الدكتور وائل الدكروري باستقبال استفسارات الأهالي والزملاء والمؤسسات عبر نموذج طلب الموعد أو الهاتف أو البريد الإلكتروني.',
         `Email: ${SITE_EMAIL}. Phone: ${SITE_PHONE}.`,
         'Psych Care Complex — Communication Disorders Department, Riyadh, Saudi Arabia.',
         'مجمع العناية النفسية — قسم اضطرابات التواصل، الرياض، المملكة العربية السعودية.',
@@ -438,7 +333,7 @@ export function getPageSeo(pathname) {
       keywords: '',
       image: absoluteUrl(SITE_IMAGE_PATH),
       locale: 'en_US',
-      alternateLocales: ['ar_SA', 'es_ES', 'en_CA'],
+      alternateLocales: ['ar_SA'],
       robots: 'noindex, nofollow',
     }
   }
@@ -452,7 +347,7 @@ export function getPageSeo(pathname) {
     keywords: joinKeywords(config.keywords),
     image: absoluteUrl(SITE_IMAGE_PATH),
     locale: 'en_US',
-    alternateLocales: ['ar_SA', 'es_ES', 'en_CA'],
+    alternateLocales: ['ar_SA'],
     robots: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1',
     changefreq: config.changefreq,
     priority: config.priority,
@@ -579,7 +474,7 @@ export function buildJsonLd(pathname, contact = {}) {
     name: SITE_NAME,
     alternateName: ['دكتور وائل الدكروري', 'الدكتور وائل الدكروري', 'Dr Wael Al Dakroury'],
     description: PAGE_SEO['/'].description,
-    inLanguage: ['en', 'ar', 'es'],
+    inLanguage: ['en', 'ar'],
     publisher: { '@id': `${SITE_URL}/#person` },
   }
 
@@ -704,21 +599,23 @@ export function renderCrawlerNoscript(pathname) {
     })
     .join('\n')
   const nav = NAV_LINKS.map((link) => `          <a href="${link.href}">${escapeHtml(link.label)}</a>`).join(' |\n')
+  const pageUrlLine =
+    path === '/'
+      ? `        <p>
+          Contact: <a href="mailto:${SITE_EMAIL}">${SITE_EMAIL}</a>,
+          <a href="tel:${toTelHref(SITE_PHONE)}">${SITE_PHONE}</a>.
+        </p>`
+      : `        <p>
+          Page: <a href="${escapeHtml(seo.canonical)}">${escapeHtml(seo.canonical)}</a>.
+          Contact: <a href="mailto:${SITE_EMAIL}">${SITE_EMAIL}</a>,
+          <a href="tel:${toTelHref(SITE_PHONE)}">${SITE_PHONE}</a>.
+        </p>`
 
   return `      <header>
         <h1>${escapeHtml(page.crawler.heading)}</h1>
 ${paragraphs}
 ${lists}
-        <p lang="ar" dir="rtl">
-          الموقع الرسمي للدكتور وائل الدكروري في السعودية:
-          <a href="${SITE_URL}/">${SITE_URL}/</a>.
-        </p>
-        <p>
-          Official website: <a href="${SITE_URL}/">${SITE_URL}/</a>.
-          This page: <a href="${escapeHtml(seo.canonical)}">${escapeHtml(seo.canonical)}</a>.
-          Contact: <a href="mailto:${SITE_EMAIL}">${SITE_EMAIL}</a>,
-          <a href="tel:${toTelHref(SITE_PHONE)}">${SITE_PHONE}</a>.
-        </p>
+${pageUrlLine}
         <nav aria-label="Site navigation">
 ${nav}
         </nav>

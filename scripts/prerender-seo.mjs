@@ -50,8 +50,12 @@ function replaceHreflang(html, href) {
     .replace(/hreflang="en" href="[^"]*"/g, `hreflang="en" href="${escapeHtml(href)}"`)
     .replace(/hreflang="ar" href="[^"]*"/g, `hreflang="ar" href="${escapeHtml(href)}"`)
     .replace(/hreflang="ar-SA" href="[^"]*"/g, `hreflang="ar-SA" href="${escapeHtml(href)}"`)
-    .replace(/hreflang="es" href="[^"]*"/g, `hreflang="es" href="${escapeHtml(href)}"`)
     .replace(/hreflang="x-default" href="[^"]*"/g, `hreflang="x-default" href="${escapeHtml(href)}"`)
+
+  // Drop leftover Spanish alternates from older builds/templates.
+  next = next.replace(/\s*<link\s+rel="alternate"\s+hreflang="es"\s+href="[^"]*"\s*\/?>/gi, '')
+  next = next.replace(/\s*<meta\s+property="og:locale:alternate"\s+content="es_ES"\s*\/?>/gi, '')
+  next = next.replace(/\s*<meta\s+property="og:locale:alternate"\s+content="en_CA"\s*\/?>/gi, '')
 
   if (!/hreflang="ar-SA"/i.test(next)) {
     next = next.replace(
@@ -112,7 +116,6 @@ function writeSitemap() {
     <xhtml:link rel="alternate" hreflang="en" href="${loc}" />
     <xhtml:link rel="alternate" hreflang="ar" href="${loc}" />
     <xhtml:link rel="alternate" hreflang="ar-SA" href="${loc}" />
-    <xhtml:link rel="alternate" hreflang="es" href="${loc}" />
     <xhtml:link rel="alternate" hreflang="x-default" href="${loc}" />`
 
     return `  <url>
